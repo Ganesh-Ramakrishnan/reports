@@ -3,32 +3,1156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vormor Reports</title>
+<title>Vormor Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-    background:#F3F4F7;font-family:system-ui,sans-serif;color:#1A1D23;}
-  .wrap{max-width:480px;width:100%;padding:16px;}
-  h1{font-size:20px;margin:0 0 6px;}
-  p{color:#6B7280;font-size:13.5px;margin:0 0 20px;}
-  a.card{display:block;background:#fff;border:1px solid #E4E6EB;border-radius:10px;
-    padding:16px 18px;margin-bottom:12px;text-decoration:none;color:inherit;}
-  a.card:hover{border-color:#FF7A1A;}
-  a.card .t{font-weight:600;font-size:14.5px;}
-  a.card .s{color:#6B7280;font-size:12.5px;margin-top:3px;}
+  :root{
+    --sidebar-bg:#1A1A1A;
+    --sidebar-row-hover:#464646;
+    --sidebar-text:#F7F7F7;
+    --sidebar-text-dim:#6E6E6E;
+    --sidebar-text-active:#FFFFFF;
+    --sidebar-divider:rgba(255,255,255,0.14);
+    --sidebar-group-label:#F7F7F7;
+    --sidebar-home:#FF8234;
+    --orange:#FF761A;
+    --orange-dim:rgba(255,118,26,0.16);
+    --bg:#F3F4F7;
+    --card:#FFFFFF;
+    --border:#E4E6EB;
+    --text:#1A1D23;
+    --text-dim:#6B7280;
+    --text-faint:#9AA0AC;
+    --green:#17A673;
+    --green-bg:#E8F7F1;
+    --amber:#E8972B;
+    --amber-bg:#FDF2E2;
+    --red:#E0493C;
+    --red-bg:#FBE9E7;
+    --blue:#2F6FED;
+    --blue-bg:#EAF1FE;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(16,20,28,0.04), 0 1px 1px rgba(16,20,28,0.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;overflow:hidden;}
+  body{background:var(--bg);color:var(--text);font-family:'Public Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;}
+  h1,h2,h3,h4{font-family:'Lexend',system-ui,sans-serif;margin:0;text-wrap:balance;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:inherit;cursor:pointer;}
+  .app{display:flex;height:100vh;height:100dvh;overflow:hidden;}
+
+  /* Themed scrollbars: a quiet thin thumb instead of the default chrome, light variant for the white content pane, pale variant for the dark sidebar */
+  .content, .table-scroll, .slideover{scrollbar-width:thin;scrollbar-color:rgba(26,29,35,0.22) transparent;}
+  .content::-webkit-scrollbar, .table-scroll::-webkit-scrollbar, .slideover::-webkit-scrollbar{width:9px;height:9px;}
+  .content::-webkit-scrollbar-track, .table-scroll::-webkit-scrollbar-track, .slideover::-webkit-scrollbar-track{background:transparent;}
+  .content::-webkit-scrollbar-thumb, .table-scroll::-webkit-scrollbar-thumb, .slideover::-webkit-scrollbar-thumb{background:rgba(26,29,35,0.2);border-radius:8px;border:2px solid transparent;background-clip:padding-box;}
+  .content:hover::-webkit-scrollbar-thumb, .table-scroll:hover::-webkit-scrollbar-thumb, .slideover:hover::-webkit-scrollbar-thumb{background:rgba(26,29,35,0.38);background-clip:padding-box;}
+  .nav{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.22) transparent;}
+  .nav::-webkit-scrollbar{width:6px;}
+  .nav::-webkit-scrollbar-track{background:transparent;}
+  .nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.16);border-radius:8px;}
+  .nav:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);}
+
+  /* ---------- Sidebar (matches the Vormor side-nav reference exactly: bold icons, generous type, soft dark sheen) ---------- */
+  .sidebar-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:59;display:none;}
+  .sidebar-scrim.open{display:block;}
+  /* Collapsed by default (icon rail), expands on hover — matches the real app's hover-expand side-navbar */
+  .sidebar{
+    width:76px;flex:none;
+    background:
+      radial-gradient(120% 70% at 15% 0%, rgba(255,255,255,0.07), transparent 60%),
+      linear-gradient(160deg, #2b2b2b 0%, #1c1c1c 45%, #0d0d0d 100%);
+    display:flex;flex-direction:column;
+    height:100%;z-index:60;overflow:hidden;
+    transition:width .3s ease;
+  }
+  .sidebar.expanded{width:278px;}
+  .nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 0 10px;}
+  .nav-divider{height:1px;background:var(--sidebar-divider);margin:16px 16px;}
+  .nav-group-label{
+    color:var(--sidebar-group-label);font-size:21px;font-weight:700;white-space:nowrap;
+    padding:0 16px 14px 82px;font-family:'Lexend',sans-serif;
+    opacity:0;transition:opacity .15s ease;
+  }
+  .sidebar.expanded .nav-group-label{opacity:1;transition:opacity .2s ease .1s;}
+  .nav-item{
+    display:flex;align-items:center;gap:0;width:100%;border:none;background:transparent;
+    color:var(--sidebar-text);min-height:58px;padding:6px 16px;border-radius:4px;font-size:18px;font-weight:400;
+    text-align:left;margin-bottom:2px;white-space:nowrap;
+  }
+  .nav-item .icon-container{width:44px;flex:none;display:flex;align-items:center;justify-content:center;transition:width .3s ease;}
+  .sidebar.expanded .nav-item .icon-container{width:66px;justify-content:flex-start;}
+  .nav-item .navicon{width:25px;height:25px;flex:none;color:var(--sidebar-text);}
+  .nav-item .navicon.navicon-lg{width:30px;height:30px;}
+  .nav-item .nav-label{opacity:0;transition:opacity .15s ease;}
+  .sidebar.expanded .nav-item .nav-label{opacity:1;transition:opacity .2s ease .1s;}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-row-hover);}
+  .nav-item:hover{color:#fff;}
+  .nav-item:hover .navicon{color:#fff;}
+  .nav-item.active{color:var(--sidebar-text-active);}
+  .nav-item.active .navicon{color:var(--orange);}
+  .nav-item .badge-new{
+    margin-left:auto;background:var(--orange);color:#fff;font-size:9px;font-weight:700;
+    padding:1.5px 6px;border-radius:999px;letter-spacing:.03em;opacity:0;transition:opacity .15s ease;
+  }
+  .sidebar.expanded .nav-item .badge-new{opacity:1;transition:opacity .2s ease .1s;}
+  .nav-top-item{padding:20px 0 12px;}
+  .nav-top-item .nav-item{color:var(--sidebar-home);font-weight:600;}
+  .nav-top-item .navicon{width:32px;height:32px;color:var(--sidebar-home);}
+  .nav-top-item .nav-item:hover .navicon,
+  .nav-top-item .nav-item.active .navicon{color:var(--sidebar-home);}
+  .nav-top-divider{height:1px;background:var(--sidebar-divider);margin:6px 16px 0;}
+
+  .sidebar-foot{padding:14px 16px 30px;text-align:center;opacity:0;transition:opacity .15s ease;}
+  .sidebar.expanded .sidebar-foot{opacity:1;transition:opacity .2s ease .1s;}
+  .ver{color:var(--sidebar-text-dim);font-size:12.5px;line-height:1.8;white-space:nowrap;}
+
+  .sidebar-pin-row{display:flex;justify-content:center;padding:12px 10px 0;}
+  .sidebar.expanded .sidebar-pin-row{justify-content:flex-end;}
+  .pin-btn{
+    width:34px;height:34px;flex:none;border:none;background:transparent;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;color:var(--sidebar-text-dim);
+  }
+  .pin-btn svg{width:18px;height:18px;transition:transform .2s ease;}
+  .pin-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .pin-btn.pinned{color:var(--orange);}
+  .pin-btn.pinned svg{transform:rotate(45deg);}
+
+  .hamburger{display:none;border:none;background:transparent;width:36px;height:36px;border-radius:8px;
+    align-items:center;justify-content:center;color:var(--text);position:absolute;left:20px;top:50%;transform:translateY(-50%);}
+  .hamburger svg{width:22px;height:22px;}
+  @media (max-width:900px){
+    .hamburger{display:flex;}
+    .sidebar-pin-row{display:none;}
+    .sidebar{position:fixed;top:0;left:0;height:100vh;width:278px;max-width:85vw;transform:translateX(-100%);transition:transform .25s ease;}
+    .sidebar.open{transform:translateX(0);}
+    .sidebar.open .nav-group-label,.sidebar.open .nav-item .nav-label,
+    .sidebar.open .nav-item .icon-container,.sidebar.open .sidebar-foot{opacity:1;}
+    .sidebar.open .nav-item .icon-container{width:66px;justify-content:flex-start;}
+  }
+
+  /* ---------- Main: logo-bar + topbar stay put, .content is the one scrolling pane ---------- */
+  .main{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden;}
+
+  .logo-bar{
+    flex:none;
+    background:var(--card);border-bottom:1px solid var(--border);
+    padding:22px 32px;display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .logo-wordmark{font-family:'Lexend';font-weight:700;font-size:26px;letter-spacing:-.01em;}
+  .logo-wordmark .s1{color:var(--orange);}
+  .logo-wordmark .s2{color:#1A1D23;}
+  .logo-bar-icons{position:absolute;right:32px;top:50%;transform:translateY(-50%);display:flex;gap:14px;align-items:center;}
+  .logo-icon-btn{
+    width:40px;height:40px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;
+    background:transparent;color:var(--orange);position:relative;flex:none;
+  }
+  .logo-icon-btn.filled{background:var(--orange);color:#fff;}
+  .logo-icon-btn svg{width:21px;height:21px;}
+  .dot-badge{position:absolute;top:5px;right:5px;width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid #fff;}
+
+  .preview-as{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);
+    padding:4px;border-radius:8px;flex:none;}
+  .preview-as span.lbl{font-size:10.5px;color:var(--text-dim);font-weight:600;padding-left:7px;white-space:nowrap;}
+  .preview-as button{
+    border:none;background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;
+    padding:5px 9px;border-radius:6px;white-space:nowrap;
+  }
+  .preview-as button.active{background:var(--text);color:#fff;}
+
+  /* Page heading: lives in the scrolling content, not a second fixed bar */
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+  .page-head h2{font-size:21px;}
+  .topbar-sub{color:var(--text-dim);font-size:13px;margin-top:3px;}
+  .demo-tag{
+    flex:none;background:var(--bg);border:1px solid var(--border);color:var(--text-faint);
+    font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:4px 10px;border-radius:999px;white-space:nowrap;margin-top:2px;
+  }
+  .content{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 28px 60px;}
+  .content-inner{max-width:1180px;width:100%;margin:0 auto;}
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* ---------- Shared bits ---------- */
+  .crumb{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;margin-bottom:14px;}
+  .crumb button{background:none;border:none;color:var(--blue);font-weight:600;font-size:12.5px;padding:0;}
+  .placeholder{
+    background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);
+    padding:60px 20px;text-align:center;color:var(--text-faint);font-size:13px;
+  }
+  .grid{display:grid;gap:14px;}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g2{grid-template-columns:2fr 1fr;}
+  @media (max-width:900px){ .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:1fr;} .g2{grid-template-columns:1fr;} }
+  @media (max-width:600px){
+    .g4{grid-template-columns:1fr 1fr;}
+    .content{padding:16px 16px 48px;}
+    .logo-bar{padding:14px 20px 14px 64px;}
+    .logo-wordmark{font-size:20px;}
+    .preview-as{display:none;}
+    .page-head h2{font-size:18px;}
+    .filterbar .field{min-width:100%;}
+    .actions-right{width:100%;justify-content:flex-start;}
+    .slideover{width:100%;max-width:100%;}
+  }
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0;}
+  .grid > *{min-width:0;}
+  .card-head{flex-wrap:wrap;row-gap:4px;}
+  .card-head > *{min-width:0;}
+  .card-pad{padding:18px 20px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .card-head h3{font-size:14.5px;}
+  .card-head .hint{color:var(--text-faint);font-size:11.5px;}
+
+  .kpi{padding:16px 18px;}
+  .kpi .label{color:var(--text-dim);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  .kpi .value{font-family:'Lexend';font-size:25px;font-weight:600;margin-top:6px;}
+  .kpi .delta{font-size:11.5px;margin-top:5px;font-weight:600;}
+  .delta.up{color:var(--green);} .delta.down{color:var(--red);}
+
+  .btn{
+    border:1px solid var(--border);background:var(--card);color:var(--text);
+    padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn:hover{background:var(--bg);}
+  .btn-primary{background:var(--orange);border-color:var(--orange);color:#1B1E24;}
+  .btn-primary:hover{background:#ff8a35;}
+  .btn-ghost{border-color:transparent;background:transparent;color:var(--blue);padding:6px 4px;}
+
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{width:100%;min-width:620px;border-collapse:collapse;}
+  .alert-banner{
+    display:flex;align-items:flex-start;gap:12px;background:var(--amber-bg);border:1px solid rgba(232,151,43,0.35);
+    border-radius:var(--radius);padding:13px 16px;margin-bottom:14px;color:#6B4710;font-size:13px;
+  }
+  .alert-banner .ic{flex:none;font-size:16px;line-height:1;}
+  .alert-banner b{font-weight:700;}
+  .alert-banner .names{color:#92600E;}
+  th{text-align:left;color:var(--text-dim);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+     padding:8px 10px;border-bottom:1px solid var(--border);}
+  td{padding:11px 10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr.rowlink{cursor:pointer;}
+  tr.rowlink:hover{background:var(--bg);}
+  .avatar{
+    width:28px;height:28px;border-radius:50%;background:var(--blue-bg);color:var(--blue);
+    display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;margin-right:9px;flex:none;
+  }
+  .namecell{display:flex;align-items:center;}
+  .pill{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .pill-green{background:var(--green-bg);color:#0E7A54;}
+  .pill-amber{background:var(--amber-bg);color:#92600E;}
+  .pill-red{background:var(--red-bg);color:#A3291F;}
+  .sparkline{width:72px;height:22px;}
+  .dim{color:var(--text-dim);}
+
+  /* class cards */
+  .class-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px;display:flex;flex-direction:column;gap:12px;cursor:pointer;
+  }
+  .class-card:hover{border-color:var(--orange);}
+  .class-card .swatch{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-family:'Lexend';font-weight:700;color:#fff;font-size:14px;}
+  .class-card h4{font-size:15px;}
+  .class-card .meta{color:var(--text-dim);font-size:12px;}
+  .class-card .foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;}
+  .code-chip{background:var(--bg);border:1px dashed var(--border);border-radius:6px;padding:3px 8px;font-size:11.5px;font-weight:600;letter-spacing:.06em;}
+  .add-class-card{
+    border:1.5px dashed var(--border);border-radius:var(--radius);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:8px;color:var(--text-dim);font-weight:600;font-size:13px;min-height:150px;
+  }
+  .add-class-card:hover{border-color:var(--orange);color:var(--orange);}
+
+  /* modal */
+  .modal-scrim{position:fixed;inset:0;background:rgba(16,20,28,0.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .modal-scrim.open{display:flex;}
+  .modal{background:var(--card);border-radius:14px;width:420px;max-width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+  .modal h3{font-size:16px;margin-bottom:4px;}
+  .modal .mhint{color:var(--text-dim);font-size:12.5px;margin-bottom:16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:5px;}
+  .field input,.field select{
+    width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);
+  }
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+  .joincode-box{
+    background:var(--orange-dim);border:1px dashed var(--orange);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;
+  }
+  .joincode-box .code{font-family:'IBM Plex Mono';font-size:26px;font-weight:600;letter-spacing:.14em;color:#B85600;}
+  .joincode-box .lbl{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
+  .or-div{display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:11px;margin:14px 0;}
+  .or-div::before,.or-div::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  /* slide-over for student detail */
+  .slideover-scrim{position:fixed;inset:0;background:rgba(16,20,28,0.35);display:none;z-index:40;}
+  .slideover-scrim.open{display:block;}
+  .slideover{
+    position:fixed;top:0;right:0;height:100vh;width:460px;max-width:92vw;background:var(--bg);
+    box-shadow:-8px 0 30px rgba(0,0,0,0.15);transform:translateX(100%);transition:transform .22s ease;z-index:41;
+    overflow-y:auto;
+  }
+  .slideover.open{transform:translateX(0);}
+  .slideover-head{background:var(--card);border-bottom:1px solid var(--border);padding:18px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;}
+  .slideover-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+  .close-x{border:none;background:var(--bg);width:30px;height:30px;border-radius:8px;font-size:15px;color:var(--text-dim);}
+
+  .filterbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;}
+  .filterbar .field{margin:0;min-width:150px;flex:1;}
+  .filterbar .field.small{min-width:110px;flex:none;}
+  .actions-right{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+
+  .legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;}
+  .legend-row span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+
+  .tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .student-tile{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--border);cursor:pointer;
+  }
+  .student-tile:hover{border-color:var(--text-faint);}
+  .student-tile .avatar{flex:none;}
+  .tile-info{min-width:0;}
+  .tile-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tile-minutes{font-family:'Lexend';font-size:15px;font-weight:700;}
+  .student-tile.status-green{border-left-color:var(--green);}
+  .student-tile.status-amber{border-left-color:var(--amber);}
+  .student-tile.status-red{border-left-color:var(--red);}
+  .status-green .tile-minutes{color:#0E7A54;}
+  .status-amber .tile-minutes{color:#92600E;}
+  .status-red .tile-minutes{color:#A3291F;}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Vormor Reports</h1>
-    <p>Design-concept frontend mockups for the Scanner Version analytics &amp; reporting work.</p>
-    <a class="card" href="vormor-classroom-ui.html">
-      <div class="t">Vormor Classroom UI</div>
-      <div class="s">Teacher/student classroom shell: My Activity, My Classes, Goals, Reports, Analytics</div>
-    </a>
-    <a class="card" href="vormor-analytics-dashboard.html">
-      <div class="t">Vormor Analytics Dashboard</div>
-      <div class="s">Earlier device analytics dashboard draft</div>
-    </a>
+
+<div class="app">
+  <div class="sidebar-scrim" id="sidebarScrim" onclick="closeSidebar()"></div>
+  <!-- ===================== SIDEBAR (structure mirrors the real side-navbar: Home row, then Scanner / Document / Classroom / Account groups separated by divider lines) ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-pin-row">
+      <button class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3Z"/><path d="M12 15v5"/></svg>
+      </button>
+    </div>
+    <div class="nav-top-item">
+      <button class="nav-item active" data-page="home" onclick="go('home')" title="Home">
+        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.8 1.6 11.2a1 1 0 0 0 .63 1.78H4V21a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-5.5h3v5.5a1 1 0 0 0 1 1H19a1 1 0 0 0 1-1v-8h1.77a1 1 0 0 0 .63-1.78Z"/></svg></span>
+        <span class="nav-label">Home</span>
+      </button>
+    </div>
+    <div class="nav-top-divider"></div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Scanner</div>
+      <button class="nav-item" onclick="go('placeholder')" title="Connect or disconnect your Scanmarker">
+        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6.5V3M13 11.5V8"/><path d="M6 8h9v3a4.5 4.5 0 0 1-4.5 4.5A4.5 4.5 0 0 1 6 11Z"/><path d="M10.5 15.5V19"/><path d="M4 20 20 4"/></svg></span>
+        <span class="nav-label">Connect/Disconnect</span>
+      </button>
+
+      <div class="nav-divider"></div>
+      <div class="nav-group-label">Document</div>
+      <button class="nav-item" onclick="go('placeholder')" title="Print">
+        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5"/><rect x="5" y="9" width="14" height="8" rx="1.5"/><rect x="8" y="14" width="8" height="6"/></svg></span>
+        <span class="nav-label">Print</span>
+      </button>
+      <button class="nav-item" onclick="go('placeholder')" title="Share">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 11l8-4M8 13l8 4"/></svg></span>
+        <span class="nav-label">Share</span>
+      </button>
+      <button class="nav-item" onclick="go('placeholder')" title="Export">
+        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg></span>
+        <span class="nav-label">Export</span>
+      </button>
+
+      <div class="nav-divider"></div>
+      <div class="nav-group-label">Classroom</div>
+      <button class="nav-item" data-page="activity" data-roles="student,teacher" onclick="go('activity')" title="My Activity">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="3.2" height="8"/><rect x="10.4" y="6" width="3.2" height="14"/><rect x="16.8" y="9" width="3.2" height="11"/></svg></span>
+        <span class="nav-label">My Activity</span>
+      </button>
+      <button class="nav-item" data-page="classes" data-roles="teacher" onclick="go('classes')" title="My Classes">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg></span>
+        <span class="nav-label">My Classes</span>
+      </button>
+      <button class="nav-item" data-page="goals" data-roles="teacher" onclick="go('goals')" title="Goals">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
+        <span class="nav-label">Goals</span>
+      </button>
+      <button class="nav-item" data-page="reports" data-roles="teacher" onclick="go('reports')" title="Reports">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
+        <span class="nav-label">Reports</span>
+      </button>
+      <button class="nav-item" data-page="analytics" data-roles="teacher" onclick="go('analytics')" title="Analytics">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg></span>
+        <span class="nav-label">Analytics</span>
+      </button>
+
+      <div class="nav-divider"></div>
+      <div class="nav-group-label">Account</div>
+      <button class="nav-item" onclick="go('placeholder')" title="My Account">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg></span>
+        <span class="nav-label">My Account</span>
+      </button>
+      <button class="nav-item" onclick="go('placeholder')" title="Support">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9a2.7 2.7 0 1 1 3.9 2.4c-1 .5-1.5 1-1.5 2.1"/><path d="M12 17h.01"/></svg></span>
+        <span class="nav-label">Support</span>
+      </button>
+      <button class="nav-item" onclick="go('placeholder')" title="Terms &amp; Conditions">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 16h6M9 10h3"/></svg></span>
+        <span class="nav-label">Terms &amp; Conditions</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot"><div class="ver">Client Version 1.0.0.3.0, Server Version 1.2.0<br>All rights reserved</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+    <div class="logo-bar">
+      <button class="hamburger" onclick="openSidebar()" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="logo-wordmark"><span class="s1">s</span><span class="s2">canmarker</span></div>
+      <div class="logo-bar-icons">
+        <div class="preview-as">
+          <span class="lbl">Preview as</span>
+          <button id="btnRoleStudent" class="active" onclick="setRole('student')">Student</button>
+          <button id="btnRoleTeacher" onclick="setRole('teacher')">Teacher</button>
+        </div>
+        <button class="logo-icon-btn" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          <span class="dot-badge"></span>
+        </button>
+        <button class="logo-icon-btn filled" title="Support chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 6.5 0 0 1 8-6.5 8 6.5 0 0 1 8 6.5c0 3.6-3.6 6.5-8 6.5-1 0-2-.15-2.9-.4L5 20l1-3.3C4.75 15.4 4 13.8 4 12Z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+     <div class="content-inner">
+
+      <div class="page-head">
+        <div>
+          <h2 id="pageTitle">Home</h2>
+          <div class="topbar-sub" id="pageSub">Welcome back</div>
+        </div>
+        <span class="demo-tag">Example data</span>
+      </div>
+
+      <!-- ---------- HOME / PLACEHOLDER (existing screens, unchanged) ---------- -->
+      <section class="page active" data-page="home">
+        <div class="placeholder">This is the existing Home screen — unchanged by this feature.</div>
+      </section>
+      <section class="page" data-page="placeholder">
+        <div class="placeholder">Existing screen — not part of this feature, shown only to keep the real navigation intact.</div>
+      </section>
+
+      <!-- ---------- MY ACTIVITY (Student — personal only) ---------- -->
+      <section class="page" data-page="activity">
+        <div class="grid g4" style="margin-bottom:14px;">
+          <div class="card kpi"><div class="label">Scans this week</div><div class="value">58</div><div class="delta up">▲ 12% vs last week</div></div>
+          <div class="card kpi"><div class="label">Words read</div><div class="value">9,340</div><div class="delta up">▲ 6%</div></div>
+          <div class="card kpi"><div class="label">Reading time</div><div class="value">3h 42m</div><div class="delta down">▼ 8%</div></div>
+          <div class="card kpi"><div class="label">Active days</div><div class="value">5 / 7</div><div class="delta up">On track</div></div>
+        </div>
+        <div class="grid g2">
+          <div class="card card-pad">
+            <div class="card-head"><h3>My usage this week</h3><span class="hint">Scans &amp; reading time</span></div>
+            <canvas id="chartMe" height="150"></canvas>
+          </div>
+          <div class="card card-pad">
+            <div class="card-head"><h3>Features I use most</h3></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Reading</span><span class="dim">42%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:42%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Translation</span><span class="dim">27%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:27%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Dictionary</span><span class="dim">18%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:18%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Voice Translation</span><span class="dim">9%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:9%;height:100%;background:var(--amber);border-radius:4px;"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Phonics</span><span class="dim">4%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:4%;height:100%;background:var(--red);border-radius:4px;"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- MY CLASSES (Teacher) ---------- -->
+      <section class="page" data-page="classes">
+        <div class="grid g3">
+          <div class="class-card" onclick="openClass('5B')">
+            <div class="swatch" style="background:var(--blue);">5B</div>
+            <div><h4>Grade 5 — Section B</h4><div class="meta">22 students · 19 active today</div></div>
+            <div class="foot"><span class="code-chip">JOIN: K3F9XQ</span><span class="pill pill-green">Active</span></div>
+          </div>
+          <div class="class-card" onclick="openClass('ESL')">
+            <div class="swatch" style="background:var(--green);">E1</div>
+            <div><h4>ESL — Morning Group</h4><div class="meta">14 students · 10 active today</div></div>
+            <div class="foot"><span class="code-chip">JOIN: PT72LM</span><span class="pill pill-green">Active</span></div>
+          </div>
+          <div class="class-card" onclick="openClass('READ')">
+            <div class="swatch" style="background:var(--amber);">R3</div>
+            <div><h4>Reading Club — Grade 3</h4><div class="meta">16 students · 6 active today</div></div>
+            <div class="foot"><span class="code-chip">JOIN: 9BCW4R</span><span class="pill pill-amber">Low activity</span></div>
+          </div>
+          <div class="add-class-card" onclick="openModal('modalCreateClass')">
+            <div style="font-size:26px;line-height:1;">＋</div>
+            Create a class
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- CLASS DETAIL (roster) ---------- -->
+      <section class="page" data-page="classdetail">
+        <div class="crumb"><button onclick="go('classes')">My Classes</button> / <span id="classDetailName">Grade 5 — Section B</span></div>
+        <div class="grid g4" style="margin-bottom:14px;">
+          <div class="card kpi"><div class="label">Students</div><div class="value">22</div></div>
+          <div class="card kpi"><div class="label">Active today</div><div class="value">19</div><div class="delta up">86%</div></div>
+          <div class="card kpi"><div class="label">Avg. reading time</div><div class="value">41m</div><div class="delta up">▲ 5%</div></div>
+          <div class="card kpi"><div class="label">Class join code</div><div class="value mono" style="font-size:19px;">K3F9XQ</div></div>
+        </div>
+        <div class="alert-banner">
+          <span class="ic">⚠</span>
+          <div><b>2 students need attention.</b> <span class="names">Kabir Rao</span> has gone quiet this week and <span class="names">Meera Iyer</span> hasn't opened the app in 3 days.</div>
+        </div>
+        <div class="card">
+          <div class="card-pad" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border);">
+            <h3>Roster</h3>
+            <div style="display:flex;gap:8px;">
+              <button class="btn">⬇ Export roster</button>
+              <button class="btn btn-primary" onclick="openModal('modalAddStudent')">＋ Add student</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Student</th><th>Last active</th><th>Scans (7d)</th><th>Words read (7d)</th><th>Trend</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td class="dim">Today, 9:40 AM</td><td>18</td><td>2,140</td><td><canvas class="sparkline" data-spark="5,7,6,9,8,10,9"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td class="dim">Today, 8:15 AM</td><td>24</td><td>3,010</td><td><canvas class="sparkline" data-spark="4,6,8,9,11,12,13"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Kabir Rao')"><td><div class="namecell"><span class="avatar">KR</span>Kabir Rao</div></td><td class="dim">Yesterday, 4:02 PM</td><td>6</td><td>540</td><td><canvas class="sparkline" data-spark="9,7,5,4,3,2,2"></canvas></td><td><span class="pill pill-amber">Slipping</span></td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Meera Iyer')"><td><div class="namecell"><span class="avatar">MI</span>Meera Iyer</div></td><td class="dim">3 days ago</td><td>0</td><td>0</td><td><canvas class="sparkline" data-spark="6,5,3,2,0,0,0"></canvas></td><td><span class="pill pill-red">Inactive</span></td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td class="dim">Today, 7:58 AM</td><td>15</td><td>1,860</td><td><canvas class="sparkline" data-spark="7,8,7,9,10,9,11"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- GOALS (Teacher — set & track daily practice targets per class) ---------- -->
+      <section class="page" data-page="goals">
+        <div class="filterbar">
+          <div class="field"><label>Class</label>
+            <select><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
+          </div>
+          <div class="field small"><label>Date</label><input type="date" value="2026-09-25"></div>
+          <div class="actions-right">
+            <button class="btn btn-primary" onclick="openModal('modalAddGoal')">＋ Add class goal</button>
+          </div>
+        </div>
+
+        <div class="grid g3" style="margin-bottom:14px;">
+          <div class="card kpi"><div class="label">Class practice today</div><div class="value">14 min</div><div class="delta up">Goal: 25 min/day</div></div>
+          <div class="card kpi"><div class="label">Function goals met</div><div class="value">9 / 15</div><div class="delta up">3 functions × 5 students</div></div>
+          <div class="card kpi"><div class="label">Students with all goals met</div><div class="value">2 / 5</div><div class="delta down">for Sep 25, 2026</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Current class goals</h3></div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Function</th><th>Daily target</th><th>Applies on</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><div class="namecell">📖 Reading</div></td><td>10 min / day</td><td>School days</td><td><span class="btn-ghost">Edit</span></td></tr>
+              <tr><td><div class="namecell">📘 Dictionary</div></td><td>5 min / day</td><td>School days</td><td><span class="btn-ghost">Edit</span></td></tr>
+              <tr><td><div class="namecell">🌐 Translation</div></td><td>10 min / day</td><td>Daily</td><td><span class="btn-ghost">Edit</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Student progress — Sep 25, 2026</h3></div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Student</th><th>Reading (min)</th><th>Dictionary (min)</th><th>Translation (min)</th><th>Total (min)</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td>11</td><td>6</td><td>10</td><td>27</td><td><span class="pill pill-green">All goals met</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td>12</td><td>5</td><td>11</td><td>28</td><td><span class="pill pill-green">All goals met</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Kabir Rao')"><td><div class="namecell"><span class="avatar">KR</span>Kabir Rao</div></td><td>4</td><td>2</td><td>0</td><td>6</td><td><span class="pill pill-amber">1 of 3 met</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Meera Iyer')"><td><div class="namecell"><span class="avatar">MI</span>Meera Iyer</div></td><td>0</td><td>0</td><td>0</td><td>0</td><td><span class="pill pill-red">0 of 3 met</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td>9</td><td>4</td><td>8</td><td>21</td><td><span class="pill pill-amber">2 of 3 met</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- REPORTS (Teacher — printable/exportable practice summaries) ---------- -->
+      <section class="page" data-page="reports">
+        <div class="card card-pad" style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+            <div>
+              <h3 style="font-size:16px;">Progress reports</h3>
+              <div class="dim" style="font-size:12.5px;margin-top:4px;">Prepare student and class practice summaries for review and discussion.</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn">⬇ Export CSV</button>
+              <button class="btn btn-primary">🖨 Print / PDF</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+            <button class="btn" id="repTabStudent" onclick="setReportTab('student')" style="background:var(--text);color:#fff;">Student report</button>
+            <button class="btn" id="repTabClass" onclick="setReportTab('class')">Class report</button>
+          </div>
+          <div class="filterbar" style="margin:16px 0 0;" id="repFilterStudent">
+            <div class="field small"><label>Student</label>
+              <select><option>Maya R. (AB1234)</option><option>Liam K.</option><option>Ava P.</option><option>Noah D.</option><option>Sofia M.</option></select>
+            </div>
+            <div class="field small"><label>Period</label><select><option>Sep 21–25, 2026</option><option>Sep 14–18, 2026</option><option>This term</option></select></div>
+          </div>
+          <div class="filterbar" style="margin:16px 0 0;display:none;" id="repFilterClass">
+            <div class="field small"><label>Class</label>
+              <select><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
+            </div>
+            <div class="field small"><label>Period</label><select><option>Sep 21–25, 2026</option><option>Sep 14–18, 2026</option><option>This term</option></select></div>
+          </div>
+        </div>
+
+        <!-- ---- Student report view ---- -->
+        <div class="card card-pad" id="repViewStudent">
+          <div class="card-head"><h3>Reading support activity · Sep 21–25, 2026</h3><span class="hint">Maya R. · AB1234</span></div>
+
+          <div class="grid g3" style="margin-bottom:16px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Progress toward practice goals</div>
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Reading</span><span class="dim">38 / 50 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:76%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Dictionary</span><span class="dim">20 / 25 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:80%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Translation</span><span class="dim">33 / 50 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:66%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Daily practice time <span class="faint">(goal: 25 min/day)</span></div>
+              <canvas id="chartReportDaily" height="110"></canvas>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Daily activity by function</div>
+              <canvas id="chartReportFunctions" height="110"></canvas>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:14px;">
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Teacher note</label>
+            <textarea style="width:100%;min-height:70px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;">Maya practiced with the pen on five school days and met all three daily practice targets on Monday and Thursday.</textarea>
+          </div>
+
+          <div style="margin-top:14px;padding:11px 14px;background:var(--bg);border-radius:8px;font-size:11.5px;color:var(--text-dim);">
+            This report measures tool usage, not reading proficiency. Pair it with assessments and classroom observation before drawing conclusions.
+          </div>
+        </div>
+
+        <!-- ---- Class report view ---- -->
+        <div class="card card-pad" id="repViewClass" style="display:none;">
+          <div class="card-head"><h3>Class practice summary · Sep 21–25, 2026</h3><span class="hint">Grade 5 — Section B · 22 students</span></div>
+
+          <div class="grid g3" style="margin-bottom:16px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Class met goal</div>
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Reading</span><span class="dim">19 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:86%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Dictionary</span><span class="dim">15 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:68%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Translation</span><span class="dim">17 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:77%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Students active per day <span class="faint">(of 22)</span></div>
+              <canvas id="chartClassDaily" height="110"></canvas>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Class practice by function</div>
+              <canvas id="chartClassFunctionsRep" height="110"></canvas>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);">Practice minutes by student, Sep 21–25</div>
+              <div class="legend-row" style="margin-top:0;">
+                <span><span class="dot" style="background:var(--green);"></span>Met weekly goal</span>
+                <span><span class="dot" style="background:var(--amber);"></span>Partway there</span>
+                <span><span class="dot" style="background:var(--red);"></span>Needs a check-in</span>
+              </div>
+            </div>
+            <div class="tile-grid" id="classTileGrid"></div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:14px;">
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Teacher note</label>
+            <textarea style="width:100%;min-height:70px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;">Most of the class is on pace this week. Kabir and Meera have fallen behind and may need a check-in.</textarea>
+          </div>
+
+          <div style="margin-top:14px;padding:11px 14px;background:var(--bg);border-radius:8px;font-size:11.5px;color:var(--text-dim);">
+            This report measures tool usage, not reading proficiency. Pair it with assessments and classroom observation before drawing conclusions.
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- ANALYTICS (Teacher — aggregate, class-first) ---------- -->
+      <section class="page" data-page="analytics">
+        <div class="filterbar">
+          <div class="field"><label>Class</label>
+            <select id="analyticsClass"><option>All classes</option><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
+          </div>
+          <div class="field small"><label>Date range</label><select><option>Last 7 days</option><option>Last 30 days</option><option>This term</option></select></div>
+          <div class="field small"><label>Feature</label><select><option>All features</option><option>Reading</option><option>Translation</option><option>Dictionary</option></select></div>
+          <div class="actions-right">
+            <button class="btn" onclick="openModal('modalDeviceSearch')">⚙ Advanced: search by Device SN / User ID</button>
+            <button class="btn btn-primary">⬇ Export CSV</button>
+          </div>
+        </div>
+
+        <div class="card card-pad" id="deviceSearchResult" style="display:none;margin-bottom:14px;">
+          <div class="card-head">
+            <h3>Device lookup result</h3>
+            <button class="btn-ghost" onclick="document.getElementById('deviceSearchResult').style.display='none';">Clear ✕</button>
+          </div>
+          <div class="grid g4">
+            <div class="card kpi"><div class="label">Device SN</div><div class="value mono" style="font-size:16px;" id="devResultSn">SN-204981</div></div>
+            <div class="card kpi"><div class="label">User ID</div><div class="value" style="font-size:16px;" id="devResultUser">ishaan.verma@vormor.app</div></div>
+            <div class="card kpi"><div class="label">Activation date</div><div class="value" style="font-size:16px;">Mar 3, 2026</div></div>
+            <div class="card kpi"><div class="label">Total active days</div><div class="value" style="font-size:16px;">142</div></div>
+            <div class="card kpi"><div class="label">First login</div><div class="value" style="font-size:16px;">Mar 4, 2026</div></div>
+            <div class="card kpi"><div class="label">Last login</div><div class="value" style="font-size:16px;">Today, 7:58 AM</div></div>
+            <div class="card kpi"><div class="label">Linked student</div><div class="value" style="font-size:16px;">Ishaan Verma</div></div>
+            <div class="card kpi"><div class="label">Status</div><div class="value" style="font-size:16px;"><span class="pill pill-green">Active</span></div></div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="openStudent('Ishaan Verma')">View this student's activity →</button>
+        </div>
+
+        <div class="grid g4" style="margin-bottom:14px;">
+          <div class="card kpi"><div class="label">Students (selected)</div><div class="value">22</div></div>
+          <div class="card kpi"><div class="label">Avg. weekly reading time</div><div class="value">38m</div><div class="delta up">▲ 4%</div></div>
+          <div class="card kpi"><div class="label">Most used feature</div><div class="value" style="font-size:18px;">Reading</div></div>
+          <div class="card kpi"><div class="label">Inactive 7+ days</div><div class="value">3</div><div class="delta down">Needs attention</div></div>
+        </div>
+
+        <div class="grid g2" style="margin-bottom:14px;">
+          <div class="card card-pad">
+            <div class="card-head"><h3>Usage trend — selected class</h3><span class="hint">Scans per day</span></div>
+            <canvas id="chartClassTrend" height="150"></canvas>
+          </div>
+          <div class="card card-pad">
+            <div class="card-head"><h3>Feature mix — selected class</h3></div>
+            <canvas id="chartClassFeatures" height="150"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Most active students</h3></div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Student</th><th>Class</th><th>Scans</th><th>Reading time</th><th></th></tr></thead>
+            <tbody>
+              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td class="dim">Grade 5 — B</td><td>24</td><td>1h 02m</td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td class="dim">Grade 5 — B</td><td>18</td><td>49m</td><td><span class="btn-ghost">View →</span></td></tr>
+              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td class="dim">Grade 5 — B</td><td>15</td><td>44m</td><td><span class="btn-ghost">View →</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </section>
+
+     </div>
+    </div>
   </div>
+</div>
+
+<!-- ===================== MODAL: create class ===================== -->
+<div class="modal-scrim" id="modalCreateClass">
+  <div class="modal">
+    <h3>Create a class</h3>
+    <div class="mhint">Students join using a code — no need to add each one by hand.</div>
+    <div class="field"><label>Class name</label><input id="newClassName" placeholder="e.g. Grade 5 — Section B"></div>
+    <div class="field"><label>Grade / subject (optional)</label><input placeholder="e.g. Grade 5"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalCreateClass')">Cancel</button>
+      <button class="btn btn-primary" onclick="createClass()">Create class</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: add student ===================== -->
+<div class="modal-scrim" id="modalAddStudent">
+  <div class="modal">
+    <h3>Add a student</h3>
+    <div class="mhint">Share the join code, or add a known student directly.</div>
+    <div class="joincode-box">
+      <div class="code">K3F9XQ</div>
+      <div class="lbl">Students enter this code once, inside their own app, to join this class.</div>
+    </div>
+    <div class="or-div">OR ADD DIRECTLY</div>
+    <div class="field"><label>Student email</label><input placeholder="student@example.com"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalAddStudent')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modalAddStudent')">Send invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: device / user search ===================== -->
+<div class="modal-scrim" id="modalDeviceSearch">
+  <div class="modal">
+    <h3>Search by Device SN or User ID</h3>
+    <div class="mhint">Look up a device or account directly, even if it isn't in one of your classes yet.</div>
+    <div class="field"><label>Device Serial Number</label><input id="devSearchSn" placeholder="e.g. SN-204981"></div>
+    <div class="field"><label>User ID (email)</label><input id="devSearchUser" placeholder="e.g. student@vormor.app"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalDeviceSearch')">Cancel</button>
+      <button class="btn btn-primary" onclick="runDeviceSearch()">Search</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: add class goal ===================== -->
+<div class="modal-scrim" id="modalAddGoal">
+  <div class="modal">
+    <h3>Add a class goal</h3>
+    <div class="mhint">Apply the same daily target to everyone, then adjust individual plans.</div>
+    <div class="field"><label>Function</label>
+      <select><option>Reading</option><option>Dictionary</option><option>Translation</option></select>
+    </div>
+    <div class="field"><label>Daily practice minutes</label><input type="number" value="10" min="1"></div>
+    <div class="field"><label>Applies on</label>
+      <select><option>School days</option><option>Daily</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalAddGoal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modalAddGoal')">Apply to class</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE-OVER: student detail ===================== -->
+<div class="slideover-scrim" id="studentScrim" onclick="closeStudent()"></div>
+<div class="slideover" id="studentPanel">
+  <div class="slideover-head">
+    <span class="avatar" id="sAvatar" style="width:36px;height:36px;font-size:13px;">AM</span>
+    <div style="flex:1;">
+      <div style="font-weight:700;font-size:15px;" id="sName">Aarav Mehta</div>
+      <div class="dim" style="font-size:12px;" id="sClass">Grade 5 — Section B</div>
+    </div>
+    <button class="close-x" onclick="closeStudent()">✕</button>
+  </div>
+  <div class="slideover-body">
+    <div class="grid g4" style="grid-template-columns:repeat(2,1fr);">
+      <div class="card kpi"><div class="label">Scans (7d)</div><div class="value" style="font-size:20px;" id="sScans">–</div></div>
+      <div class="card kpi"><div class="label">Words read</div><div class="value" style="font-size:20px;" id="sWords">–</div></div>
+      <div class="card kpi"><div class="label">Reading time</div><div class="value" style="font-size:20px;" id="sReadingTime">–</div></div>
+      <div class="card kpi"><div class="label">Active days</div><div class="value" style="font-size:20px;" id="sActiveDays">–</div></div>
+    </div>
+    <div class="card card-pad">
+      <div class="card-head"><h3>Daily activity</h3></div>
+      <canvas id="chartStudent" height="140"></canvas>
+    </div>
+    <div class="card card-pad">
+      <div class="card-head"><h3>Feature usage</h3></div>
+      <div id="sFeatures" style="display:flex;flex-direction:column;gap:9px;"></div>
+    </div>
+    <button class="btn" style="align-self:flex-start;" onclick="closeStudent()">← Back to class roster</button>
+  </div>
+</div>
+
+<script>
+const PAGES = {
+  home:{title:'Home', sub:'Welcome back'},
+  placeholder:{title:'Document', sub:'Existing screen'},
+  activity:{title:'My Activity', sub:'Your personal usage — visible to you only'},
+  classes:{title:'My Classes', sub:'Classes you teach'},
+  classdetail:{title:'Grade 5 — Section B', sub:'Roster and per-student activity'},
+  goals:{title:'Goals', sub:'Set and track daily practice targets'},
+  reports:{title:'Reports', sub:'Printable student and class practice summaries'},
+  analytics:{title:'Analytics', sub:'Aggregate usage across your classes'},
+};
+let role = 'student';
+
+function setRole(r){
+  role = r;
+  document.getElementById('btnRoleStudent').classList.toggle('active', r==='student');
+  document.getElementById('btnRoleTeacher').classList.toggle('active', r==='teacher');
+  document.querySelectorAll('.nav-item[data-roles]').forEach(function(btn){
+    var roles = btn.getAttribute('data-roles').split(',');
+    btn.style.display = roles.indexOf(r) !== -1 ? '' : 'none';
+  });
+  go(r==='teacher' ? 'classes' : 'activity');
+}
+
+function go(page){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.dataset.page===page); });
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(b){ b.classList.toggle('active', b.dataset.page===page); });
+  var meta = PAGES[page] || PAGES.placeholder;
+  document.getElementById('pageTitle').textContent = meta.title;
+  document.getElementById('pageSub').textContent = meta.sub;
+  window.scrollTo(0,0);
+  closeSidebar();
+  if(page==='activity') setTimeout(drawMe, 0);
+  if(page==='analytics') setTimeout(drawAnalytics, 0);
+  if(page==='reports') setTimeout(drawReport, 0);
+}
+
+function setReportTab(tab){
+  var s = document.getElementById('repTabStudent');
+  var c = document.getElementById('repTabClass');
+  s.style.background = tab==='student' ? 'var(--text)' : '';
+  s.style.color = tab==='student' ? '#fff' : '';
+  c.style.background = tab==='class' ? 'var(--text)' : '';
+  c.style.color = tab==='class' ? '#fff' : '';
+
+  document.getElementById('repFilterStudent').style.display = tab==='student' ? '' : 'none';
+  document.getElementById('repFilterClass').style.display = tab==='class' ? '' : 'none';
+  document.getElementById('repViewStudent').style.display = tab==='student' ? '' : 'none';
+  document.getElementById('repViewClass').style.display = tab==='class' ? '' : 'none';
+
+  if(tab==='class') setTimeout(drawClassReport, 0);
+}
+
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarScrim').classList.add('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarScrim').classList.remove('open');
+}
+
+(function(){
+  var sidebarEl = document.getElementById('sidebar');
+  var pinBtn = document.getElementById('pinBtn');
+  var collapseTimer = null;
+  var pinned = false;
+  var hovered = false;
+
+  function applyState(){
+    if(window.innerWidth <= 900) return;
+    clearTimeout(collapseTimer);
+    if(pinned || hovered){
+      sidebarEl.classList.add('expanded');
+    } else {
+      collapseTimer = setTimeout(function(){ sidebarEl.classList.remove('expanded'); }, 300);
+    }
+  }
+
+  sidebarEl.addEventListener('mouseenter', function(){ hovered = true; applyState(); });
+  sidebarEl.addEventListener('mouseleave', function(){ hovered = false; applyState(); });
+
+  window.togglePin = function(){
+    pinned = !pinned;
+    pinBtn.classList.toggle('pinned', pinned);
+    pinBtn.title = pinned ? 'Unpin menu' : 'Keep menu open';
+    applyState();
+  };
+})();
+
+function openClass(id){ go('classdetail'); drawSparklines(); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function createClass(){ closeModal('modalCreateClass'); go('classes'); }
+
+function runDeviceSearch(){
+  var sn = document.getElementById('devSearchSn').value.trim();
+  var user = document.getElementById('devSearchUser').value.trim();
+  closeModal('modalDeviceSearch');
+  if(sn) document.getElementById('devResultSn').textContent = sn;
+  if(user) document.getElementById('devResultUser').textContent = user;
+  var result = document.getElementById('deviceSearchResult');
+  result.style.display = '';
+  result.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+var STUDENT_DATA = {
+  'Aarav Mehta': { cls:'Grade 5 — Section B', scans:18, words:'2,140', reading:'49m', active:'6/7',
+    daily:[5,7,6,9,8,10,9], features:[['Reading',44,'orange'],['Translation',28,'blue'],['Dictionary',20,'green'],['Other',8,'amber']] },
+  'Diya Shah': { cls:'Grade 5 — Section B', scans:24, words:'3,010', reading:'1h 02m', active:'7/7',
+    daily:[4,6,8,9,11,12,13], features:[['Reading',50,'orange'],['Translation',22,'blue'],['Dictionary',18,'green'],['Other',10,'amber']] },
+  'Kabir Rao': { cls:'Grade 5 — Section B', scans:6, words:'540', reading:'14m', active:'3/7',
+    daily:[9,7,5,4,3,2,2], features:[['Reading',60,'orange'],['Dictionary',15,'green'],['Translation',10,'blue'],['Other',15,'amber']] },
+  'Meera Iyer': { cls:'Grade 5 — Section B', scans:0, words:'0', reading:'0m', active:'0/7',
+    daily:[6,5,3,2,0,0,0], features:[] },
+  'Ishaan Verma': { cls:'Grade 5 — Section B', scans:15, words:'1,860', reading:'44m', active:'6/7',
+    daily:[7,8,7,9,10,9,11], features:[['Reading',46,'orange'],['Translation',24,'blue'],['Dictionary',20,'green'],['Other',10,'amber']] }
+};
+
+function renderFeatureBars(features){
+  var el = document.getElementById('sFeatures');
+  if(!features || !features.length){
+    el.innerHTML = '<div class="faint" style="font-size:12.5px;">No activity recorded this week.</div>';
+    return;
+  }
+  var colorVar = { orange:'var(--orange)', blue:'var(--blue)', green:'var(--green)', amber:'var(--amber)', red:'var(--red)' };
+  el.innerHTML = features.map(function(f){
+    return '<div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">'
+      + '<span>'+f[0]+'</span><span class="dim">'+f[1]+'%</span></div>'
+      + '<div style="height:6px;background:var(--bg);border-radius:4px;">'
+      + '<div style="width:'+f[1]+'%;height:100%;background:'+colorVar[f[2]]+';border-radius:4px;"></div></div></div>';
+  }).join('');
+}
+
+function openStudent(name){
+  var d = STUDENT_DATA[name] || { cls:'', scans:0, words:'0', reading:'0m', active:'0/7', daily:[0,0,0,0,0,0,0], features:[] };
+  document.getElementById('sName').textContent = name;
+  document.getElementById('sAvatar').textContent = name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+  document.getElementById('sClass').textContent = d.cls;
+  document.getElementById('sScans').textContent = d.scans;
+  document.getElementById('sWords').textContent = d.words;
+  document.getElementById('sReadingTime').textContent = d.reading;
+  document.getElementById('sActiveDays').textContent = d.active;
+  renderFeatureBars(d.features);
+  document.getElementById('studentScrim').classList.add('open');
+  document.getElementById('studentPanel').classList.add('open');
+  setTimeout(function(){ drawStudent(d.daily); }, 50);
+}
+function closeStudent(){
+  document.getElementById('studentScrim').classList.remove('open');
+  document.getElementById('studentPanel').classList.remove('open');
+}
+
+var chartColors = { grid:'rgba(0,0,0,0.06)', text:'#6B7280' };
+var chartMe, chartTrend, chartFeat, chartStu;
+
+function drawMe(){
+  var ctx = document.getElementById('chartMe');
+  if(!ctx || chartMe) return;
+  chartMe = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{label:'Scans', data:[6,9,7,10,8,12,6], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:26}]},
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
+  });
+}
+function drawAnalytics(){
+  var c1 = document.getElementById('chartClassTrend');
+  if(c1 && !chartTrend){
+    chartTrend = new Chart(c1, { type:'line',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets:[{label:'Scans', data:[140,165,150,180,170,120,95], borderColor:'#2F6FED', backgroundColor:'rgba(47,111,237,0.1)', fill:true, tension:.35}]},
+      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
+    });
+  }
+  var c2 = document.getElementById('chartClassFeatures');
+  if(c2 && !chartFeat){
+    chartFeat = new Chart(c2, { type:'doughnut',
+      data:{ labels:['Reading','Translation','Dictionary','Voice Translation','Phonics'],
+        datasets:[{ data:[42,27,18,9,4], backgroundColor:['#FF7A1A','#2F6FED','#17A673','#E8972B','#E0493C'] }]},
+      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
+    });
+  }
+}
+function drawStudent(daily){
+  var ctx = document.getElementById('chartStudent');
+  if(!ctx) return;
+  if(chartStu){
+    chartStu.data.datasets[0].data = daily;
+    chartStu.update();
+    return;
+  }
+  chartStu = new Chart(ctx, { type:'bar',
+    data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{label:'Scans', data:daily, backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:22}]},
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
+  });
+}
+
+var chartReportDaily, chartReportFunctions;
+function drawReport(){
+  var c1 = document.getElementById('chartReportDaily');
+  if(c1 && !chartReportDaily){
+    chartReportDaily = new Chart(c1, { type:'bar',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
+        datasets:[
+          {label:'Minutes', data:[26,22,0,30,20], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:22, order:2},
+          {label:'Goal', data:[25,25,25,25,25], type:'line', borderColor:'#9AA0AC', borderDash:[4,4], pointRadius:0, order:1}
+        ]},
+      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
+    });
+  }
+  var c2 = document.getElementById('chartReportFunctions');
+  if(c2 && !chartReportFunctions){
+    chartReportFunctions = new Chart(c2, { type:'bar',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
+        datasets:[
+          {label:'Reading', data:[10,9,0,12,7], backgroundColor:'#FF7A1A', stack:'s'},
+          {label:'Dictionary', data:[6,5,0,6,3], backgroundColor:'#2F6FED', stack:'s'},
+          {label:'Translation', data:[10,8,0,12,10], backgroundColor:'#17A673', stack:'s'}
+        ]},
+      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}},
+        scales:{ y:{beginAtZero:true, stacked:true, grid:{color:chartColors.grid}}, x:{stacked:true, grid:{display:false}} } }
+    });
+  }
+}
+
+var chartClassDaily, chartClassFunctionsRep;
+function drawClassReport(){
+  var c1 = document.getElementById('chartClassDaily');
+  if(c1 && !chartClassDaily){
+    chartClassDaily = new Chart(c1, { type:'bar',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
+        datasets:[
+          {label:'Active students', data:[19,20,14,21,17], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:28, order:2},
+          {label:'Full class', data:[22,22,22,22,22], type:'line', borderColor:'#9AA0AC', borderDash:[4,4], pointRadius:0, order:1}
+        ]},
+      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, max:22, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
+    });
+  }
+  var c2 = document.getElementById('chartClassFunctionsRep');
+  if(c2 && !chartClassFunctionsRep){
+    chartClassFunctionsRep = new Chart(c2, { type:'bar',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
+        datasets:[
+          {label:'Reading', data:[180,165,90,210,150], backgroundColor:'#FF7A1A', stack:'s'},
+          {label:'Dictionary', data:[95,88,40,110,80], backgroundColor:'#2F6FED', stack:'s'},
+          {label:'Translation', data:[140,130,70,160,120], backgroundColor:'#17A673', stack:'s'}
+        ]},
+      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}},
+        scales:{ y:{beginAtZero:true, stacked:true, grid:{color:chartColors.grid}}, x:{stacked:true, grid:{display:false}} } }
+    });
+  }
+  renderClassTiles();
+}
+
+function renderClassTiles(){
+  var grid = document.getElementById('classTileGrid');
+  if(!grid || grid.dataset.drawn) return;
+  grid.dataset.drawn = '1';
+  var names = ['Diya Shah','Aarav Mehta','Ishaan Verma','Priya Nair','Rohan Das','Ananya Singh','Vikram Rao','Tanvi Joshi','Arjun Mehta','Sara Khan','Kabir Rao','Meera Iyer'];
+  var minutes = [142,128,118,105,98,90,84,75,68,52,42,12];
+  grid.innerHTML = names.map(function(name, i){
+    var m = minutes[i];
+    var status = m>=110 ? 'green' : m>=60 ? 'amber' : 'red';
+    var initials = name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    return '<div class="student-tile status-'+status+'" onclick="openStudent(\''+name+'\')">'
+      + '<span class="avatar">'+initials+'</span>'
+      + '<div class="tile-info"><div class="tile-name">'+name+'</div><div class="tile-minutes">'+m+'m</div></div>'
+      + '</div>';
+  }).join('');
+}
+function drawSparklines(){
+  document.querySelectorAll('canvas[data-spark]').forEach(function(c){
+    if(c.dataset.drawn) return;
+    c.dataset.drawn = '1';
+    var vals = c.dataset.spark.split(',').map(Number);
+    new Chart(c, { type:'line',
+      data:{ labels:vals.map(function(_,i){return i;}), datasets:[{ data:vals, borderColor:'#2F6FED', borderWidth:1.6, pointRadius:0, tension:.4 }]},
+      options:{ responsive:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, elements:{line:{borderJoinStyle:'round'}} }
+    });
+  });
+}
+
+setRole('student');
+</script>
+
 </body>
 </html>
