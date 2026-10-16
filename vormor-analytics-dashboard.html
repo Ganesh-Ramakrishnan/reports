@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vormor Analytics</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #F6F7F6;
+    --bg-alt: #EFF1EE;
+    --surface: #FFFFFF;
+    --ink: #15181B;
+    --muted: #5B6560;
+    --faint: #8C958F;
+    --line: #E1E5E0;
+    --primary: #0B6E4F;
+    --primary-deep: #07513A;
+    --primary-tint: #E2F2EA;
+    --amber: #B9770E;
+    --amber-tint: #FBEEDA;
+    --red: #B3261E;
+    --red-tint: #FBE6E4;
+    --blue: #2563A8;
+    --blue-tint: #E3EDF7;
+    --shadow: 0 1px 2px rgba(21,24,27,0.04), 0 10px 28px -16px rgba(21,24,27,0.16);
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body {
+    margin: 0; color: var(--ink); font-family: 'Public Sans', system-ui, sans-serif;
+    font-size: 14.5px; line-height: 1.5;
+  }
+  h1, h2, h3 { font-family: 'Lexend', system-ui, sans-serif; margin: 0; text-wrap: balance; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 24px 64px; }
+
+  /* ---------------- app shell: sidebar + main ---------------- */
+  .app-shell { display: flex; align-items: flex-start; min-height: 100vh; }
+
+  .sidebar {
+    width: 232px; flex: none; background: var(--surface); border-right: 1px solid var(--line);
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 20;
+  }
+  .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; }
+  .sidebar-brand .mark {
+    width: 32px; height: 32px; border-radius: 9px; background: var(--primary);
+    display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Lexend', sans-serif;
+    font-weight: 800; font-size: 15px; flex: none;
+  }
+  .sidebar-brand h1 { font-size: 16.5px; font-weight: 700; }
+  .sidebar-brand .tag { font-size: 11px; color: var(--faint); margin-top: -1px; }
+
+  .sidebar-nav { flex: 1; padding: 6px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 9px;
+    font-size: 13.5px; font-weight: 600; color: var(--muted); cursor: pointer; border: none;
+    background: transparent; text-align: left; width: 100%; font-family: 'Public Sans', sans-serif;
+  }
+  .nav-item svg { width: 17px; height: 17px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .nav-item:hover { background: var(--bg-alt); color: var(--ink); }
+  .nav-item.active { background: var(--primary-tint); color: var(--primary-deep); }
+
+  .sidebar-foot { padding: 14px; border-top: 1px solid var(--line); }
+  .user-chip { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; }
+  .user-chip:hover { background: var(--bg-alt); }
+  .user-chip .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--primary-deep); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 12.5px; flex: none;
+  }
+  .user-chip .who { flex: 1; min-width: 0; }
+  .user-chip .who .name { font-size: 12.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-chip .who .role { font-size: 11px; color: var(--faint); }
+  .user-chip .logout { font-size: 15px; color: var(--faint); line-height: 1; }
+
+  .main { flex: 1; min-width: 0; }
+
+  /* ---------------- top bar ---------------- */
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-inner {
+    max-width: 1120px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .topbar-inner h2 { font-size: 18px; font-weight: 700; }
+
+  .badge-env {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--amber); background: var(--amber-tint); padding: 4px 10px; border-radius: 999px;
+  }
+
+  .menu-btn {
+    display: none; align-items: center; justify-content: center; width: 34px; height: 34px;
+    border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+  }
+  .menu-btn svg { width: 17px; height: 17px; stroke: var(--ink); fill: none; stroke-width: 1.8; }
+  .sidebar-scrim { display: none; }
+  @media (max-width: 860px) {
+    .sidebar-scrim.open { display: block; position: fixed; inset: 0; background: rgba(21,24,27,0.35); z-index: 19; }
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  @media (max-width: 860px) {
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; transform: translateX(-100%); transition: transform .2s ease; box-shadow: 0 0 0 1px var(--line); }
+    .sidebar.open { transform: translateX(0); }
+    .menu-btn { display: inline-flex !important; }
+  }
+
+  /* ---------------- filter bar ---------------- */
+  .filters {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+    padding: 16px 18px; margin: 24px 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 150px; flex: 1; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .field input, .field select {
+    font-family: 'Public Sans', sans-serif; font-size: 13.5px; padding: 9px 11px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  }
+  .field input:focus, .field select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .btn {
+    font-family: 'Public Sans', sans-serif; font-weight: 600; font-size: 13.5px; padding: 10px 16px;
+    border-radius: 8px; border: none; cursor: pointer; white-space: nowrap;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+  .export-group { display: flex; gap: 8px; }
+
+  /* ---------------- section heading ---------------- */
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 36px 0 14px; flex-wrap: wrap; gap: 8px; }
+  .section-head h2 { font-size: 17px; font-weight: 700; }
+  .section-head .hint { font-size: 12.5px; color: var(--faint); }
+
+  /* ---------------- KPI tiles ---------------- */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-card .label { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .kpi-card .value { font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 28px; margin-top: 6px; }
+  .kpi-card .delta { font-size: 12px; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+  .delta.up { color: var(--primary); }
+  .delta.down { color: var(--red); }
+
+  /* ---------------- device info card ---------------- */
+  .device-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+    padding: 20px 22px; display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+  }
+  .device-avatar {
+    width: 52px; height: 52px; border-radius: 12px; background: var(--primary-tint); color: var(--primary-deep);
+    display: flex; align-items: center; justify-content: center; font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 18px;
+  }
+  .device-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+  .device-grid .d-label { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  .device-grid .d-value { font-weight: 700; font-size: 15px; margin-top: 3px; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .status-pill.active { background: var(--primary-tint); color: var(--primary-deep); }
+  .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* ---------------- panels / charts ---------------- */
+  .grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+    padding: 18px 20px;
+  }
+  .panel h3 { font-size: 14.5px; font-weight: 700; margin-bottom: 2px; }
+  .panel .sub { font-size: 12px; color: var(--faint); margin-bottom: 14px; }
+  .chart-wrap { position: relative; height: 230px; }
+  .chart-wrap.small { height: 180px; }
+
+  .toggle-row { display: flex; gap: 6px; }
+  .toggle-row button {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 5px 10px;
+    border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); cursor: pointer;
+  }
+  .toggle-row button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ---------------- stat grid (usage tracking) ---------------- */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+  .stat-cell { background: var(--surface); padding: 16px 18px; }
+  .stat-cell .s-label { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  .stat-cell .s-value { font-family: 'Lexend', sans-serif; font-weight: 800; font-size: 21px; margin-top: 5px; }
+
+  /* ---------------- ranked list widgets ---------------- */
+  .ranked { display: flex; flex-direction: column; gap: 11px; }
+  .ranked-row { display: flex; align-items: center; gap: 10px; }
+  .ranked-row .r-name { flex: 1; font-size: 13px; font-weight: 600; }
+  .ranked-row .r-bar-track { flex: 2; height: 7px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; }
+  .ranked-row .r-bar-fill { height: 100%; background: var(--primary); border-radius: 999px; }
+  .ranked-row .r-value { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); width: 44px; text-align: right; }
+
+  /* ---------------- data table ---------------- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
+  thead th {
+    text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tbody tr:hover { background: var(--bg-alt); }
+  .sn-link { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--blue); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+  .pill.active { background: var(--primary-tint); color: var(--primary-deep); }
+  .pill.inactive { background: var(--red-tint); color: var(--red); }
+  .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  /* ---------------- learning analytics (optional) ---------------- */
+  .optional-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--blue); background: var(--blue-tint); padding: 3px 9px; border-radius: 999px;
+  }
+
+  @media (max-width: 980px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .device-card { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .kpi-grid, .stat-grid { grid-template-columns: 1fr; }
+    .shell { padding: 0 16px 48px; }
+    .topbar-inner { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <div class="sidebar-scrim" id="scrim"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="mark">V</div>
+        <div>
+          <h1>Vormor Analytics</h1>
+          <div class="tag">Device &amp; usage reporting</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="overview">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          Overview
+        </button>
+        <button class="nav-item" data-page="trends">
+          <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+          Trend analysis
+        </button>
+        <button class="nav-item" data-page="language">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>
+          Language analytics
+        </button>
+        <button class="nav-item" data-page="widgets">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard widgets
+        </button>
+        <button class="nav-item" data-page="devices">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Devices &amp; users
+        </button>
+        <button class="nav-item" data-page="learning">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/></svg>
+          Learning analytics
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <div class="avatar">GR</div>
+          <div class="who">
+            <div class="name">Ganesh R.</div>
+            <div class="role">Admin</div>
+          </div>
+          <div class="logout" title="Log out">&#8594;</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h2 id="pageTitle">Overview</h2>
+      </div>
+      <span class="badge-env">Design concept &middot; example data</span>
+    </div>
+  </div>
+
+  <div class="shell">
+
+    <div class="filters">
+      <div class="field">
+        <label>Device Serial Number</label>
+        <input type="text" placeholder="e.g. VM-2J4-7781" value="VM-2J4-7781">
+      </div>
+      <div class="field">
+        <label>User ID</label>
+        <input type="text" placeholder="e.g. j.alvarez@school.edu" value="j.alvarez@school.edu">
+      </div>
+      <div class="field">
+        <label>Date range</label>
+        <select>
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+          <option>This month</option>
+          <option>This year</option>
+          <option>Custom range&hellip;</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Feature</label>
+        <select>
+          <option>All features</option>
+          <option>Reading</option>
+          <option>Translation</option>
+          <option>Dictionary</option>
+          <option>Voice Translation</option>
+          <option>Phonics</option>
+          <option>Favorites</option>
+          <option>Voice Recorder</option>
+          <option>Text Export</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Language</label>
+        <select>
+          <option>All languages</option>
+          <option>English</option>
+          <option>Spanish</option>
+          <option>French</option>
+          <option>German</option>
+        </select>
+      </div>
+      <button class="btn btn-primary">Apply filters</button>
+      <div class="export-group">
+        <button class="btn btn-ghost">Export CSV</button>
+        <button class="btn btn-ghost">Export Excel</button>
+      </div>
+    </div>
+
+    <section class="page active" data-page="overview">
+    <!-- Device info -->
+    <div class="section-head">
+      <h2>Device &amp; user overview</h2>
+      <span class="hint">Showing VM-2J4-7781 &middot; j.alvarez@school.edu</span>
+    </div>
+    <div class="device-card">
+      <div class="device-avatar">JA</div>
+      <div class="device-grid">
+        <div><div class="d-label">Activation date</div><div class="d-value num">Feb 14, 2026</div></div>
+        <div><div class="d-label">First login</div><div class="d-value num">Feb 15, 2026</div></div>
+        <div><div class="d-label">Last login</div><div class="d-value num">Oct 13, 2026</div></div>
+        <div><div class="d-label">Total active days</div><div class="d-value num">172</div></div>
+        <div><div class="d-label">Status</div><div class="d-value"><span class="status-pill active"><span class="dot"></span>Active device</span></div></div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="section-head">
+      <h2>Usage tracking</h2>
+      <span class="hint">Last 30 days</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">Total scans</div>
+        <div class="value num">3,842</div>
+        <div class="delta up">&#9650; 12% vs. prior period</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Words scanned</div>
+        <div class="value num">214,960</div>
+        <div class="delta up">&#9650; 8%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Pages processed</div>
+        <div class="value num">1,206</div>
+        <div class="delta up">&#9650; 5%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Total reading time</div>
+        <div class="value num">86.4 hrs</div>
+        <div class="delta down">&#9660; 3%</div>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="stat-cell"><div class="s-label">Sentences scanned</div><div class="s-value num">18,340</div></div>
+      <div class="stat-cell"><div class="s-label">Reading sessions</div><div class="s-value num">214</div></div>
+      <div class="stat-cell"><div class="s-label">Avg. session duration</div><div class="s-value num">24.2 min</div></div>
+      <div class="stat-cell"><div class="s-label">Active devices (period)</div><div class="s-value num">412</div></div>
+    </div>
+    </section>
+
+    <section class="page" data-page="trends">
+    <!-- Trend + feature usage -->
+    <div class="section-head">
+      <h2>Trend analysis</h2>
+      <div class="toggle-row">
+        <button class="active">Daily</button>
+        <button>Weekly</button>
+        <button>Monthly</button>
+        <button>Yearly</button>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Scan activity over time</h3>
+        <div class="sub">Total scans per day &middot; last 14 days</div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Feature usage</h3>
+        <div class="sub">Actions recorded this period, by feature</div>
+        <div class="chart-wrap"><canvas id="featureChart"></canvas></div>
+      </div>
+    </div>
+    </section>
+
+    <section class="page" data-page="language">
+    <!-- Language analytics -->
+    <div class="section-head">
+      <h2>Language analytics</h2>
+      <span class="hint">Languages used, by feature</span>
+    </div>
+    <div class="grid-3">
+      <div class="panel">
+        <h3>Reading</h3>
+        <div class="chart-wrap small"><canvas id="langReading"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Translation</h3>
+        <div class="chart-wrap small"><canvas id="langTranslate"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Voice Translation</h3>
+        <div class="chart-wrap small"><canvas id="langVoice"></canvas></div>
+      </div>
+    </div>
+    </section>
+
+    <section class="page" data-page="widgets">
+    <!-- Dashboard widgets -->
+    <div class="section-head">
+      <h2>Dashboard widgets</h2>
+      <span class="hint">Admin overview &middot; all devices &amp; users</span>
+    </div>
+    <div class="grid-3">
+      <div class="panel">
+        <h3>Most-used features</h3>
+        <div class="sub">By total actions this month</div>
+        <div class="ranked" id="mostUsedFeatures"></div>
+      </div>
+      <div class="panel">
+        <h3>Most active users</h3>
+        <div class="sub">By session count this month</div>
+        <div class="ranked" id="mostActiveUsers"></div>
+      </div>
+      <div class="panel">
+        <h3>Active vs. inactive devices</h3>
+        <div class="sub">Used in the last 30 days</div>
+        <div class="chart-wrap small"><canvas id="deviceStatusChart"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:16px">
+      <div class="panel">
+        <h3>Active vs. inactive users</h3>
+        <div class="sub">Logged in within 30 days</div>
+        <div class="chart-wrap small"><canvas id="userStatusChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Language usage distribution</h3>
+        <div class="sub">All features combined</div>
+        <div class="chart-wrap small"><canvas id="langAllChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Usage by date range</h3>
+        <div class="sub">This week vs. last week</div>
+        <div class="chart-wrap small"><canvas id="weekCompareChart"></canvas></div>
+      </div>
+    </div>
+    </section>
+
+    <section class="page" data-page="devices">
+    <!-- Admin reports table -->
+    <div class="section-head">
+      <h2>Devices &amp; users</h2>
+      <span class="hint">412 matching records</span>
+    </div>
+    <div class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Device SN</th><th>User ID</th><th>Last login</th><th>Total scans</th><th>Reading time</th><th>Status</th></tr>
+          </thead>
+          <tbody id="deviceTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    </section>
+
+    <section class="page" data-page="learning">
+    <!-- Learning analytics (optional) -->
+    <div class="section-head">
+      <h2>Learning analytics <span class="optional-tag">Optional module</span></h2>
+      <span class="hint">By User ID &amp; Device SN</span>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Practice activity</h3>
+        <div class="sub">Reading practice, vocabulary lookups and phonics usage this month</div>
+        <div class="ranked" id="learningActivity"></div>
+      </div>
+      <div class="panel">
+        <h3>Progress trend</h3>
+        <div class="sub">Reading proficiency score over time</div>
+        <div class="chart-wrap"><canvas id="progressChart"></canvas></div>
+      </div>
+    </div>
+    </section>
+
+  </div>
+    </div>
+  </div>
+
+  <script>
+    Chart.defaults.font.family = "'Public Sans', sans-serif";
+    Chart.defaults.color = '#5B6560';
+    const PRIMARY = '#0B6E4F', PRIMARY_LIGHT = '#6FBE9C', AMBER = '#B9770E', RED = '#B3261E', BLUE = '#2563A8', LINE = '#E1E5E0';
+
+    // Trend chart
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: {
+        labels: ['Sep 30','Oct 1','Oct 2','Oct 3','Oct 4','Oct 5','Oct 6','Oct 7','Oct 8','Oct 9','Oct 10','Oct 11','Oct 12','Oct 13'],
+        datasets: [{
+          data: [210,245,260,198,310,330,290,275,340,360,355,380,402,418],
+          borderColor: PRIMARY, backgroundColor: 'rgba(11,110,79,0.08)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5
+        }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:{color:LINE}} } }
+    });
+
+    // Feature usage
+    new Chart(document.getElementById('featureChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Reading','Translation','Dictionary','Voice Translation','Phonics','Favorites','Voice Recorder','Text Export'],
+        datasets: [{ data: [3840,2210,1560,1340,980,720,540,410], backgroundColor: PRIMARY, borderRadius: 6, maxBarThickness: 22 }]
+      },
+      options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:LINE}}, y:{grid:{display:false}} } }
+    });
+
+    function donut(id, labels, data, colors) {
+      new Chart(document.getElementById(id), {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+        options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:9, font:{size:11} } } } }
+      });
+    }
+    donut('langReading', ['English','Spanish','French','German'], [58,22,12,8], [PRIMARY,PRIMARY_LIGHT,AMBER,BLUE]);
+    donut('langTranslate', ['English→Spanish','English→French','Spanish→English','Other'], [40,25,20,15], [PRIMARY,PRIMARY_LIGHT,AMBER,BLUE]);
+    donut('langVoice', ['English','Spanish','French'], [62,26,12], [PRIMARY,PRIMARY_LIGHT,AMBER]);
+    donut('langAllChart', ['English','Spanish','French','German','Other'], [48,24,14,9,5], [PRIMARY,PRIMARY_LIGHT,AMBER,BLUE,'#C9CFC8']);
+    donut('deviceStatusChart', ['Active','Inactive'], [412,96], [PRIMARY,'#D8DEDA']);
+    donut('userStatusChart', ['Active','Inactive'], [388,120], [PRIMARY,'#D8DEDA']);
+
+    new Chart(document.getElementById('weekCompareChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [
+          { label:'This week', data:[320,360,340,410,390,210,180], backgroundColor: PRIMARY, borderRadius: 5, maxBarThickness: 16 },
+          { label:'Last week', data:[290,310,300,350,330,190,150], backgroundColor: '#D8DEDA', borderRadius: 5, maxBarThickness: 16 }
+        ]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:9,font:{size:11}}}}, scales:{ x:{grid:{display:false}}, y:{grid:{color:LINE}} } }
+    });
+
+    new Chart(document.getElementById('progressChart'), {
+      type: 'line',
+      data: {
+        labels: ['Jun','Jul','Aug','Sep','Oct'],
+        datasets: [{ data:[62,68,71,76,82], borderColor: BLUE, backgroundColor:'rgba(37,99,168,0.08)', fill:true, tension:0.35, pointRadius:3, pointBackgroundColor:BLUE, borderWidth:2.5 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:{color:LINE}, min:0, max:100} } }
+    });
+
+    // Ranked lists
+    function renderRanked(id, rows, max) {
+      const el = document.getElementById(id);
+      el.innerHTML = rows.map(r => `
+        <div class="ranked-row">
+          <div class="r-name">${r[0]}</div>
+          <div class="r-bar-track"><div class="r-bar-fill" style="width:${(r[1]/max*100).toFixed(0)}%"></div></div>
+          <div class="r-value num">${r[1].toLocaleString()}</div>
+        </div>`).join('');
+    }
+    renderRanked('mostUsedFeatures', [['Reading',3840],['Translation',2210],['Dictionary',1560],['Voice Translation',1340],['Phonics',980]], 3840);
+    renderRanked('mostActiveUsers', [['j.alvarez@school.edu',214],['m.chen@district.org',188],['r.patel@school.edu',165],['s.kim@district.org',142],['a.nguyen@school.edu',121]], 214);
+    renderRanked('learningActivity', [['Reading practice sessions',214],['Vocabulary lookups',146],['Phonics drills',98],['Progress check-ins',31]], 214);
+
+    // Device table
+    const rows = [
+      ['VM-2J4-7781','j.alvarez@school.edu','Oct 13, 2026','3,842','86.4 hrs','active'],
+      ['VM-9K1-3340','m.chen@district.org','Oct 13, 2026','3,310','74.1 hrs','active'],
+      ['VM-4H7-2201','r.patel@school.edu','Oct 12, 2026','2,980','68.9 hrs','active'],
+      ['VM-1B8-9015','s.kim@district.org','Oct 11, 2026','2,540','55.2 hrs','active'],
+      ['VM-6D3-4482','a.nguyen@school.edu','Sep 2, 2026','640','12.8 hrs','inactive'],
+      ['VM-7F2-1190','t.ortiz@district.org','Aug 18, 2026','410','9.1 hrs','inactive'],
+    ];
+    document.getElementById('deviceTableBody').innerHTML = rows.map(r => `
+      <tr>
+        <td class="sn-link">${r[0]}</td>
+        <td>${r[1]}</td>
+        <td class="num">${r[2]}</td>
+        <td class="num">${r[3]}</td>
+        <td class="num">${r[4]}</td>
+        <td><span class="pill ${r[5]}"><span class="dot"></span>${r[5] === 'active' ? 'Active' : 'Inactive'}</span></td>
+      </tr>`).join('');
+
+    // Sidebar navigation: switch which page is visible
+    const PAGE_TITLES = {
+      overview: 'Overview', trends: 'Trend analysis', language: 'Language analytics',
+      widgets: 'Dashboard widgets', devices: 'Devices & users', learning: 'Learning analytics'
+    };
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    const pageTitle = document.getElementById('pageTitle');
+    navItems.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.page;
+        navItems.forEach((b) => b.classList.toggle('active', b === btn));
+        pages.forEach((p) => p.classList.toggle('active', p.dataset.page === target));
+        pageTitle.textContent = PAGE_TITLES[target] || '';
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('scrim').classList.remove('open');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    });
+
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const scrim = document.getElementById('scrim');
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      sidebar.classList.add('open');
+      scrim.classList.add('open');
+    });
+    scrim.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      scrim.classList.remove('open');
+    });
+  </script>
+
+</body>
+</html>
