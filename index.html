@@ -3,1156 +3,844 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vormor Classroom</title>
+<title>Scanmarker Max Teacher Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --sidebar-bg:#1A1A1A;
-    --sidebar-row-hover:#464646;
-    --sidebar-text:#F7F7F7;
-    --sidebar-text-dim:#6E6E6E;
-    --sidebar-text-active:#FFFFFF;
-    --sidebar-divider:rgba(255,255,255,0.14);
-    --sidebar-group-label:#F7F7F7;
-    --sidebar-home:#FF8234;
-    --orange:#FF761A;
-    --orange-dim:rgba(255,118,26,0.16);
-    --bg:#F3F4F7;
-    --card:#FFFFFF;
-    --border:#E4E6EB;
-    --text:#1A1D23;
-    --text-dim:#6B7280;
-    --text-faint:#9AA0AC;
-    --green:#17A673;
-    --green-bg:#E8F7F1;
-    --amber:#E8972B;
-    --amber-bg:#FDF2E2;
-    --red:#E0493C;
-    --red-bg:#FBE9E7;
-    --blue:#2F6FED;
-    --blue-bg:#EAF1FE;
-    --radius:10px;
-    --shadow:0 1px 2px rgba(16,20,28,0.04), 0 1px 1px rgba(16,20,28,0.03);
+    --blue:#3165e6; --teal:#16a6a0; --amber:#e9a124;
+    --ink:#10213e; --text:#1b2942; --dim:#6b7a92; --faint:#9aa6ba;
+    --bg:#f5f7fb; --card:#ffffff; --line:#e4eaf3;
+    --green-bg:#e7f8ef; --green:#168053;
+    --amber-bg:#fff4e4; --amber-ink:#a66b15;
+    --red:#d1453d; --red-bg:#fdeceb;
+    --radius:14px; --shadow:0 3px 13px rgba(16,33,62,0.05);
   }
   *{box-sizing:border-box;}
   html,body{height:100%;margin:0;overflow:hidden;}
   body{background:var(--bg);color:var(--text);font-family:'Public Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;}
-  h1,h2,h3,h4{font-family:'Lexend',system-ui,sans-serif;margin:0;text-wrap:balance;}
+  h1,h2,h3{font-family:'Lexend',system-ui,sans-serif;margin:0;text-wrap:balance;}
+  button,input,select,textarea{font:inherit;}
+  button{cursor:pointer;}
   .mono{font-family:'IBM Plex Mono',monospace;}
-  button{font-family:inherit;cursor:pointer;}
-  .app{display:flex;height:100vh;height:100dvh;overflow:hidden;}
 
-  /* Themed scrollbars: a quiet thin thumb instead of the default chrome, light variant for the white content pane, pale variant for the dark sidebar */
-  .content, .table-scroll, .slideover{scrollbar-width:thin;scrollbar-color:rgba(26,29,35,0.22) transparent;}
-  .content::-webkit-scrollbar, .table-scroll::-webkit-scrollbar, .slideover::-webkit-scrollbar{width:9px;height:9px;}
-  .content::-webkit-scrollbar-track, .table-scroll::-webkit-scrollbar-track, .slideover::-webkit-scrollbar-track{background:transparent;}
-  .content::-webkit-scrollbar-thumb, .table-scroll::-webkit-scrollbar-thumb, .slideover::-webkit-scrollbar-thumb{background:rgba(26,29,35,0.2);border-radius:8px;border:2px solid transparent;background-clip:padding-box;}
-  .content:hover::-webkit-scrollbar-thumb, .table-scroll:hover::-webkit-scrollbar-thumb, .slideover:hover::-webkit-scrollbar-thumb{background:rgba(26,29,35,0.38);background-clip:padding-box;}
-  .nav{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.22) transparent;}
-  .nav::-webkit-scrollbar{width:6px;}
-  .nav::-webkit-scrollbar-track{background:transparent;}
-  .nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.16);border-radius:8px;}
-  .nav:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);}
+  .app{display:flex;height:100vh;overflow:hidden;}
 
-  /* ---------- Sidebar (matches the Vormor side-nav reference exactly: bold icons, generous type, soft dark sheen) ---------- */
-  .sidebar-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:59;display:none;}
-  .sidebar-scrim.open{display:block;}
-  /* Collapsed by default (icon rail), expands on hover — matches the real app's hover-expand side-navbar */
-  .sidebar{
-    width:76px;flex:none;
-    background:
-      radial-gradient(120% 70% at 15% 0%, rgba(255,255,255,0.07), transparent 60%),
-      linear-gradient(160deg, #2b2b2b 0%, #1c1c1c 45%, #0d0d0d 100%);
-    display:flex;flex-direction:column;
-    height:100%;z-index:60;overflow:hidden;
-    transition:width .3s ease;
+  /* ---------- Sidebar ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(8,16,33,0.5);z-index:40;display:none;}
+  .scrim.open{display:block;}
+  .side{
+    width:232px;flex:none;background:var(--ink);color:#fff;
+    display:flex;flex-direction:column;padding:26px 16px;height:100%;z-index:41;
   }
-  .sidebar.expanded{width:278px;}
-  .nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 0 10px;}
-  .nav-divider{height:1px;background:var(--sidebar-divider);margin:16px 16px;}
-  .nav-group-label{
-    color:var(--sidebar-group-label);font-size:21px;font-weight:700;white-space:nowrap;
-    padding:0 16px 14px 82px;font-family:'Lexend',sans-serif;
-    opacity:0;transition:opacity .15s ease;
-  }
-  .sidebar.expanded .nav-group-label{opacity:1;transition:opacity .2s ease .1s;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 28px;}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:#ff724e;color:#10213e;
+    font-family:'Lexend';font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .brand-name{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+  .brand-name b{color:#ff724e;}
+  .brand-sub{font-size:10.5px;color:#8ea0c2;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;}
+  .nav{display:flex;flex-direction:column;gap:3px;flex:1;}
   .nav-item{
-    display:flex;align-items:center;gap:0;width:100%;border:none;background:transparent;
-    color:var(--sidebar-text);min-height:58px;padding:6px 16px;border-radius:4px;font-size:18px;font-weight:400;
-    text-align:left;margin-bottom:2px;white-space:nowrap;
+    display:flex;align-items:center;gap:11px;width:100%;border:0;text-align:left;background:none;
+    color:#b9c7dc;border-radius:10px;padding:12px 13px;font-weight:700;font-size:14px;
   }
-  .nav-item .icon-container{width:44px;flex:none;display:flex;align-items:center;justify-content:center;transition:width .3s ease;}
-  .sidebar.expanded .nav-item .icon-container{width:66px;justify-content:flex-start;}
-  .nav-item .navicon{width:25px;height:25px;flex:none;color:var(--sidebar-text);}
-  .nav-item .navicon.navicon-lg{width:30px;height:30px;}
-  .nav-item .nav-label{opacity:0;transition:opacity .15s ease;}
-  .sidebar.expanded .nav-item .nav-label{opacity:1;transition:opacity .2s ease .1s;}
-  .nav-item:hover,.nav-item.active{background:var(--sidebar-row-hover);}
-  .nav-item:hover{color:#fff;}
-  .nav-item:hover .navicon{color:#fff;}
-  .nav-item.active{color:var(--sidebar-text-active);}
-  .nav-item.active .navicon{color:var(--orange);}
-  .nav-item .badge-new{
-    margin-left:auto;background:var(--orange);color:#fff;font-size:9px;font-weight:700;
-    padding:1.5px 6px;border-radius:999px;letter-spacing:.03em;opacity:0;transition:opacity .15s ease;
-  }
-  .sidebar.expanded .nav-item .badge-new{opacity:1;transition:opacity .2s ease .1s;}
-  .nav-top-item{padding:20px 0 12px;}
-  .nav-top-item .nav-item{color:var(--sidebar-home);font-weight:600;}
-  .nav-top-item .navicon{width:32px;height:32px;color:var(--sidebar-home);}
-  .nav-top-item .nav-item:hover .navicon,
-  .nav-top-item .nav-item.active .navicon{color:var(--sidebar-home);}
-  .nav-top-divider{height:1px;background:var(--sidebar-divider);margin:6px 16px 0;}
+  .nav-item .ic{width:18px;text-align:center;flex:none;}
+  .nav-item:hover{background:#1c3156;color:#fff;}
+  .nav-item.active{background:#253f6c;color:#fff;}
+  .side-foot{font-size:11px;color:#6f81a0;padding:10px 8px 0;border-top:1px solid rgba(255,255,255,0.08);margin-top:10px;padding-top:14px;}
 
-  .sidebar-foot{padding:14px 16px 30px;text-align:center;opacity:0;transition:opacity .15s ease;}
-  .sidebar.expanded .sidebar-foot{opacity:1;transition:opacity .2s ease .1s;}
-  .ver{color:var(--sidebar-text-dim);font-size:12.5px;line-height:1.8;white-space:nowrap;}
-
-  .sidebar-pin-row{display:flex;justify-content:center;padding:12px 10px 0;}
-  .sidebar.expanded .sidebar-pin-row{justify-content:flex-end;}
-  .pin-btn{
-    width:34px;height:34px;flex:none;border:none;background:transparent;border-radius:8px;
-    display:flex;align-items:center;justify-content:center;color:var(--sidebar-text-dim);
-  }
-  .pin-btn svg{width:18px;height:18px;transition:transform .2s ease;}
-  .pin-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
-  .pin-btn.pinned{color:var(--orange);}
-  .pin-btn.pinned svg{transform:rotate(45deg);}
-
-  .hamburger{display:none;border:none;background:transparent;width:36px;height:36px;border-radius:8px;
-    align-items:center;justify-content:center;color:var(--text);position:absolute;left:20px;top:50%;transform:translateY(-50%);}
+  .hamburger{display:none;border:0;background:transparent;width:38px;height:38px;border-radius:9px;
+    align-items:center;justify-content:center;color:var(--text);flex:none;}
   .hamburger svg{width:22px;height:22px;}
-  @media (max-width:900px){
+  @media (max-width:980px){
     .hamburger{display:flex;}
-    .sidebar-pin-row{display:none;}
-    .sidebar{position:fixed;top:0;left:0;height:100vh;width:278px;max-width:85vw;transform:translateX(-100%);transition:transform .25s ease;}
-    .sidebar.open{transform:translateX(0);}
-    .sidebar.open .nav-group-label,.sidebar.open .nav-item .nav-label,
-    .sidebar.open .nav-item .icon-container,.sidebar.open .sidebar-foot{opacity:1;}
-    .sidebar.open .nav-item .icon-container{width:66px;justify-content:flex-start;}
+    .side{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);transition:transform .25s ease;max-width:85vw;}
+    .side.open{transform:translateX(0);}
   }
 
-  /* ---------- Main: logo-bar + topbar stay put, .content is the one scrolling pane ---------- */
-  .main{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden;}
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{flex:none;background:var(--card);border-bottom:1px solid var(--line);padding:14px 28px;
+    display:flex;align-items:center;gap:14px;}
+  .topbar-title{font-weight:800;font-size:15px;}
+  .content{flex:1;min-height:0;overflow-y:auto;padding:28px 34px 70px;}
+  .content-inner{max-width:1280px;margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 
-  .logo-bar{
-    flex:none;
-    background:var(--card);border-bottom:1px solid var(--border);
-    padding:22px 32px;display:flex;align-items:center;justify-content:center;position:relative;
-  }
-  .logo-wordmark{font-family:'Lexend';font-weight:700;font-size:26px;letter-spacing:-.01em;}
-  .logo-wordmark .s1{color:var(--orange);}
-  .logo-wordmark .s2{color:#1A1D23;}
-  .logo-bar-icons{position:absolute;right:32px;top:50%;transform:translateY(-50%);display:flex;gap:14px;align-items:center;}
-  .logo-icon-btn{
-    width:40px;height:40px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;
-    background:transparent;color:var(--orange);position:relative;flex:none;
-  }
-  .logo-icon-btn.filled{background:var(--orange);color:#fff;}
-  .logo-icon-btn svg{width:21px;height:21px;}
-  .dot-badge{position:absolute;top:5px;right:5px;width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid #fff;}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+  .eyebrow{text-transform:uppercase;font-size:11.5px;letter-spacing:.1em;color:var(--dim);font-weight:800;margin:0 0 7px;}
+  h1.page-title{font-size:28px;letter-spacing:-1px;margin:0 0 6px;}
+  .sub{color:var(--dim);margin:0;font-size:13.5px;}
+  .tag{display:inline-block;border-radius:18px;background:#eaf0ff;color:#385ac3;padding:7px 12px;font-size:12px;font-weight:750;white-space:nowrap;}
 
-  .preview-as{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);
-    padding:4px;border-radius:8px;flex:none;}
-  .preview-as span.lbl{font-size:10.5px;color:var(--text-dim);font-weight:600;padding-left:7px;white-space:nowrap;}
-  .preview-as button{
-    border:none;background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;
-    padding:5px 9px;border-radius:6px;white-space:nowrap;
-  }
-  .preview-as button.active{background:var(--text);color:#fff;}
+  .btn{border-radius:9px;padding:10px 15px;font-weight:700;font-size:13px;border:1px solid var(--line);background:#fff;color:#2e4bac;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{background:#f6f8fc;}
+  .btn-primary{border:1px solid #315fe5;background:#315fe5;color:#fff;}
+  .btn-primary:hover{background:#2851c9;}
+  .btn-link{border:0;background:none;color:#315fe5;font-weight:700;padding:5px;}
+  .btn-link:hover{text-decoration:underline;}
 
-  /* Page heading: lives in the scrolling content, not a second fixed bar */
-  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
-  .page-head h2{font-size:21px;}
-  .topbar-sub{color:var(--text-dim);font-size:13px;margin-top:3px;}
-  .demo-tag{
-    flex:none;background:var(--bg);border:1px solid var(--border);color:var(--text-faint);
-    font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:4px 10px;border-radius:999px;white-space:nowrap;margin-top:2px;
-  }
-  .content{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 28px 60px;}
-  .content-inner{max-width:1180px;width:100%;margin:0 auto;}
-  .page{display:none;}
-  .page.active{display:block;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:26px 0 13px;}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;}
 
-  /* ---------- Shared bits ---------- */
-  .crumb{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;margin-bottom:14px;}
-  .crumb button{background:none;border:none;color:var(--blue);font-weight:600;font-size:12.5px;padding:0;}
-  .placeholder{
-    background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);
-    padding:60px 20px;text-align:center;color:var(--text-faint);font-size:13px;
-  }
-  .grid{display:grid;gap:14px;}
-  .g4{grid-template-columns:repeat(4,1fr);}
-  .g3{grid-template-columns:repeat(3,1fr);}
-  .g2{grid-template-columns:2fr 1fr;}
-  @media (max-width:900px){ .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:1fr;} .g2{grid-template-columns:1fr;} }
-  @media (max-width:600px){
-    .g4{grid-template-columns:1fr 1fr;}
-    .content{padding:16px 16px 48px;}
-    .logo-bar{padding:14px 20px 14px 64px;}
-    .logo-wordmark{font-size:20px;}
-    .preview-as{display:none;}
-    .page-head h2{font-size:18px;}
-    .filterbar .field{min-width:100%;}
-    .actions-right{width:100%;justify-content:flex-start;}
-    .slideover{width:100%;max-width:100%;}
-  }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:21px;box-shadow:var(--shadow);min-width:0;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:15px;}
+  .grid3 > *, .grid2 > *{min-width:0;}
+  @media (max-width:900px){.grid3{grid-template-columns:repeat(2,1fr);} .grid2{grid-template-columns:1fr;}}
+  @media (max-width:600px){.grid3{grid-template-columns:1fr;} .content{padding:18px 16px 60px;}}
 
-  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0;}
-  .grid > *{min-width:0;}
-  .card-head{flex-wrap:wrap;row-gap:4px;}
-  .card-head > *{min-width:0;}
-  .card-pad{padding:18px 20px;}
-  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-  .card-head h3{font-size:14.5px;}
-  .card-head .hint{color:var(--text-faint);font-size:11.5px;}
+  .mini{background:#f7f9fc;border-radius:10px;padding:16px;}
+  .mini span{font-size:11.5px;color:var(--dim);font-weight:600;}
+  .mini b{display:block;font-family:'Lexend';font-size:24px;margin:6px 0;letter-spacing:-.5px;}
+  .mini small{font-size:11.5px;color:var(--faint);}
 
-  .kpi{padding:16px 18px;}
-  .kpi .label{color:var(--text-dim);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
-  .kpi .value{font-family:'Lexend';font-size:25px;font-weight:600;margin-top:6px;}
-  .kpi .delta{font-size:11.5px;margin-top:5px;font-weight:600;}
-  .delta.up{color:var(--green);} .delta.down{color:var(--red);}
+  .rowhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .fine{color:var(--dim);font-size:12px;}
 
-  .btn{
-    border:1px solid var(--border);background:var(--card);color:var(--text);
-    padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;
-  }
-  .btn:hover{background:var(--bg);}
-  .btn-primary{background:var(--orange);border-color:var(--orange);color:#1B1E24;}
-  .btn-primary:hover{background:#ff8a35;}
-  .btn-ghost{border-color:transparent;background:transparent;color:var(--blue);padding:6px 4px;}
+  .track{height:9px;background:#edf1f6;border-radius:10px;overflow:hidden;margin:11px 0;}
+  .fill{height:100%;border-radius:10px;transition:width .4s ease;}
+  .goalhead{display:flex;align-items:center;gap:10px;}
+  .icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:17px;flex:none;}
+  .big{font-family:'Lexend';font-size:24px;font-weight:800;margin:14px 0 3px;}
 
-  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  table{width:100%;min-width:620px;border-collapse:collapse;}
-  .alert-banner{
-    display:flex;align-items:flex-start;gap:12px;background:var(--amber-bg);border:1px solid rgba(232,151,43,0.35);
-    border-radius:var(--radius);padding:13px 16px;margin-bottom:14px;color:#6B4710;font-size:13px;
-  }
-  .alert-banner .ic{flex:none;font-size:16px;line-height:1;}
-  .alert-banner b{font-weight:700;}
-  .alert-banner .names{color:#92600E;}
-  th{text-align:left;color:var(--text-dim);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
-     padding:8px 10px;border-bottom:1px solid var(--border);}
-  td{padding:11px 10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
-  tr:last-child td{border-bottom:none;}
-  tr.rowlink{cursor:pointer;}
-  tr.rowlink:hover{background:var(--bg);}
-  .avatar{
-    width:28px;height:28px;border-radius:50%;background:var(--blue-bg);color:var(--blue);
-    display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;margin-right:9px;flex:none;
-  }
-  .namecell{display:flex;align-items:center;}
-  .pill{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
-  .pill-green{background:var(--green-bg);color:#0E7A54;}
-  .pill-amber{background:var(--amber-bg);color:#92600E;}
-  .pill-red{background:var(--red-bg);color:#A3291F;}
-  .sparkline{width:72px;height:22px;}
-  .dim{color:var(--text-dim);}
+  .note{padding:13px 16px;background:#eaf0ff;border-radius:10px;color:#3a527e;font-size:12.5px;line-height:1.55;margin-top:16px;}
 
-  /* class cards */
-  .class-card{
-    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-    padding:18px;display:flex;flex-direction:column;gap:12px;cursor:pointer;
-  }
-  .class-card:hover{border-color:var(--orange);}
-  .class-card .swatch{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
-    font-family:'Lexend';font-weight:700;color:#fff;font-size:14px;}
-  .class-card h4{font-size:15px;}
-  .class-card .meta{color:var(--text-dim);font-size:12px;}
-  .class-card .foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;}
-  .code-chip{background:var(--bg);border:1px dashed var(--border);border-radius:6px;padding:3px 8px;font-size:11.5px;font-weight:600;letter-spacing:.06em;}
-  .add-class-card{
-    border:1.5px dashed var(--border);border-radius:var(--radius);display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:8px;color:var(--text-dim);font-weight:600;font-size:13px;min-height:150px;
-  }
-  .add-class-card:hover{border-color:var(--orange);color:var(--orange);}
+  .table-scroll{overflow-x:auto;}
+  table{border-collapse:collapse;width:100%;min-width:680px;font-size:13px;}
+  th{text-align:left;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;
+    padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th.sortable{cursor:pointer;user-select:none;}
+  th.sortable:hover{color:#2e4bac;}
+  th.sortable .arrow{margin-left:3px;opacity:.5;}
+  th.sortable.sorted .arrow{opacity:1;}
+  td{padding:12px 9px;border-bottom:1px solid #edf1f6;vertical-align:middle;}
+  tr.clickable{cursor:pointer;}
+  tr.clickable:hover{background:#f8fafd;}
 
-  /* modal */
-  .modal-scrim{position:fixed;inset:0;background:rgba(16,20,28,0.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .badge{display:inline-block;background:var(--green-bg);color:var(--green);border-radius:15px;padding:4px 10px;font-size:11.5px;font-weight:750;white-space:nowrap;}
+  .badge.partial{background:var(--amber-bg);color:var(--amber-ink);}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:18px 0;}
+  .toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  select,input,textarea{border:1px solid #d9e2ee;background:#fff;color:#293955;border-radius:9px;padding:9px 12px;font-size:13px;}
+  input[type=number]{max-width:160px;}
+  .search{width:220px;max-width:100%;}
+  @media (max-width:600px){.search{width:100%;}}
+
+  .tabs{display:flex;background:#e9eef7;padding:4px;border-radius:10px;}
+  .tab{border:0;background:transparent;color:#627590;border-radius:8px;padding:9px 15px;font-weight:750;font-size:12.5px;}
+  .tab.active{background:#fff;color:#2d4fb3;box-shadow:0 2px 8px rgba(23,51,91,0.13);}
+
+  /* ---------- Chart ---------- */
+  .chart{height:190px;display:flex;align-items:end;justify-content:space-around;border-bottom:1px solid #dbe3ec;position:relative;margin:24px 2px 30px;}
+  .chartline{position:absolute;left:0;right:0;border-top:2px dashed #b9c7dc;}
+  .chartline label{position:absolute;right:0;top:-19px;color:#7789a4;font-size:10.5px;background:var(--card);padding-left:4px;}
+  .barcol{height:100%;width:13%;display:flex;align-items:end;justify-content:center;position:relative;cursor:pointer;}
+  .barcol.active .bar{outline:3px solid #d8e2fb;outline-offset:3px;}
+  .bar{width:60%;max-width:50px;display:flex;flex-direction:column-reverse;border-radius:6px 6px 0 0;overflow:hidden;transition:height .35s ease;}
+  .bar i{display:block;width:100%;transition:height .35s ease;}
+  .day{position:absolute;bottom:-22px;color:var(--dim);font-size:11.5px;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:11.5px;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
+
+  .chart-tip{
+    position:fixed;z-index:60;background:var(--ink);color:#fff;border-radius:9px;padding:9px 12px;
+    font-size:11.5px;line-height:1.5;pointer-events:none;opacity:0;transform:translate(-50%,-6px);
+    transition:opacity .12s ease;box-shadow:0 10px 24px rgba(8,16,33,0.25);white-space:nowrap;
+  }
+  .chart-tip.show{opacity:1;}
+  .chart-tip b{display:block;font-size:11.5px;margin-bottom:3px;}
+  .chart-tip .ti{display:flex;align-items:center;gap:5px;}
+
+  .metric{display:grid;grid-template-columns:92px 1fr 96px;align-items:center;gap:9px;margin:15px 0;font-size:12.5px;}
+  .metric strong{text-align:right;}
+
+  /* ---------- Modal ---------- */
+  .modal-scrim{position:fixed;inset:0;background:rgba(7,21,45,0.6);display:none;align-items:center;justify-content:center;padding:18px;z-index:70;}
   .modal-scrim.open{display:flex;}
-  .modal{background:var(--card);border-radius:14px;width:420px;max-width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
-  .modal h3{font-size:16px;margin-bottom:4px;}
-  .modal .mhint{color:var(--text-dim);font-size:12.5px;margin-bottom:16px;}
-  .field{margin-bottom:14px;}
-  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:5px;}
-  .field input,.field select{
-    width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);
-  }
-  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
-  .joincode-box{
-    background:var(--orange-dim);border:1px dashed var(--orange);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;
-  }
-  .joincode-box .code{font-family:'IBM Plex Mono';font-size:26px;font-weight:600;letter-spacing:.14em;color:#B85600;}
-  .joincode-box .lbl{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
-  .or-div{display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:11px;margin:14px 0;}
-  .or-div::before,.or-div::after{content:"";flex:1;height:1px;background:var(--border);}
+  .dialog{background:#fff;border-radius:16px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:26px;
+    box-shadow:0 25px 80px rgba(6,21,43,0.4);animation:pop .15s ease;}
+  @keyframes pop{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:none;}}
+  .dialog p{font-size:12.5px;color:var(--dim);line-height:1.55;}
+  .field-label{display:block;font-size:12.5px;font-weight:750;margin:15px 0 6px;}
+  .dialog input,.dialog select{width:100%;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px;}
+  .feedback{padding:10px 12px;background:#edf4ff;color:#3b527e;border-radius:9px;font-size:12.5px;margin-top:13px;}
+  .feedback.error{background:var(--red-bg);color:#a34531;}
+  .preview{max-height:170px;overflow:auto;}
+  .preview table{min-width:0;}
+  .note-input{display:block;width:100%;min-height:90px;resize:vertical;line-height:1.5;margin-top:10px;}
 
-  /* slide-over for student detail */
-  .slideover-scrim{position:fixed;inset:0;background:rgba(16,20,28,0.35);display:none;z-index:40;}
-  .slideover-scrim.open{display:block;}
-  .slideover{
-    position:fixed;top:0;right:0;height:100vh;width:460px;max-width:92vw;background:var(--bg);
-    box-shadow:-8px 0 30px rgba(0,0,0,0.15);transform:translateX(100%);transition:transform .22s ease;z-index:41;
-    overflow-y:auto;
+  /* ---------- Toasts ---------- */
+  .toast-stack{position:fixed;bottom:20px;right:20px;z-index:90;display:flex;flex-direction:column;gap:10px;max-width:min(360px,calc(100vw - 40px));}
+  .toast{background:var(--ink);color:#fff;border-radius:11px;padding:13px 16px;font-size:13px;box-shadow:0 14px 34px rgba(6,21,43,0.3);
+    display:flex;align-items:center;gap:10px;animation:toastIn .2s ease;}
+  .toast.err{background:#7a2a24;}
+  @keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .toast .dot-ok{width:8px;height:8px;border-radius:50%;background:#4ade80;flex:none;}
+  .toast.err .dot-ok{background:#f87171;}
+
+  @media print{
+    body{background:#fff;}
+    .side,.no-print,.modal-scrim,.hamburger,.toast-stack{display:none!important;}
+    .app,.main,.content{height:auto;overflow:visible;}
+    .content{padding:0;}
+    .view{display:none!important;}
+    #reports.view{display:block!important;}
+    .card{box-shadow:none;break-inside:avoid;}
+    .grid2{grid-template-columns:1fr 1fr;}
+    .note-input{border:0;padding:0;min-height:0;}
   }
-  .slideover.open{transform:translateX(0);}
-  .slideover-head{background:var(--card);border-bottom:1px solid var(--border);padding:18px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;}
-  .slideover-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
-  .close-x{border:none;background:var(--bg);width:30px;height:30px;border-radius:8px;font-size:15px;color:var(--text-dim);}
-
-  .filterbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:var(--card);border:1px solid var(--border);
-    border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;}
-  .filterbar .field{margin:0;min-width:150px;flex:1;}
-  .filterbar .field.small{min-width:110px;flex:none;}
-  .actions-right{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
-
-  .legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;}
-  .legend-row span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);}
-  .dot{width:8px;height:8px;border-radius:50%;flex:none;}
-
-  .tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
-  .student-tile{
-    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-    background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--border);cursor:pointer;
-  }
-  .student-tile:hover{border-color:var(--text-faint);}
-  .student-tile .avatar{flex:none;}
-  .tile-info{min-width:0;}
-  .tile-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tile-minutes{font-family:'Lexend';font-size:15px;font-weight:700;}
-  .student-tile.status-green{border-left-color:var(--green);}
-  .student-tile.status-amber{border-left-color:var(--amber);}
-  .student-tile.status-red{border-left-color:var(--red);}
-  .status-green .tile-minutes{color:#0E7A54;}
-  .status-amber .tile-minutes{color:#92600E;}
-  .status-red .tile-minutes{color:#A3291F;}
 </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="sidebar-scrim" id="sidebarScrim" onclick="closeSidebar()"></div>
-  <!-- ===================== SIDEBAR (structure mirrors the real side-navbar: Home row, then Scanner / Document / Classroom / Account groups separated by divider lines) ===================== -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-pin-row">
-      <button class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3Z"/><path d="M12 15v5"/></svg>
-      </button>
+  <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div>
+        <div class="brand-name"><b>scan</b>marker <span style="color:#ff724e">Max</span></div>
+        <div class="brand-sub">Teacher Dashboard</div>
+      </div>
     </div>
-    <div class="nav-top-item">
-      <button class="nav-item active" data-page="home" onclick="go('home')" title="Home">
-        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.8 1.6 11.2a1 1 0 0 0 .63 1.78H4V21a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-5.5h3v5.5a1 1 0 0 0 1 1H19a1 1 0 0 0 1-1v-8h1.77a1 1 0 0 0 .63-1.78Z"/></svg></span>
-        <span class="nav-label">Home</span>
-      </button>
-    </div>
-    <div class="nav-top-divider"></div>
-
     <nav class="nav">
-      <div class="nav-group-label">Scanner</div>
-      <button class="nav-item" onclick="go('placeholder')" title="Connect or disconnect your Scanmarker">
-        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6.5V3M13 11.5V8"/><path d="M6 8h9v3a4.5 4.5 0 0 1-4.5 4.5A4.5 4.5 0 0 1 6 11Z"/><path d="M10.5 15.5V19"/><path d="M4 20 20 4"/></svg></span>
-        <span class="nav-label">Connect/Disconnect</span>
-      </button>
-
-      <div class="nav-divider"></div>
-      <div class="nav-group-label">Document</div>
-      <button class="nav-item" onclick="go('placeholder')" title="Print">
-        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5"/><rect x="5" y="9" width="14" height="8" rx="1.5"/><rect x="8" y="14" width="8" height="6"/></svg></span>
-        <span class="nav-label">Print</span>
-      </button>
-      <button class="nav-item" onclick="go('placeholder')" title="Share">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 11l8-4M8 13l8 4"/></svg></span>
-        <span class="nav-label">Share</span>
-      </button>
-      <button class="nav-item" onclick="go('placeholder')" title="Export">
-        <span class="icon-container"><svg class="navicon navicon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg></span>
-        <span class="nav-label">Export</span>
-      </button>
-
-      <div class="nav-divider"></div>
-      <div class="nav-group-label">Classroom</div>
-      <button class="nav-item" data-page="activity" data-roles="student,teacher" onclick="go('activity')" title="My Activity">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="3.2" height="8"/><rect x="10.4" y="6" width="3.2" height="14"/><rect x="16.8" y="9" width="3.2" height="11"/></svg></span>
-        <span class="nav-label">My Activity</span>
-      </button>
-      <button class="nav-item" data-page="classes" data-roles="teacher" onclick="go('classes')" title="My Classes">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg></span>
-        <span class="nav-label">My Classes</span>
-      </button>
-      <button class="nav-item" data-page="goals" data-roles="teacher" onclick="go('goals')" title="Goals">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
-        <span class="nav-label">Goals</span>
-      </button>
-      <button class="nav-item" data-page="reports" data-roles="teacher" onclick="go('reports')" title="Reports">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
-        <span class="nav-label">Reports</span>
-      </button>
-      <button class="nav-item" data-page="analytics" data-roles="teacher" onclick="go('analytics')" title="Analytics">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg></span>
-        <span class="nav-label">Analytics</span>
-      </button>
-
-      <div class="nav-divider"></div>
-      <div class="nav-group-label">Account</div>
-      <button class="nav-item" onclick="go('placeholder')" title="My Account">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg></span>
-        <span class="nav-label">My Account</span>
-      </button>
-      <button class="nav-item" onclick="go('placeholder')" title="Support">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9a2.7 2.7 0 1 1 3.9 2.4c-1 .5-1.5 1-1.5 2.1"/><path d="M12 17h.01"/></svg></span>
-        <span class="nav-label">Support</span>
-      </button>
-      <button class="nav-item" onclick="go('placeholder')" title="Terms &amp; Conditions">
-        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 16h6M9 10h3"/></svg></span>
-        <span class="nav-label">Terms &amp; Conditions</span>
-      </button>
+      <button class="nav-item active" data-view="overview"><span class="ic">▦</span>Overview</button>
+      <button class="nav-item" data-view="classes"><span class="ic">🏫</span>Classes</button>
+      <button class="nav-item" data-view="analytics"><span class="ic">📈</span>Student analytics</button>
+      <button class="nav-item" data-view="goals"><span class="ic">🎯</span>Goals</button>
+      <button class="nav-item" data-view="reports"><span class="ic">📄</span>Reports</button>
     </nav>
-
-    <div class="sidebar-foot"><div class="ver">Client Version 1.0.0.3.0, Server Version 1.2.0<br>All rights reserved</div></div>
+    <div class="side-foot">Concept prototype · example data<br>Scanmarker Max v1.0</div>
   </aside>
 
-  <!-- ===================== MAIN ===================== -->
   <div class="main">
-    <div class="logo-bar">
-      <button class="hamburger" onclick="openSidebar()" title="Menu">
+    <div class="topbar">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
-      <div class="logo-wordmark"><span class="s1">s</span><span class="s2">canmarker</span></div>
-      <div class="logo-bar-icons">
-        <div class="preview-as">
-          <span class="lbl">Preview as</span>
-          <button id="btnRoleStudent" class="active" onclick="setRole('student')">Student</button>
-          <button id="btnRoleTeacher" onclick="setRole('teacher')">Teacher</button>
-        </div>
-        <button class="logo-icon-btn" title="Notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
-          <span class="dot-badge"></span>
-        </button>
-        <button class="logo-icon-btn filled" title="Support chat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 6.5 0 0 1 8-6.5 8 6.5 0 0 1 8 6.5c0 3.6-3.6 6.5-8 6.5-1 0-2-.15-2.9-.4L5 20l1-3.3C4.75 15.4 4 13.8 4 12Z"/></svg>
-        </button>
-      </div>
+      <div class="topbar-title" id="topbarTitle">Overview</div>
     </div>
 
     <div class="content">
-     <div class="content-inner">
+      <div class="content-inner">
 
-      <div class="page-head">
-        <div>
-          <h2 id="pageTitle">Home</h2>
-          <div class="topbar-sub" id="pageSub">Welcome back</div>
-        </div>
-        <span class="demo-tag">Example data</span>
+        <!-- ================= OVERVIEW ================= -->
+        <section id="overview" class="view active">
+          <div class="top">
+            <div>
+              <p class="eyebrow">Teacher dashboard · Sample data</p>
+              <h1 class="page-title">Overview</h1>
+              <p class="sub" id="overviewSub"></p>
+            </div>
+            <span class="tag">Class snapshot</span>
+          </div>
+          <div class="grid3" id="overviewStats"></div>
+          <div class="grid2" style="margin-top:16px">
+            <div class="card">
+              <div class="rowhead"><h2>Class practice by day</h2><span class="fine">Minutes across the roster</span></div>
+              <div class="chart" id="overviewChart"></div>
+              <div class="legend" id="overviewLegend"></div>
+            </div>
+            <div class="card">
+              <h2>Review next</h2>
+              <div id="reviewList"></div>
+              <div class="actions" style="margin-top:16px">
+                <button class="btn" data-go="classes">Manage class</button>
+                <button class="btn btn-primary" data-go="reports">View reports</button>
+              </div>
+            </div>
+          </div>
+          <div class="note">Usage and time show practice with the pen. Reading proficiency requires assessments, work samples, and teacher observations.</div>
+        </section>
+
+        <!-- ================= CLASSES ================= -->
+        <section id="classes" class="view">
+          <div class="top">
+            <div>
+              <p class="eyebrow">Teacher dashboard · Class setup</p>
+              <h1 class="page-title">Classes</h1>
+              <p class="sub">Manage the classroom with school-issued student IDs.</p>
+            </div>
+            <span class="tag">Class setup</span>
+          </div>
+          <div class="card">
+            <div class="rowhead"><h2>Class details</h2><button class="btn" id="editClassBtn">Edit class</button></div>
+            <div class="grid3" id="classDetails" style="margin-top:16px"></div>
+          </div>
+          <div class="section-head">
+            <div><h2>Students and devices</h2><div class="fine">Enter an ID like s40301234, upload a roster, or review the proposed LMS mapping.</div></div>
+            <div class="actions">
+              <button class="btn" id="lmsBtn">LMS setup</button>
+              <button class="btn" id="uploadBtn">Upload CSV</button>
+              <button class="btn btn-primary" id="addStudentBtn">+ Add student</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="rowhead">
+              <h2>Class roster <span class="fine" id="rosterCount"></span></h2>
+              <input class="search" id="rosterSearch" placeholder="Search name or school ID" aria-label="Search roster">
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr>
+                  <th class="sortable" data-sort="name">Student <span class="arrow">↕</span></th>
+                  <th class="sortable" data-sort="id">School ID <span class="arrow">↕</span></th>
+                  <th>Device SN</th><th>Link</th><th></th>
+                </tr></thead>
+                <tbody id="rosterRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="note">School IT can map LMS student IDs and class IDs to this roster. On a shared pen, each student must enter their own ID before use to attribute activity correctly.</div>
+        </section>
+
+        <!-- ================= ANALYTICS ================= -->
+        <section id="analytics" class="view">
+          <div class="top">
+            <div>
+              <p class="eyebrow">Teacher dashboard · Sample data</p>
+              <h1 class="page-title">Student analytics</h1>
+              <p class="sub">Review time against daily Reading, Dictionary, and Translation goals.</p>
+            </div>
+            <span class="tag">Sep 21–25, 2026</span>
+          </div>
+          <div class="toolbar">
+            <div class="left">
+              <label class="fine" for="analyticsStudent" style="display:none">Student</label>
+              <select id="analyticsStudent"></select>
+              <span class="fine" id="analyticsDay"></span>
+            </div>
+            <button class="btn" data-go="goals">Edit goals</button>
+          </div>
+          <div class="grid3" id="analyticsCards"></div>
+          <div class="grid2" style="margin-top:16px">
+            <div class="card">
+              <div class="rowhead"><h2>Practice time by day</h2><span class="fine" id="analyticsTarget"></span></div>
+              <div class="chart" id="analyticsChart"></div>
+              <div class="legend" id="analyticsLegend"></div>
+            </div>
+            <div class="card">
+              <h2>Weekly summary</h2>
+              <div class="grid3" id="analyticsStats" style="margin-top:16px"></div>
+              <p class="note">Select a chart bar or table row to review that day. Time with a function is not a reading proficiency score.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2>Daily detail</h2>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Day</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>Total</th><th>All goals</th></tr></thead>
+                <tbody id="analyticsRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= GOALS ================= -->
+        <section id="goals" class="view">
+          <div class="top">
+            <div>
+              <p class="eyebrow">Teacher dashboard · Sample data</p>
+              <h1 class="page-title">Goals</h1>
+              <p class="sub">Set class practice targets, then adjust them for individual students.</p>
+            </div>
+            <button class="btn btn-primary" id="addClassGoalBtn">+ Add class goal</button>
+          </div>
+          <div class="grid3" id="classGoalCards"></div>
+          <div class="card" style="margin-top:16px">
+            <div class="rowhead"><h2>Student goals and today's use</h2><span class="fine">Friday, Sep 25 · minutes used / assigned goal</span></div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Student</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>All goals</th><th></th></tr></thead>
+                <tbody id="goalRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="note">Individual targets override the class target for that student. Changing the class goal keeps individual overrides in place.</div>
+        </section>
+
+        <!-- ================= REPORTS ================= -->
+        <section id="reports" class="view">
+          <div class="top">
+            <div>
+              <p class="eyebrow">Teacher dashboard · Sample data</p>
+              <h1 class="page-title">Reports</h1>
+              <p class="sub">Prepare a practice summary for families, conferences, or administrators.</p>
+            </div>
+            <span class="tag">Sep 21–25, 2026</span>
+          </div>
+          <div class="toolbar no-print">
+            <div class="left">
+              <div class="tabs">
+                <button class="tab active" data-report="student">Student report</button>
+                <button class="tab" data-report="class">Class report</button>
+              </div>
+              <select id="reportStudent" aria-label="Student report"></select>
+            </div>
+            <div class="right">
+              <button class="btn" id="exportCSVBtn">⬇ Export CSV</button>
+              <button class="btn btn-primary" id="printReportBtn">🖨 Print / save PDF</button>
+            </div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Practice report</p>
+            <h2 id="reportHeading"></h2>
+            <p class="fine" id="reportSub"></p>
+            <div class="grid3" id="reportStats" style="margin-top:16px"></div>
+          </div>
+          <div class="grid2" style="margin-top:16px">
+            <div class="card"><h2>Progress toward practice goals</h2><div id="reportGoals"></div></div>
+            <div class="card">
+              <h2>Activity by day</h2>
+              <div class="chart" id="reportChart"></div>
+              <div class="legend" id="reportLegend"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2 id="reportTableTitle"></h2>
+            <div class="table-scroll">
+              <table><thead id="reportHead"></thead><tbody id="reportRows"></tbody></table>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2>Teacher note</h2>
+            <textarea class="note-input" id="reportNote" aria-label="Teacher note"></textarea>
+            <p class="fine" style="margin-top:8px">This report documents use of reading support and practice goals. Use assessments and student work to discuss academic growth. Share through school-approved channels.</p>
+          </div>
+        </section>
+
+        <p class="fine" style="margin:24px 2px 4px">Concept prototype with illustrative minutes. Production reports need user ID, device serial number, function, session duration, and sync rules. Changes in this prototype are stored only in this browser.</p>
       </div>
-
-      <!-- ---------- HOME / PLACEHOLDER (existing screens, unchanged) ---------- -->
-      <section class="page active" data-page="home">
-        <div class="placeholder">This is the existing Home screen — unchanged by this feature.</div>
-      </section>
-      <section class="page" data-page="placeholder">
-        <div class="placeholder">Existing screen — not part of this feature, shown only to keep the real navigation intact.</div>
-      </section>
-
-      <!-- ---------- MY ACTIVITY (Student — personal only) ---------- -->
-      <section class="page" data-page="activity">
-        <div class="grid g4" style="margin-bottom:14px;">
-          <div class="card kpi"><div class="label">Scans this week</div><div class="value">58</div><div class="delta up">▲ 12% vs last week</div></div>
-          <div class="card kpi"><div class="label">Words read</div><div class="value">9,340</div><div class="delta up">▲ 6%</div></div>
-          <div class="card kpi"><div class="label">Reading time</div><div class="value">3h 42m</div><div class="delta down">▼ 8%</div></div>
-          <div class="card kpi"><div class="label">Active days</div><div class="value">5 / 7</div><div class="delta up">On track</div></div>
-        </div>
-        <div class="grid g2">
-          <div class="card card-pad">
-            <div class="card-head"><h3>My usage this week</h3><span class="hint">Scans &amp; reading time</span></div>
-            <canvas id="chartMe" height="150"></canvas>
-          </div>
-          <div class="card card-pad">
-            <div class="card-head"><h3>Features I use most</h3></div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Reading</span><span class="dim">42%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:42%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
-              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Translation</span><span class="dim">27%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:27%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
-              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Dictionary</span><span class="dim">18%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:18%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
-              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Voice Translation</span><span class="dim">9%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:9%;height:100%;background:var(--amber);border-radius:4px;"></div></div></div>
-              <div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;"><span>Phonics</span><span class="dim">4%</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:4%;height:100%;background:var(--red);border-radius:4px;"></div></div></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- MY CLASSES (Teacher) ---------- -->
-      <section class="page" data-page="classes">
-        <div class="grid g3">
-          <div class="class-card" onclick="openClass('5B')">
-            <div class="swatch" style="background:var(--blue);">5B</div>
-            <div><h4>Grade 5 — Section B</h4><div class="meta">22 students · 19 active today</div></div>
-            <div class="foot"><span class="code-chip">JOIN: K3F9XQ</span><span class="pill pill-green">Active</span></div>
-          </div>
-          <div class="class-card" onclick="openClass('ESL')">
-            <div class="swatch" style="background:var(--green);">E1</div>
-            <div><h4>ESL — Morning Group</h4><div class="meta">14 students · 10 active today</div></div>
-            <div class="foot"><span class="code-chip">JOIN: PT72LM</span><span class="pill pill-green">Active</span></div>
-          </div>
-          <div class="class-card" onclick="openClass('READ')">
-            <div class="swatch" style="background:var(--amber);">R3</div>
-            <div><h4>Reading Club — Grade 3</h4><div class="meta">16 students · 6 active today</div></div>
-            <div class="foot"><span class="code-chip">JOIN: 9BCW4R</span><span class="pill pill-amber">Low activity</span></div>
-          </div>
-          <div class="add-class-card" onclick="openModal('modalCreateClass')">
-            <div style="font-size:26px;line-height:1;">＋</div>
-            Create a class
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- CLASS DETAIL (roster) ---------- -->
-      <section class="page" data-page="classdetail">
-        <div class="crumb"><button onclick="go('classes')">My Classes</button> / <span id="classDetailName">Grade 5 — Section B</span></div>
-        <div class="grid g4" style="margin-bottom:14px;">
-          <div class="card kpi"><div class="label">Students</div><div class="value">22</div></div>
-          <div class="card kpi"><div class="label">Active today</div><div class="value">19</div><div class="delta up">86%</div></div>
-          <div class="card kpi"><div class="label">Avg. reading time</div><div class="value">41m</div><div class="delta up">▲ 5%</div></div>
-          <div class="card kpi"><div class="label">Class join code</div><div class="value mono" style="font-size:19px;">K3F9XQ</div></div>
-        </div>
-        <div class="alert-banner">
-          <span class="ic">⚠</span>
-          <div><b>2 students need attention.</b> <span class="names">Kabir Rao</span> has gone quiet this week and <span class="names">Meera Iyer</span> hasn't opened the app in 3 days.</div>
-        </div>
-        <div class="card">
-          <div class="card-pad" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border);">
-            <h3>Roster</h3>
-            <div style="display:flex;gap:8px;">
-              <button class="btn">⬇ Export roster</button>
-              <button class="btn btn-primary" onclick="openModal('modalAddStudent')">＋ Add student</button>
-            </div>
-          </div>
-          <div class="table-scroll">
-          <table>
-            <thead><tr><th>Student</th><th>Last active</th><th>Scans (7d)</th><th>Words read (7d)</th><th>Trend</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td class="dim">Today, 9:40 AM</td><td>18</td><td>2,140</td><td><canvas class="sparkline" data-spark="5,7,6,9,8,10,9"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td class="dim">Today, 8:15 AM</td><td>24</td><td>3,010</td><td><canvas class="sparkline" data-spark="4,6,8,9,11,12,13"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Kabir Rao')"><td><div class="namecell"><span class="avatar">KR</span>Kabir Rao</div></td><td class="dim">Yesterday, 4:02 PM</td><td>6</td><td>540</td><td><canvas class="sparkline" data-spark="9,7,5,4,3,2,2"></canvas></td><td><span class="pill pill-amber">Slipping</span></td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Meera Iyer')"><td><div class="namecell"><span class="avatar">MI</span>Meera Iyer</div></td><td class="dim">3 days ago</td><td>0</td><td>0</td><td><canvas class="sparkline" data-spark="6,5,3,2,0,0,0"></canvas></td><td><span class="pill pill-red">Inactive</span></td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td class="dim">Today, 7:58 AM</td><td>15</td><td>1,860</td><td><canvas class="sparkline" data-spark="7,8,7,9,10,9,11"></canvas></td><td><span class="pill pill-green">On track</span></td><td><span class="btn-ghost">View →</span></td></tr>
-            </tbody>
-          </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- GOALS (Teacher — set & track daily practice targets per class) ---------- -->
-      <section class="page" data-page="goals">
-        <div class="filterbar">
-          <div class="field"><label>Class</label>
-            <select><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
-          </div>
-          <div class="field small"><label>Date</label><input type="date" value="2026-09-25"></div>
-          <div class="actions-right">
-            <button class="btn btn-primary" onclick="openModal('modalAddGoal')">＋ Add class goal</button>
-          </div>
-        </div>
-
-        <div class="grid g3" style="margin-bottom:14px;">
-          <div class="card kpi"><div class="label">Class practice today</div><div class="value">14 min</div><div class="delta up">Goal: 25 min/day</div></div>
-          <div class="card kpi"><div class="label">Function goals met</div><div class="value">9 / 15</div><div class="delta up">3 functions × 5 students</div></div>
-          <div class="card kpi"><div class="label">Students with all goals met</div><div class="value">2 / 5</div><div class="delta down">for Sep 25, 2026</div></div>
-        </div>
-
-        <div class="card">
-          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Current class goals</h3></div>
-          <div class="table-scroll">
-          <table>
-            <thead><tr><th>Function</th><th>Daily target</th><th>Applies on</th><th></th></tr></thead>
-            <tbody>
-              <tr><td><div class="namecell">📖 Reading</div></td><td>10 min / day</td><td>School days</td><td><span class="btn-ghost">Edit</span></td></tr>
-              <tr><td><div class="namecell">📘 Dictionary</div></td><td>5 min / day</td><td>School days</td><td><span class="btn-ghost">Edit</span></td></tr>
-              <tr><td><div class="namecell">🌐 Translation</div></td><td>10 min / day</td><td>Daily</td><td><span class="btn-ghost">Edit</span></td></tr>
-            </tbody>
-          </table>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Student progress — Sep 25, 2026</h3></div>
-          <div class="table-scroll">
-          <table>
-            <thead><tr><th>Student</th><th>Reading (min)</th><th>Dictionary (min)</th><th>Translation (min)</th><th>Total (min)</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td>11</td><td>6</td><td>10</td><td>27</td><td><span class="pill pill-green">All goals met</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td>12</td><td>5</td><td>11</td><td>28</td><td><span class="pill pill-green">All goals met</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Kabir Rao')"><td><div class="namecell"><span class="avatar">KR</span>Kabir Rao</div></td><td>4</td><td>2</td><td>0</td><td>6</td><td><span class="pill pill-amber">1 of 3 met</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Meera Iyer')"><td><div class="namecell"><span class="avatar">MI</span>Meera Iyer</div></td><td>0</td><td>0</td><td>0</td><td>0</td><td><span class="pill pill-red">0 of 3 met</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td>9</td><td>4</td><td>8</td><td>21</td><td><span class="pill pill-amber">2 of 3 met</span></td></tr>
-            </tbody>
-          </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- REPORTS (Teacher — printable/exportable practice summaries) ---------- -->
-      <section class="page" data-page="reports">
-        <div class="card card-pad" style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
-            <div>
-              <h3 style="font-size:16px;">Progress reports</h3>
-              <div class="dim" style="font-size:12.5px;margin-top:4px;">Prepare student and class practice summaries for review and discussion.</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn">⬇ Export CSV</button>
-              <button class="btn btn-primary">🖨 Print / PDF</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
-            <button class="btn" id="repTabStudent" onclick="setReportTab('student')" style="background:var(--text);color:#fff;">Student report</button>
-            <button class="btn" id="repTabClass" onclick="setReportTab('class')">Class report</button>
-          </div>
-          <div class="filterbar" style="margin:16px 0 0;" id="repFilterStudent">
-            <div class="field small"><label>Student</label>
-              <select><option>Maya R. (AB1234)</option><option>Liam K.</option><option>Ava P.</option><option>Noah D.</option><option>Sofia M.</option></select>
-            </div>
-            <div class="field small"><label>Period</label><select><option>Sep 21–25, 2026</option><option>Sep 14–18, 2026</option><option>This term</option></select></div>
-          </div>
-          <div class="filterbar" style="margin:16px 0 0;display:none;" id="repFilterClass">
-            <div class="field small"><label>Class</label>
-              <select><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
-            </div>
-            <div class="field small"><label>Period</label><select><option>Sep 21–25, 2026</option><option>Sep 14–18, 2026</option><option>This term</option></select></div>
-          </div>
-        </div>
-
-        <!-- ---- Student report view ---- -->
-        <div class="card card-pad" id="repViewStudent">
-          <div class="card-head"><h3>Reading support activity · Sep 21–25, 2026</h3><span class="hint">Maya R. · AB1234</span></div>
-
-          <div class="grid g3" style="margin-bottom:16px;">
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Progress toward practice goals</div>
-              <div style="display:flex;flex-direction:column;gap:9px;">
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Reading</span><span class="dim">38 / 50 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:76%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Dictionary</span><span class="dim">20 / 25 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:80%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Translation</span><span class="dim">33 / 50 min</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:66%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
-              </div>
-            </div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Daily practice time <span class="faint">(goal: 25 min/day)</span></div>
-              <canvas id="chartReportDaily" height="110"></canvas>
-            </div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Daily activity by function</div>
-              <canvas id="chartReportFunctions" height="110"></canvas>
-            </div>
-          </div>
-
-          <div style="border-top:1px solid var(--border);padding-top:14px;">
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Teacher note</label>
-            <textarea style="width:100%;min-height:70px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;">Maya practiced with the pen on five school days and met all three daily practice targets on Monday and Thursday.</textarea>
-          </div>
-
-          <div style="margin-top:14px;padding:11px 14px;background:var(--bg);border-radius:8px;font-size:11.5px;color:var(--text-dim);">
-            This report measures tool usage, not reading proficiency. Pair it with assessments and classroom observation before drawing conclusions.
-          </div>
-        </div>
-
-        <!-- ---- Class report view ---- -->
-        <div class="card card-pad" id="repViewClass" style="display:none;">
-          <div class="card-head"><h3>Class practice summary · Sep 21–25, 2026</h3><span class="hint">Grade 5 — Section B · 22 students</span></div>
-
-          <div class="grid g3" style="margin-bottom:16px;">
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Class met goal</div>
-              <div style="display:flex;flex-direction:column;gap:9px;">
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Reading</span><span class="dim">19 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:86%;height:100%;background:var(--orange);border-radius:4px;"></div></div></div>
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Dictionary</span><span class="dim">15 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:68%;height:100%;background:var(--blue);border-radius:4px;"></div></div></div>
-                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>Translation</span><span class="dim">17 / 22 students</span></div><div style="height:6px;background:var(--bg);border-radius:4px;"><div style="width:77%;height:100%;background:var(--green);border-radius:4px;"></div></div></div>
-              </div>
-            </div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Students active per day <span class="faint">(of 22)</span></div>
-              <canvas id="chartClassDaily" height="110"></canvas>
-            </div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">Class practice by function</div>
-              <canvas id="chartClassFunctionsRep" height="110"></canvas>
-            </div>
-          </div>
-
-          <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-              <div style="font-size:12px;font-weight:600;color:var(--text-dim);">Practice minutes by student, Sep 21–25</div>
-              <div class="legend-row" style="margin-top:0;">
-                <span><span class="dot" style="background:var(--green);"></span>Met weekly goal</span>
-                <span><span class="dot" style="background:var(--amber);"></span>Partway there</span>
-                <span><span class="dot" style="background:var(--red);"></span>Needs a check-in</span>
-              </div>
-            </div>
-            <div class="tile-grid" id="classTileGrid"></div>
-          </div>
-
-          <div style="border-top:1px solid var(--border);padding-top:14px;">
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Teacher note</label>
-            <textarea style="width:100%;min-height:70px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;">Most of the class is on pace this week. Kabir and Meera have fallen behind and may need a check-in.</textarea>
-          </div>
-
-          <div style="margin-top:14px;padding:11px 14px;background:var(--bg);border-radius:8px;font-size:11.5px;color:var(--text-dim);">
-            This report measures tool usage, not reading proficiency. Pair it with assessments and classroom observation before drawing conclusions.
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- ANALYTICS (Teacher — aggregate, class-first) ---------- -->
-      <section class="page" data-page="analytics">
-        <div class="filterbar">
-          <div class="field"><label>Class</label>
-            <select id="analyticsClass"><option>All classes</option><option>Grade 5 — Section B</option><option>ESL — Morning Group</option><option>Reading Club — Grade 3</option></select>
-          </div>
-          <div class="field small"><label>Date range</label><select><option>Last 7 days</option><option>Last 30 days</option><option>This term</option></select></div>
-          <div class="field small"><label>Feature</label><select><option>All features</option><option>Reading</option><option>Translation</option><option>Dictionary</option></select></div>
-          <div class="actions-right">
-            <button class="btn" onclick="openModal('modalDeviceSearch')">⚙ Advanced: search by Device SN / User ID</button>
-            <button class="btn btn-primary">⬇ Export CSV</button>
-          </div>
-        </div>
-
-        <div class="card card-pad" id="deviceSearchResult" style="display:none;margin-bottom:14px;">
-          <div class="card-head">
-            <h3>Device lookup result</h3>
-            <button class="btn-ghost" onclick="document.getElementById('deviceSearchResult').style.display='none';">Clear ✕</button>
-          </div>
-          <div class="grid g4">
-            <div class="card kpi"><div class="label">Device SN</div><div class="value mono" style="font-size:16px;" id="devResultSn">SN-204981</div></div>
-            <div class="card kpi"><div class="label">User ID</div><div class="value" style="font-size:16px;" id="devResultUser">ishaan.verma@vormor.app</div></div>
-            <div class="card kpi"><div class="label">Activation date</div><div class="value" style="font-size:16px;">Mar 3, 2026</div></div>
-            <div class="card kpi"><div class="label">Total active days</div><div class="value" style="font-size:16px;">142</div></div>
-            <div class="card kpi"><div class="label">First login</div><div class="value" style="font-size:16px;">Mar 4, 2026</div></div>
-            <div class="card kpi"><div class="label">Last login</div><div class="value" style="font-size:16px;">Today, 7:58 AM</div></div>
-            <div class="card kpi"><div class="label">Linked student</div><div class="value" style="font-size:16px;">Ishaan Verma</div></div>
-            <div class="card kpi"><div class="label">Status</div><div class="value" style="font-size:16px;"><span class="pill pill-green">Active</span></div></div>
-          </div>
-          <button class="btn btn-primary" style="margin-top:14px;" onclick="openStudent('Ishaan Verma')">View this student's activity →</button>
-        </div>
-
-        <div class="grid g4" style="margin-bottom:14px;">
-          <div class="card kpi"><div class="label">Students (selected)</div><div class="value">22</div></div>
-          <div class="card kpi"><div class="label">Avg. weekly reading time</div><div class="value">38m</div><div class="delta up">▲ 4%</div></div>
-          <div class="card kpi"><div class="label">Most used feature</div><div class="value" style="font-size:18px;">Reading</div></div>
-          <div class="card kpi"><div class="label">Inactive 7+ days</div><div class="value">3</div><div class="delta down">Needs attention</div></div>
-        </div>
-
-        <div class="grid g2" style="margin-bottom:14px;">
-          <div class="card card-pad">
-            <div class="card-head"><h3>Usage trend — selected class</h3><span class="hint">Scans per day</span></div>
-            <canvas id="chartClassTrend" height="150"></canvas>
-          </div>
-          <div class="card card-pad">
-            <div class="card-head"><h3>Feature mix — selected class</h3></div>
-            <canvas id="chartClassFeatures" height="150"></canvas>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-pad" style="border-bottom:1px solid var(--border);"><h3>Most active students</h3></div>
-          <div class="table-scroll">
-          <table>
-            <thead><tr><th>Student</th><th>Class</th><th>Scans</th><th>Reading time</th><th></th></tr></thead>
-            <tbody>
-              <tr class="rowlink" onclick="openStudent('Diya Shah')"><td><div class="namecell"><span class="avatar">DS</span>Diya Shah</div></td><td class="dim">Grade 5 — B</td><td>24</td><td>1h 02m</td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Aarav Mehta')"><td><div class="namecell"><span class="avatar">AM</span>Aarav Mehta</div></td><td class="dim">Grade 5 — B</td><td>18</td><td>49m</td><td><span class="btn-ghost">View →</span></td></tr>
-              <tr class="rowlink" onclick="openStudent('Ishaan Verma')"><td><div class="namecell"><span class="avatar">IV</span>Ishaan Verma</div></td><td class="dim">Grade 5 — B</td><td>15</td><td>44m</td><td><span class="btn-ghost">View →</span></td></tr>
-            </tbody>
-          </table>
-          </div>
-        </div>
-      </section>
-
-     </div>
     </div>
   </div>
 </div>
 
-<!-- ===================== MODAL: create class ===================== -->
-<div class="modal-scrim" id="modalCreateClass">
-  <div class="modal">
-    <h3>Create a class</h3>
-    <div class="mhint">Students join using a code — no need to add each one by hand.</div>
-    <div class="field"><label>Class name</label><input id="newClassName" placeholder="e.g. Grade 5 — Section B"></div>
-    <div class="field"><label>Grade / subject (optional)</label><input placeholder="e.g. Grade 5"></div>
+<div class="modal-scrim" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="dialog">
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('modalCreateClass')">Cancel</button>
-      <button class="btn btn-primary" onclick="createClass()">Create class</button>
+      <button class="btn" id="modalCancel">Cancel</button>
+      <button class="btn btn-primary" id="modalSave">Save</button>
     </div>
   </div>
 </div>
 
-<!-- ===================== MODAL: add student ===================== -->
-<div class="modal-scrim" id="modalAddStudent">
-  <div class="modal">
-    <h3>Add a student</h3>
-    <div class="mhint">Share the join code, or add a known student directly.</div>
-    <div class="joincode-box">
-      <div class="code">K3F9XQ</div>
-      <div class="lbl">Students enter this code once, inside their own app, to join this class.</div>
-    </div>
-    <div class="or-div">OR ADD DIRECTLY</div>
-    <div class="field"><label>Student email</label><input placeholder="student@example.com"></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('modalAddStudent')">Cancel</button>
-      <button class="btn btn-primary" onclick="closeModal('modalAddStudent')">Send invite</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== MODAL: device / user search ===================== -->
-<div class="modal-scrim" id="modalDeviceSearch">
-  <div class="modal">
-    <h3>Search by Device SN or User ID</h3>
-    <div class="mhint">Look up a device or account directly, even if it isn't in one of your classes yet.</div>
-    <div class="field"><label>Device Serial Number</label><input id="devSearchSn" placeholder="e.g. SN-204981"></div>
-    <div class="field"><label>User ID (email)</label><input id="devSearchUser" placeholder="e.g. student@vormor.app"></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('modalDeviceSearch')">Cancel</button>
-      <button class="btn btn-primary" onclick="runDeviceSearch()">Search</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== MODAL: add class goal ===================== -->
-<div class="modal-scrim" id="modalAddGoal">
-  <div class="modal">
-    <h3>Add a class goal</h3>
-    <div class="mhint">Apply the same daily target to everyone, then adjust individual plans.</div>
-    <div class="field"><label>Function</label>
-      <select><option>Reading</option><option>Dictionary</option><option>Translation</option></select>
-    </div>
-    <div class="field"><label>Daily practice minutes</label><input type="number" value="10" min="1"></div>
-    <div class="field"><label>Applies on</label>
-      <select><option>School days</option><option>Daily</option></select>
-    </div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('modalAddGoal')">Cancel</button>
-      <button class="btn btn-primary" onclick="closeModal('modalAddGoal')">Apply to class</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE-OVER: student detail ===================== -->
-<div class="slideover-scrim" id="studentScrim" onclick="closeStudent()"></div>
-<div class="slideover" id="studentPanel">
-  <div class="slideover-head">
-    <span class="avatar" id="sAvatar" style="width:36px;height:36px;font-size:13px;">AM</span>
-    <div style="flex:1;">
-      <div style="font-weight:700;font-size:15px;" id="sName">Aarav Mehta</div>
-      <div class="dim" style="font-size:12px;" id="sClass">Grade 5 — Section B</div>
-    </div>
-    <button class="close-x" onclick="closeStudent()">✕</button>
-  </div>
-  <div class="slideover-body">
-    <div class="grid g4" style="grid-template-columns:repeat(2,1fr);">
-      <div class="card kpi"><div class="label">Scans (7d)</div><div class="value" style="font-size:20px;" id="sScans">–</div></div>
-      <div class="card kpi"><div class="label">Words read</div><div class="value" style="font-size:20px;" id="sWords">–</div></div>
-      <div class="card kpi"><div class="label">Reading time</div><div class="value" style="font-size:20px;" id="sReadingTime">–</div></div>
-      <div class="card kpi"><div class="label">Active days</div><div class="value" style="font-size:20px;" id="sActiveDays">–</div></div>
-    </div>
-    <div class="card card-pad">
-      <div class="card-head"><h3>Daily activity</h3></div>
-      <canvas id="chartStudent" height="140"></canvas>
-    </div>
-    <div class="card card-pad">
-      <div class="card-head"><h3>Feature usage</h3></div>
-      <div id="sFeatures" style="display:flex;flex-direction:column;gap:9px;"></div>
-    </div>
-    <button class="btn" style="align-self:flex-start;" onclick="closeStudent()">← Back to class roster</button>
-  </div>
-</div>
+<div class="chart-tip" id="chartTip"></div>
+<div class="toast-stack" id="toastStack"></div>
 
 <script>
-const PAGES = {
-  home:{title:'Home', sub:'Welcome back'},
-  placeholder:{title:'Document', sub:'Existing screen'},
-  activity:{title:'My Activity', sub:'Your personal usage — visible to you only'},
-  classes:{title:'My Classes', sub:'Classes you teach'},
-  classdetail:{title:'Grade 5 — Section B', sub:'Roster and per-student activity'},
-  goals:{title:'Goals', sub:'Set and track daily practice targets'},
-  reports:{title:'Reports', sub:'Printable student and class practice summaries'},
-  analytics:{title:'Analytics', sub:'Aggregate usage across your classes'},
+const days=['Mon, Sep 21','Tue, Sep 22','Wed, Sep 23','Thu, Sep 24','Fri, Sep 25'];
+const keys=['reading','dictionary','translation'];
+const labels={reading:'Reading',dictionary:'Dictionary',translation:'Translation'};
+const colors={reading:'#3165e6',dictionary:'#16a6a0',translation:'#e9a124'};
+const icons={reading:'▤',dictionary:'⌕',translation:'文'};
+
+const initial={
+  className:'Grade 5 Reading', classId:'G5-READ-2026', teacher:'Ms. Lee',
+  goals:{reading:10,dictionary:5,translation:10},
+  periods:{reading:'Every school day',dictionary:'Every school day',translation:'Every school day'},
+  students:[
+    {name:'Maya R.', id:'s40301234', sn:'913362309000001', daily:[[10,5,10],[12,4,8],[8,5,10],[10,6,10],[6,2,4]], overrides:{}},
+    {name:'Liam K.', id:'s40301235', sn:'913362309000002', daily:[[15,5,10],[16,4,11],[14,5,10],[15,6,10],[16,5,10]], overrides:{reading:15}},
+    {name:'Ava P.', id:'s40301236', sn:'', daily:[[10,8,10],[11,6,9],[10,8,10],[12,8,10],[11,6,11]], overrides:{dictionary:8}},
+    {name:'Noah D.', id:'s40301237', sn:'913362309000004', daily:[[10,5,10],[11,5,10],[10,5,10],[10,5,10],[10,5,10]], overrides:{}},
+    {name:'Sofia M.', id:'s40301238', sn:'', daily:[[7,5,9],[9,5,10],[10,5,10],[8,4,8],[7,5,8]], overrides:{}},
+  ]
 };
-let role = 'student';
 
-function setRole(r){
-  role = r;
-  document.getElementById('btnRoleStudent').classList.toggle('active', r==='student');
-  document.getElementById('btnRoleTeacher').classList.toggle('active', r==='teacher');
-  document.querySelectorAll('.nav-item[data-roles]').forEach(function(btn){
-    var roles = btn.getAttribute('data-roles').split(',');
-    btn.style.display = roles.indexOf(r) !== -1 ? '' : 'none';
-  });
-  go(r==='teacher' ? 'classes' : 'activity');
+let data;
+try{
+  const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v1'));
+  data = (saved?.students && saved?.goals) ? saved : structuredClone(initial);
+}catch{ data = structuredClone(initial); }
+
+let current='overview', studentIndex=0, selectedDay=4, reportType='student', mode='', editIndex=-1, staged=[];
+let rosterSort={key:'name', dir:1};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum = a => a.reduce((x,y)=>x+y,0);
+const minutes = s => keys.map((_,i)=> sum(s.daily.map(d=>d[i])));
+const target = (s,k) => s.overrides[k] ?? data.goals[k];
+const targetArray = s => keys.map(k=>target(s,k));
+const metDay = (s,d) => s.daily[d].every((n,i)=>n>=targetArray(s)[i]);
+const metDays = s => days.filter((_,d)=>metDay(s,d)).length;
+const weekTarget = s => sum(targetArray(s)) * 5;
+const weekActual = s => sum(minutes(s));
+const validID = id => /^[A-Za-z0-9_-]{3,32}$/.test(id);
+const persist = () => { try{ localStorage.setItem('scanmarker_max_teacher_prototype_v1', JSON.stringify(data)); }catch{} };
+
+// ---------------- toasts ----------------
+function toast(msg, isError=false){
+  const stack = $('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' err' : '');
+  el.innerHTML = '<span class="dot-ok"></span><span>'+esc(msg)+'</span>';
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s ease'; el.style.opacity='0'; setTimeout(()=>el.remove(), 260); }, 2800);
 }
 
-function go(page){
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.dataset.page===page); });
-  document.querySelectorAll('.nav-item[data-page]').forEach(function(b){ b.classList.toggle('active', b.dataset.page===page); });
-  var meta = PAGES[page] || PAGES.placeholder;
-  document.getElementById('pageTitle').textContent = meta.title;
-  document.getElementById('pageSub').textContent = meta.sub;
-  window.scrollTo(0,0);
-  closeSidebar();
-  if(page==='activity') setTimeout(drawMe, 0);
-  if(page==='analytics') setTimeout(drawAnalytics, 0);
-  if(page==='reports') setTimeout(drawReport, 0);
-}
+// ---------------- chart ----------------
+const legend = () => keys.map(k=>`<span><i class="dot" style="background:${colors[k]}"></i>${labels[k]}</span>`).join('');
 
-function setReportTab(tab){
-  var s = document.getElementById('repTabStudent');
-  var c = document.getElementById('repTabClass');
-  s.style.background = tab==='student' ? 'var(--text)' : '';
-  s.style.color = tab==='student' ? '#fff' : '';
-  c.style.background = tab==='class' ? 'var(--text)' : '';
-  c.style.color = tab==='class' ? '#fff' : '';
-
-  document.getElementById('repFilterStudent').style.display = tab==='student' ? '' : 'none';
-  document.getElementById('repFilterClass').style.display = tab==='class' ? '' : 'none';
-  document.getElementById('repViewStudent').style.display = tab==='student' ? '' : 'none';
-  document.getElementById('repViewClass').style.display = tab==='class' ? '' : 'none';
-
-  if(tab==='class') setTimeout(drawClassReport, 0);
-}
-
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarScrim').classList.add('open');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarScrim').classList.remove('open');
-}
-
-(function(){
-  var sidebarEl = document.getElementById('sidebar');
-  var pinBtn = document.getElementById('pinBtn');
-  var collapseTimer = null;
-  var pinned = false;
-  var hovered = false;
-
-  function applyState(){
-    if(window.innerWidth <= 900) return;
-    clearTimeout(collapseTimer);
-    if(pinned || hovered){
-      sidebarEl.classList.add('expanded');
-    } else {
-      collapseTimer = setTimeout(function(){ sidebarEl.classList.remove('expanded'); }, 300);
+function chart(el, series, goal, selected=-1, click=null){
+  const scale = Math.max(goal*1.2, ...series.map(sum), 1);
+  el.innerHTML = `<div class="chartline" style="bottom:${goal/scale*100}%"><label>${goal} min goal</label></div>`;
+  series.forEach((d,i)=>{
+    const box = document.createElement('div');
+    box.className = 'barcol' + (selected===i ? ' active' : '');
+    box.setAttribute('role', click ? 'button' : 'img');
+    box.setAttribute('aria-label', days[i] + ', ' + sum(d) + ' minutes');
+    box.innerHTML = `<div class="bar" style="height:${sum(d)/scale*100}%">${d.map((v,j)=>`<i style="height:${sum(d)? v/sum(d)*100 : 0}%;background:${colors[keys[j]]}"></i>`).join('')}</div><span class="day">${days[i].slice(0,3)}</span>`;
+    if(click){
+      box.tabIndex = 0;
+      box.onclick = ()=>click(i);
+      box.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); click(i); } };
     }
-  }
-
-  sidebarEl.addEventListener('mouseenter', function(){ hovered = true; applyState(); });
-  sidebarEl.addEventListener('mouseleave', function(){ hovered = false; applyState(); });
-
-  window.togglePin = function(){
-    pinned = !pinned;
-    pinBtn.classList.toggle('pinned', pinned);
-    pinBtn.title = pinned ? 'Unpin menu' : 'Keep menu open';
-    applyState();
-  };
-})();
-
-function openClass(id){ go('classdetail'); drawSparklines(); }
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-function createClass(){ closeModal('modalCreateClass'); go('classes'); }
-
-function runDeviceSearch(){
-  var sn = document.getElementById('devSearchSn').value.trim();
-  var user = document.getElementById('devSearchUser').value.trim();
-  closeModal('modalDeviceSearch');
-  if(sn) document.getElementById('devResultSn').textContent = sn;
-  if(user) document.getElementById('devResultUser').textContent = user;
-  var result = document.getElementById('deviceSearchResult');
-  result.style.display = '';
-  result.scrollIntoView({behavior:'smooth', block:'start'});
+    box.addEventListener('mouseenter', e=> showChartTip(e, days[i], d));
+    box.addEventListener('mousemove', e=> positionChartTip(e));
+    box.addEventListener('mouseleave', hideChartTip);
+    el.append(box);
+  });
 }
 
-var STUDENT_DATA = {
-  'Aarav Mehta': { cls:'Grade 5 — Section B', scans:18, words:'2,140', reading:'49m', active:'6/7',
-    daily:[5,7,6,9,8,10,9], features:[['Reading',44,'orange'],['Translation',28,'blue'],['Dictionary',20,'green'],['Other',8,'amber']] },
-  'Diya Shah': { cls:'Grade 5 — Section B', scans:24, words:'3,010', reading:'1h 02m', active:'7/7',
-    daily:[4,6,8,9,11,12,13], features:[['Reading',50,'orange'],['Translation',22,'blue'],['Dictionary',18,'green'],['Other',10,'amber']] },
-  'Kabir Rao': { cls:'Grade 5 — Section B', scans:6, words:'540', reading:'14m', active:'3/7',
-    daily:[9,7,5,4,3,2,2], features:[['Reading',60,'orange'],['Dictionary',15,'green'],['Translation',10,'blue'],['Other',15,'amber']] },
-  'Meera Iyer': { cls:'Grade 5 — Section B', scans:0, words:'0', reading:'0m', active:'0/7',
-    daily:[6,5,3,2,0,0,0], features:[] },
-  'Ishaan Verma': { cls:'Grade 5 — Section B', scans:15, words:'1,860', reading:'44m', active:'6/7',
-    daily:[7,8,7,9,10,9,11], features:[['Reading',46,'orange'],['Translation',24,'blue'],['Dictionary',20,'green'],['Other',10,'amber']] }
+function showChartTip(e, dayLabel, d){
+  const tip = $('chartTip');
+  tip.innerHTML = '<b>'+esc(dayLabel)+'</b>' + keys.map((k,i)=>
+    `<div class="ti"><i class="dot" style="background:${colors[k]}"></i>${labels[k]}: ${d[i]} min</div>`
+  ).join('') + `<div class="ti" style="margin-top:4px;opacity:.75">Total: ${sum(d)} min</div>`;
+  tip.classList.add('show');
+  positionChartTip(e);
+}
+function positionChartTip(e){
+  const tip = $('chartTip');
+  tip.style.left = e.clientX + 'px';
+  tip.style.top = (e.clientY - 14) + 'px';
+}
+function hideChartTip(){ $('chartTip').classList.remove('show'); }
+
+// ---------------- nav / sidebar ----------------
+function nav(v){
+  current = v;
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active', x.id===v));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
+  $('topbarTitle').textContent = document.querySelector('.nav-item[data-view="'+v+'"]').textContent.trim();
+  closeSidebar();
+  render();
+  document.querySelector('.content').scrollTop = 0;
+}
+document.querySelectorAll('.nav-item').forEach(b=> b.onclick = ()=>nav(b.dataset.view));
+document.querySelectorAll('[data-go]').forEach(b=> b.onclick = ()=>nav(b.dataset.go));
+function openSidebar(){ $('side').classList.add('open'); $('scrim').classList.add('open'); }
+function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classList.remove('open'); }
+
+// ---------------- render ----------------
+function render(){ renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); }
+
+function renderOverview(){
+  const ss = data.students;
+  const total = sum(ss.map(weekActual)), expected = sum(ss.map(weekTarget));
+  const linked = ss.filter(s=>s.sn).length, met = sum(ss.map(metDays));
+  $('overviewSub').textContent = data.className + ' · practice activity for Sep 21–25, 2026';
+  $('overviewStats').innerHTML = `
+    <div class="card mini"><span>Class practice this week</span><b>${total} min</b><small>${Math.round(total/expected*100)}% of assigned minutes</small></div>
+    <div class="card mini"><span>Student-days meeting all goals</span><b>${met} / ${ss.length*5}</b><small>Across five school days</small></div>
+    <div class="card mini"><span>Devices linked</span><b>${linked} / ${ss.length}</b><small>Students with a device SN</small></div>`;
+  const series = days.map((_,d)=> keys.map((_,i)=> sum(ss.map(s=>s.daily[d][i]))));
+  chart($('overviewChart'), series, sum(ss.map(s=>sum(targetArray(s)))));
+  $('overviewLegend').innerHTML = legend();
+  $('reviewList').innerHTML = ss.filter(s=> metDays(s)<3 || !s.sn).map(s=>
+    `<div style="border-bottom:1px solid #eef1f6;padding:12px 0"><strong>${esc(s.name)}</strong><div class="fine">${metDays(s)} / 5 days with all goals met${s.sn?'':' · device not linked'}</div></div>`
+  ).join('') || '<p class="fine">All students have linked devices and at least three days with all goals met.</p>';
+}
+
+function renderClasses(){
+  $('classDetails').innerHTML = [['Class name',data.className],['School class ID',data.classId],['Teacher',data.teacher]]
+    .map(([a,b])=>`<div class="mini"><span>${a}</span><strong>${esc(b)}</strong></div>`).join('');
+  $('rosterCount').textContent = '· ' + data.students.length + ' students';
+
+  const q = $('rosterSearch').value.toLowerCase().trim();
+  let rows = data.students.map((s,i)=>({s,i})).filter(({s}) => !q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q));
+  rows.sort((a,b)=>{
+    const av = rosterSort.key==='name' ? a.s.name.toLowerCase() : a.s.id.toLowerCase();
+    const bv = rosterSort.key==='name' ? b.s.name.toLowerCase() : b.s.id.toLowerCase();
+    return av < bv ? -1*rosterSort.dir : av > bv ? 1*rosterSort.dir : 0;
+  });
+
+  document.querySelectorAll('#classes th.sortable').forEach(th=>{
+    th.classList.toggle('sorted', th.dataset.sort===rosterSort.key);
+    th.querySelector('.arrow').textContent = th.dataset.sort===rosterSort.key ? (rosterSort.dir===1?'↑':'↓') : '↕';
+  });
+
+  $('rosterRows').innerHTML = rows.map(({s,i})=>
+    `<tr><td><strong>${esc(s.name)}</strong></td><td>${esc(s.id)}</td>
+      <td>${s.sn ? esc(s.sn) : '<span class="fine">Not linked</span>'}</td>
+      <td><span class="badge ${s.sn?'':'partial'}">${s.sn?'Linked':'Needs device'}</span></td>
+      <td><button class="btn-link" data-edit-student="${i}">Edit</button></td></tr>`
+  ).join('') || '<tr><td colspan="5" class="fine">No matching students</td></tr>';
+  document.querySelectorAll('[data-edit-student]').forEach(b=> b.onclick = ()=>openStudent(Number(b.dataset.editStudent)));
+}
+document.querySelectorAll('#classes th.sortable').forEach(th=>{
+  th.onclick = ()=>{
+    const key = th.dataset.sort;
+    rosterSort = rosterSort.key===key ? {key, dir:-rosterSort.dir} : {key, dir:1};
+    renderClasses();
+  };
+});
+
+function studentSelect(id, selected){
+  $(id).innerHTML = data.students.map((s,i)=>`<option value="${i}" ${i===selected?'selected':''}>${esc(s.name)} · ${esc(s.id)}</option>`).join('');
+}
+
+function renderAnalytics(){
+  if(studentIndex >= data.students.length) studentIndex = 0;
+  studentSelect('analyticsStudent', studentIndex);
+  const s = data.students[studentIndex], d = s.daily[selectedDay];
+  $('analyticsDay').textContent = days[selectedDay];
+  $('analyticsTarget').textContent = sum(targetArray(s)) + ' min daily goal';
+  $('analyticsCards').innerHTML = keys.map((k,i)=>{
+    const g = target(s,k), p = Math.min(100, d[i]/g*100);
+    return `<div class="card"><div class="goalhead"><span class="icon" style="background:${colors[k]}18;color:${colors[k]}">${icons[k]}</span><strong>${labels[k]}</strong></div>
+      <div class="big">${d[i]} <span class="fine">/ ${g} min</span></div>
+      <div class="fine">${d[i]>=g ? 'Daily goal met' : (g-d[i])+' more minutes to goal'}</div>
+      <div class="track"><div class="fill" style="width:${p}%;background:${colors[k]}"></div></div></div>`;
+  }).join('');
+  chart($('analyticsChart'), s.daily, sum(targetArray(s)), selectedDay, i=>{ selectedDay=i; renderAnalytics(); });
+  $('analyticsLegend').innerHTML = legend();
+  $('analyticsStats').innerHTML = `
+    <div class="mini"><span>Minutes practiced</span><b>${weekActual(s)}</b><small>of ${weekTarget(s)} min</small></div>
+    <div class="mini"><span>Time vs goal</span><b>${Math.round(weekActual(s)/weekTarget(s)*100)}%</b><small>Across all functions</small></div>
+    <div class="mini"><span>All goals met</span><b>${metDays(s)}</b><small>of 5 days</small></div>`;
+  $('analyticsRows').innerHTML = s.daily.map((x,i)=>
+    `<tr class="clickable" data-day="${i}" style="${i===selectedDay?'background:#f1f5ff':''}">
+      <td><strong>${days[i]}</strong></td>${x.map((v,j)=>`<td>${v} / ${targetArray(s)[j]} min</td>`).join('')}
+      <td><strong>${sum(x)} min</strong></td><td><span class="badge ${metDay(s,i)?'':'partial'}">${metDay(s,i)?'Met':'In progress'}</span></td></tr>`
+  ).join('');
+  document.querySelectorAll('#analyticsRows [data-day]').forEach(row=> row.onclick = ()=>{ selectedDay = Number(row.dataset.day); renderAnalytics(); });
+}
+
+function renderGoals(){
+  $('classGoalCards').innerHTML = keys.map(k=>{
+    const met = data.students.filter(s=> s.daily[4][keys.indexOf(k)] >= target(s,k)).length;
+    return `<div class="card"><div class="goalhead"><span class="icon" style="background:${colors[k]}18;color:${colors[k]}">${icons[k]}</span><strong>${labels[k]}</strong></div>
+      <div class="big">${data.goals[k]} <span class="fine">min / day</span></div>
+      <div class="fine">${data.periods[k]} · class target</div>
+      <div class="track"><div class="fill" style="background:${colors[k]};width:${met/data.students.length*100}%"></div></div>
+      <span class="fine">${met} / ${data.students.length} students met their individual goal today</span></div>`;
+  }).join('');
+  $('goalRows').innerHTML = data.students.map((s,i)=>
+    `<tr><td><strong>${esc(s.name)}</strong><div class="fine">${esc(s.id)}${Object.keys(s.overrides).length?' · individual goal':''}</div></td>
+      ${keys.map((k,j)=>`<td>${s.daily[4][j]} / ${target(s,k)} min</td>`).join('')}
+      <td><span class="badge ${metDay(s,4)?'':'partial'}">${metDay(s,4)?'Met':'In progress'}</span></td>
+      <td><button class="btn-link" data-goal-student="${i}">Edit goals</button></td></tr>`
+  ).join('');
+  document.querySelectorAll('[data-goal-student]').forEach(b=> b.onclick = ()=>openGoal(Number(b.dataset.goalStudent)));
+}
+
+function renderReports(){
+  if(studentIndex >= data.students.length) studentIndex = 0;
+  studentSelect('reportStudent', studentIndex);
+  $('reportStudent').style.display = reportType==='class' ? 'none' : '';
+  document.querySelectorAll('[data-report]').forEach(b=> b.classList.toggle('active', b.dataset.report===reportType));
+
+  const isClass = reportType==='class', ss = data.students, s = ss[studentIndex];
+  const actual = isClass ? keys.map((_,i)=>sum(ss.map(x=>minutes(x)[i]))) : minutes(s);
+  const g = isClass ? keys.map((_,i)=>sum(ss.map(x=>target(x,keys[i])*5))) : keys.map(k=>target(s,k)*5);
+  const total = sum(actual), goal = sum(g), met = isClass ? sum(ss.map(metDays)) : metDays(s);
+
+  $('reportHeading').textContent = isClass ? data.className+' · '+data.teacher : s.name+' · '+s.id;
+  $('reportSub').textContent = (isClass?'Class':'Student') + ' practice activity · Sep 21–25, 2026';
+  $('reportStats').innerHTML = `
+    <div class="mini"><span>Total practice</span><b>${total} min</b><small>of ${goal} min goal</small></div>
+    <div class="mini"><span>Minutes vs goal</span><b>${Math.round(total/goal*100)}%</b><small>All three functions</small></div>
+    <div class="mini"><span>${isClass?'Student-days':'Days'} all goals met</span><b>${met} / ${isClass?ss.length*5:5}</b><small>Selected period</small></div>`;
+  $('reportGoals').innerHTML = keys.map((k,i)=>
+    `<div class="metric"><span>${labels[k]}</span><div class="track"><div class="fill" style="width:${Math.min(100,actual[i]/g[i]*100)}%;background:${colors[k]}"></div></div><strong>${actual[i]} / ${g[i]} min</strong></div>`
+  ).join('');
+  const series = days.map((_,d)=> isClass ? keys.map((_,i)=>sum(ss.map(x=>x.daily[d][i]))) : s.daily[d]);
+  chart($('reportChart'), series, isClass ? sum(ss.map(x=>sum(targetArray(x)))) : sum(targetArray(s)));
+  $('reportLegend').innerHTML = legend();
+  $('reportTableTitle').textContent = isClass ? 'Student summary' : 'Daily activity';
+  $('reportHead').innerHTML = isClass
+    ? '<tr><th>Student</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>Total</th><th>Goals met</th></tr>'
+    : '<tr><th>Day</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>Total</th><th>Goals</th></tr>';
+  $('reportRows').innerHTML = isClass
+    ? ss.map(x=>`<tr><td><strong>${esc(x.name)}</strong><div class="fine">${esc(x.id)}</div></td>${minutes(x).map((v,i)=>`<td>${v} / ${target(x,keys[i])*5} min</td>`).join('')}<td>${weekActual(x)} min</td><td>${metDays(x)} / 5 days</td></tr>`).join('')
+    : s.daily.map((d,i)=>`<tr><td><strong>${days[i]}</strong></td>${d.map((v,j)=>`<td>${v} / ${targetArray(s)[j]} min</td>`).join('')}<td>${sum(d)} min</td><td>${metDay(s,i)?'Met':'In progress'}</td></tr>`).join('');
+  $('reportNote').value = isClass
+    ? `${data.className} practiced across Reading, Dictionary, and Translation this week. Review individual patterns alongside assessments and adjust goals as needed.`
+    : `${s.name} used the pen during this week and met all three daily practice goals on ${met} of five school days. Review reading comprehension with a classroom assessment.`;
+}
+
+// ---------------- modal ----------------
+const modal = $('modal');
+function show(title, body, button='Save'){
+  modal.classList.add('open');
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = body;
+  $('modalSave').textContent = button;
+  $('modalSave').disabled = false;
+  $('modalBody').querySelector('input,select')?.focus();
+}
+function closeModal(){ modal.classList.remove('open'); }
+function formError(msg){ const e=$('feedback'); if(e){ e.className='feedback error'; e.textContent=msg; } }
+
+function openClass(){
+  mode='class';
+  show('Edit class', `<label class="field-label">Class name</label><input id="className" value="${esc(data.className)}">
+    <label class="field-label">School class ID</label><input id="classId" value="${esc(data.classId)}">
+    <div class="feedback" id="feedback">Use the class identifier supplied by your school.</div>`, 'Save class');
+}
+function openStudent(i=-1){
+  mode='student'; editIndex=i;
+  const s = data.students[i] ?? {name:'',id:'',sn:''};
+  show(i<0?'Add student':'Edit student',
+    `<p>Use the school-issued student ID, for example s40301234.</p>
+     <label class="field-label">Student name</label><input id="studentName" value="${esc(s.name)}">
+     <label class="field-label">School ID</label><input id="schoolId" value="${esc(s.id)}">
+     <label class="field-label">Device serial number (optional)</label><input id="deviceSn" value="${esc(s.sn)}" placeholder="Enter SN or scan QR in connected app">
+     <div class="feedback" id="feedback">Each school ID must be unique in this class.</div>`,
+    i<0?'Add student':'Save changes');
+}
+function openGoal(i=null){
+  mode='goal'; editIndex=i;
+  const k='reading';
+  show(i===null?'Add class goal':'Edit goals for '+data.students[i].name,
+    `<p>${i===null ? 'Apply a daily target to the class. Individual overrides remain in place.' : 'Set a different daily target for this student.'}</p>
+     <label class="field-label">Function</label><select id="goalFunction">${keys.map(x=>`<option value="${x}">${labels[x]}</option>`).join('')}</select>
+     <label class="field-label">Minutes per day</label><input type="number" min="1" max="240" id="goalMinutes" value="${i===null ? data.goals[k] : target(data.students[i],k)}">
+     <label class="field-label">Time period</label><select id="goalPeriod"><option>Every school day</option><option>Every day</option></select>
+     <div class="feedback" id="feedback">Practice minutes are tracked by function.</div>`,
+    i===null?'Apply to class':'Save individual goal');
+  $('goalPeriod').value = data.periods[k];
+  $('goalFunction').onchange = e=>{
+    const key = e.target.value;
+    $('goalMinutes').value = i===null ? data.goals[key] : target(data.students[i], key);
+    $('goalPeriod').value = data.periods[key];
+  };
+}
+
+function csvParse(text){
+  const rows=[]; let row=[], field='', quoted=false;
+  for(let i=0;i<text.length;i++){
+    let c=text[i];
+    if(c==='"'){ if(quoted && text[i+1]==='"'){ field+='"'; i++; } else quoted=!quoted; }
+    else if(c===',' && !quoted){ row.push(field); field=''; }
+    else if((c==='\n'||c==='\r') && !quoted){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(field); if(row.some(v=>v.trim())) rows.push(row); row=[]; field=''; }
+    else field+=c;
+  }
+  if(quoted) throw Error('Unclosed quote in CSV.');
+  row.push(field); if(row.some(v=>v.trim())) rows.push(row);
+  const header=(rows.shift()??[]).map((v,i)=>(i===0?v.replace(/^﻿/,''):v).trim().toLowerCase());
+  const n=header.indexOf('student_name'), id=header.indexOf('school_id');
+  if(n<0||id<0) throw Error('CSV needs student_name and school_id headers.');
+  const list = rows.map(r=>({name:(r[n]??'').trim(), id:(r[id]??'').trim()})), seen=new Set();
+  if(!list.length) throw Error('No student rows found.');
+  for(const s of list){
+    if(!s.name || !validID(s.id)) throw Error('Each row needs a name and valid school ID.');
+    if(seen.has(s.id.toLowerCase())) throw Error('Duplicate school ID in CSV: '+s.id);
+    seen.add(s.id.toLowerCase());
+  }
+  return list;
+}
+
+function openUpload(){
+  mode='upload'; staged=[];
+  show('Upload class roster',
+    `<p>CSV headers: <strong>student_name,school_id</strong>. Existing IDs update names; new IDs are added.</p>
+     <label class="field-label">CSV file</label><input type="file" id="csvFile" accept=".csv,text/csv">
+     <div class="feedback" id="feedback">Select a file to preview before applying.</div>
+     <div class="preview" id="preview"></div>`, 'Apply roster');
+  $('modalSave').disabled = true;
+  $('csvFile').onchange = async e=>{
+    try{
+      staged = csvParse(await e.target.files[0].text());
+      $('feedback').className='feedback';
+      $('feedback').textContent = staged.length + ' valid row(s). Review the actions below.';
+      $('preview').innerHTML = '<table><thead><tr><th>Student</th><th>School ID</th><th>Action</th></tr></thead><tbody>' +
+        staged.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.id)}</td><td>${data.students.some(x=>x.id.toLowerCase()===s.id.toLowerCase())?'Update':'Add'}</td></tr>`).join('') +
+        '</tbody></table>';
+      $('modalSave').disabled = false;
+    }catch(err){
+      staged=[]; formError(err.message); $('preview').innerHTML=''; $('modalSave').disabled = true;
+    }
+  };
+}
+function openLMS(){
+  mode='lms';
+  show('School LMS integration · IT setup',
+    `<p>Proposed integration; no LMS is connected to this prototype.</p>
+     <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section ID → School class ID</div>
+     <p>School IT would authorize roster access, choose the class, review ID matches, and enable synchronization. Manual entry and CSV upload remain available.</p>`, 'Close');
+}
+
+$('modalCancel').onclick = closeModal;
+modal.onclick = e=>{ if(e.target===modal) closeModal(); };
+$('editClassBtn').onclick = openClass;
+$('addStudentBtn').onclick = ()=>openStudent();
+$('uploadBtn').onclick = openUpload;
+$('lmsBtn').onclick = openLMS;
+$('addClassGoalBtn').onclick = ()=>openGoal();
+$('rosterSearch').oninput = renderClasses;
+$('analyticsStudent').onchange = e=>{ studentIndex=Number(e.target.value); renderAnalytics(); };
+$('reportStudent').onchange = e=>{ studentIndex=Number(e.target.value); renderReports(); };
+document.querySelectorAll('[data-report]').forEach(b=> b.onclick = ()=>{ reportType=b.dataset.report; renderReports(); });
+$('printReportBtn').onclick = ()=> window.print();
+
+$('modalSave').onclick = ()=>{
+  if(mode==='lms'){ closeModal(); return; }
+  if(mode==='class'){
+    const name=$('className').value.trim(), id=$('classId').value.trim();
+    if(!name||!id) return formError('Enter both class name and class ID.');
+    data.className=name; data.classId=id;
+    persist(); closeModal(); render(); toast('Class details saved.');
+  } else if(mode==='student'){
+    const name=$('studentName').value.trim(), id=$('schoolId').value.trim(), sn=$('deviceSn').value.trim();
+    if(!name || !validID(id)) return formError('Enter a name and a school ID with 3–32 letters, numbers, hyphens, or underscores.');
+    if(data.students.some((s,i)=> i!==editIndex && s.id.toLowerCase()===id.toLowerCase())) return formError('This school ID already belongs to another student.');
+    if(editIndex<0){ data.students.push({name,id,sn,daily:days.map(()=>[0,0,0]),overrides:{}}); toast('Student added.'); }
+    else { Object.assign(data.students[editIndex], {name,id,sn}); toast('Student updated.'); }
+    persist(); closeModal(); render();
+  } else if(mode==='upload'){
+    for(const s of staged){
+      const found = data.students.find(x=>x.id.toLowerCase()===s.id.toLowerCase());
+      if(found) found.name=s.name;
+      else data.students.push({name:s.name,id:s.id,sn:'',daily:days.map(()=>[0,0,0]),overrides:{}});
+    }
+    persist(); closeModal(); render(); toast(staged.length + ' student(s) applied to the roster.');
+  } else if(mode==='goal'){
+    const k=$('goalFunction').value, n=Number($('goalMinutes').value);
+    if(!Number.isInteger(n) || n<1 || n>240) return formError('Enter a target from 1 to 240 minutes.');
+    if(editIndex===null){ data.goals[k]=n; data.periods[k]=$('goalPeriod').value; toast('Class goal updated.'); }
+    else { data.students[editIndex].overrides[k]=n; toast('Individual goal saved.'); }
+    persist(); closeModal(); render();
+  }
 };
 
-function renderFeatureBars(features){
-  var el = document.getElementById('sFeatures');
-  if(!features || !features.length){
-    el.innerHTML = '<div class="faint" style="font-size:12.5px;">No activity recorded this week.</div>';
-    return;
+$('exportCSVBtn').onclick = ()=>{
+  const ss = reportType==='class' ? data.students : [data.students[studentIndex]];
+  const rows = [['Student','School ID','Date','Reading minutes','Reading goal','Dictionary minutes','Dictionary goal','Translation minutes','Translation goal','Total minutes','All goals met']];
+  for(const s of ss) for(let i=0;i<days.length;i++){
+    const d=s.daily[i], g=targetArray(s);
+    rows.push([s.name,s.id,days[i],d[0],g[0],d[1],g[1],d[2],g[2],sum(d),metDay(s,i)?'Yes':'No']);
   }
-  var colorVar = { orange:'var(--orange)', blue:'var(--blue)', green:'var(--green)', amber:'var(--amber)', red:'var(--red)' };
-  el.innerHTML = features.map(function(f){
-    return '<div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">'
-      + '<span>'+f[0]+'</span><span class="dim">'+f[1]+'%</span></div>'
-      + '<div style="height:6px;background:var(--bg);border-radius:4px;">'
-      + '<div style="width:'+f[1]+'%;height:100%;background:'+colorVar[f[2]]+';border-radius:4px;"></div></div></div>';
-  }).join('');
-}
+  const csv = rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = reportType==='class' ? 'scanmarker-max-class-report.csv' : 'scanmarker-max-student-report-'+ss[0].id+'.csv';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  toast('CSV exported.');
+};
 
-function openStudent(name){
-  var d = STUDENT_DATA[name] || { cls:'', scans:0, words:'0', reading:'0m', active:'0/7', daily:[0,0,0,0,0,0,0], features:[] };
-  document.getElementById('sName').textContent = name;
-  document.getElementById('sAvatar').textContent = name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
-  document.getElementById('sClass').textContent = d.cls;
-  document.getElementById('sScans').textContent = d.scans;
-  document.getElementById('sWords').textContent = d.words;
-  document.getElementById('sReadingTime').textContent = d.reading;
-  document.getElementById('sActiveDays').textContent = d.active;
-  renderFeatureBars(d.features);
-  document.getElementById('studentScrim').classList.add('open');
-  document.getElementById('studentPanel').classList.add('open');
-  setTimeout(function(){ drawStudent(d.daily); }, 50);
-}
-function closeStudent(){
-  document.getElementById('studentScrim').classList.remove('open');
-  document.getElementById('studentPanel').classList.remove('open');
-}
-
-var chartColors = { grid:'rgba(0,0,0,0.06)', text:'#6B7280' };
-var chartMe, chartTrend, chartFeat, chartStu;
-
-function drawMe(){
-  var ctx = document.getElementById('chartMe');
-  if(!ctx || chartMe) return;
-  chartMe = new Chart(ctx, {
-    type:'bar',
-    data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      datasets:[{label:'Scans', data:[6,9,7,10,8,12,6], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:26}]},
-    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
-  });
-}
-function drawAnalytics(){
-  var c1 = document.getElementById('chartClassTrend');
-  if(c1 && !chartTrend){
-    chartTrend = new Chart(c1, { type:'line',
-      data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        datasets:[{label:'Scans', data:[140,165,150,180,170,120,95], borderColor:'#2F6FED', backgroundColor:'rgba(47,111,237,0.1)', fill:true, tension:.35}]},
-      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
-    });
-  }
-  var c2 = document.getElementById('chartClassFeatures');
-  if(c2 && !chartFeat){
-    chartFeat = new Chart(c2, { type:'doughnut',
-      data:{ labels:['Reading','Translation','Dictionary','Voice Translation','Phonics'],
-        datasets:[{ data:[42,27,18,9,4], backgroundColor:['#FF7A1A','#2F6FED','#17A673','#E8972B','#E0493C'] }]},
-      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
-    });
-  }
-}
-function drawStudent(daily){
-  var ctx = document.getElementById('chartStudent');
-  if(!ctx) return;
-  if(chartStu){
-    chartStu.data.datasets[0].data = daily;
-    chartStu.update();
-    return;
-  }
-  chartStu = new Chart(ctx, { type:'bar',
-    data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      datasets:[{label:'Scans', data:daily, backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:22}]},
-    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
-  });
-}
-
-var chartReportDaily, chartReportFunctions;
-function drawReport(){
-  var c1 = document.getElementById('chartReportDaily');
-  if(c1 && !chartReportDaily){
-    chartReportDaily = new Chart(c1, { type:'bar',
-      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
-        datasets:[
-          {label:'Minutes', data:[26,22,0,30,20], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:22, order:2},
-          {label:'Goal', data:[25,25,25,25,25], type:'line', borderColor:'#9AA0AC', borderDash:[4,4], pointRadius:0, order:1}
-        ]},
-      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
-    });
-  }
-  var c2 = document.getElementById('chartReportFunctions');
-  if(c2 && !chartReportFunctions){
-    chartReportFunctions = new Chart(c2, { type:'bar',
-      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
-        datasets:[
-          {label:'Reading', data:[10,9,0,12,7], backgroundColor:'#FF7A1A', stack:'s'},
-          {label:'Dictionary', data:[6,5,0,6,3], backgroundColor:'#2F6FED', stack:'s'},
-          {label:'Translation', data:[10,8,0,12,10], backgroundColor:'#17A673', stack:'s'}
-        ]},
-      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}},
-        scales:{ y:{beginAtZero:true, stacked:true, grid:{color:chartColors.grid}}, x:{stacked:true, grid:{display:false}} } }
-    });
-  }
-}
-
-var chartClassDaily, chartClassFunctionsRep;
-function drawClassReport(){
-  var c1 = document.getElementById('chartClassDaily');
-  if(c1 && !chartClassDaily){
-    chartClassDaily = new Chart(c1, { type:'bar',
-      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
-        datasets:[
-          {label:'Active students', data:[19,20,14,21,17], backgroundColor:'#FF7A1A', borderRadius:4, maxBarThickness:28, order:2},
-          {label:'Full class', data:[22,22,22,22,22], type:'line', borderColor:'#9AA0AC', borderDash:[4,4], pointRadius:0, order:1}
-        ]},
-      options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, max:22, grid:{color:chartColors.grid}}, x:{grid:{display:false}} } }
-    });
-  }
-  var c2 = document.getElementById('chartClassFunctionsRep');
-  if(c2 && !chartClassFunctionsRep){
-    chartClassFunctionsRep = new Chart(c2, { type:'bar',
-      data:{ labels:['Mon','Tue','Wed','Thu','Fri'],
-        datasets:[
-          {label:'Reading', data:[180,165,90,210,150], backgroundColor:'#FF7A1A', stack:'s'},
-          {label:'Dictionary', data:[95,88,40,110,80], backgroundColor:'#2F6FED', stack:'s'},
-          {label:'Translation', data:[140,130,70,160,120], backgroundColor:'#17A673', stack:'s'}
-        ]},
-      options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}},
-        scales:{ y:{beginAtZero:true, stacked:true, grid:{color:chartColors.grid}}, x:{stacked:true, grid:{display:false}} } }
-    });
-  }
-  renderClassTiles();
-}
-
-function renderClassTiles(){
-  var grid = document.getElementById('classTileGrid');
-  if(!grid || grid.dataset.drawn) return;
-  grid.dataset.drawn = '1';
-  var names = ['Diya Shah','Aarav Mehta','Ishaan Verma','Priya Nair','Rohan Das','Ananya Singh','Vikram Rao','Tanvi Joshi','Arjun Mehta','Sara Khan','Kabir Rao','Meera Iyer'];
-  var minutes = [142,128,118,105,98,90,84,75,68,52,42,12];
-  grid.innerHTML = names.map(function(name, i){
-    var m = minutes[i];
-    var status = m>=110 ? 'green' : m>=60 ? 'amber' : 'red';
-    var initials = name.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
-    return '<div class="student-tile status-'+status+'" onclick="openStudent(\''+name+'\')">'
-      + '<span class="avatar">'+initials+'</span>'
-      + '<div class="tile-info"><div class="tile-name">'+name+'</div><div class="tile-minutes">'+m+'m</div></div>'
-      + '</div>';
-  }).join('');
-}
-function drawSparklines(){
-  document.querySelectorAll('canvas[data-spark]').forEach(function(c){
-    if(c.dataset.drawn) return;
-    c.dataset.drawn = '1';
-    var vals = c.dataset.spark.split(',').map(Number);
-    new Chart(c, { type:'line',
-      data:{ labels:vals.map(function(_,i){return i;}), datasets:[{ data:vals, borderColor:'#2F6FED', borderWidth:1.6, pointRadius:0, tension:.4 }]},
-      options:{ responsive:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, elements:{line:{borderJoinStyle:'round'}} }
-    });
-  });
-}
-
-setRole('student');
+render();
 </script>
-
 </body>
 </html>
