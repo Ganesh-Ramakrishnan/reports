@@ -16,6 +16,10 @@
     --amber-bg:#fff4e4; --amber-ink:#a66b15;
     --red:#d1453d; --red-bg:#fdeceb;
     --radius:14px; --shadow:0 3px 13px rgba(16,33,62,0.05);
+
+    --orange:#FF761A; --sidebar-home:#FF8234;
+    --sidebar-text:#F7F7F7; --sidebar-text-dim:#8A8D93;
+    --sidebar-row-hover:#464646; --sidebar-divider:rgba(255,255,255,0.14);
   }
   *{box-sizing:border-box;}
   html,body{height:100%;margin:0;overflow:hidden;}
@@ -27,36 +31,66 @@
 
   .app{display:flex;height:100vh;overflow:hidden;}
 
-  /* ---------- Sidebar ---------- */
+  /* ---------- Sidebar: collapsed icon rail by default, expands on hover, matches the real app ---------- */
   .scrim{position:fixed;inset:0;background:rgba(8,16,33,0.5);z-index:40;display:none;}
   .scrim.open{display:block;}
   .side{
-    width:232px;flex:none;background:var(--ink);color:#fff;
-    display:flex;flex-direction:column;padding:26px 16px;height:100%;z-index:41;
+    width:76px;flex:none;color:#fff;
+    background:
+      radial-gradient(120% 70% at 15% 0%, rgba(255,255,255,0.07), transparent 60%),
+      linear-gradient(160deg, #2b2b2b 0%, #1c1c1c 45%, #0d0d0d 100%);
+    display:flex;flex-direction:column;height:100%;z-index:41;overflow:hidden;
+    transition:width .3s ease;
   }
-  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 28px;}
-  .brand-mark{width:34px;height:34px;border-radius:9px;background:#ff724e;color:#10213e;
-    font-family:'Lexend';font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none;}
-  .brand-name{font-size:17px;font-weight:800;letter-spacing:-.3px;}
-  .brand-name b{color:#ff724e;}
-  .brand-sub{font-size:10.5px;color:#8ea0c2;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;}
-  .nav{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .side.expanded{width:264px;}
+
+  .pin-row{display:flex;justify-content:center;padding:14px 10px 0;}
+  .side.expanded .pin-row{justify-content:flex-end;}
+  .pin-btn{width:32px;height:32px;flex:none;border:0;background:transparent;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;color:var(--sidebar-text-dim);}
+  .pin-btn svg{width:17px;height:17px;transition:transform .2s ease;}
+  .pin-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .pin-btn.pinned{color:var(--orange);}
+  .pin-btn.pinned svg{transform:rotate(45deg);}
+
+  .brand{display:flex;align-items:center;gap:12px;padding:10px 14px 20px;}
+  .brand-mark{width:32px;height:32px;border-radius:9px;background:var(--orange);color:#1c1c1c;
+    font-family:'Lexend';font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .brand-text{opacity:0;transition:opacity .15s ease;white-space:nowrap;min-width:0;}
+  .side.expanded .brand-text{opacity:1;transition:opacity .2s ease .1s;}
+  .brand-name{font-size:15px;font-weight:800;letter-spacing:-.2px;color:#fff;}
+  .brand-name b{color:var(--orange);}
+  .brand-sub{font-size:10px;color:var(--sidebar-text-dim);letter-spacing:.05em;text-transform:uppercase;margin-top:1px;}
+
+  .nav{display:flex;flex-direction:column;gap:2px;flex:1;padding:4px 10px;overflow-y:auto;}
   .nav-item{
-    display:flex;align-items:center;gap:11px;width:100%;border:0;text-align:left;background:none;
-    color:#b9c7dc;border-radius:10px;padding:12px 13px;font-weight:700;font-size:14px;
+    display:flex;align-items:center;gap:0;width:100%;border:0;text-align:left;background:none;
+    color:var(--sidebar-text);min-height:46px;padding:4px 10px;border-radius:6px;font-weight:600;font-size:14.5px;
   }
-  .nav-item .ic{width:18px;text-align:center;flex:none;}
-  .nav-item:hover{background:#1c3156;color:#fff;}
-  .nav-item.active{background:#253f6c;color:#fff;}
-  .side-foot{font-size:11px;color:#6f81a0;padding:10px 8px 0;border-top:1px solid rgba(255,255,255,0.08);margin-top:10px;padding-top:14px;}
+  .nav-item .icon-container{width:36px;flex:none;display:flex;align-items:center;justify-content:center;transition:width .3s ease;}
+  .side.expanded .nav-item .icon-container{width:34px;justify-content:flex-start;}
+  .nav-item .navicon{width:20px;height:20px;flex:none;color:var(--sidebar-text-dim);}
+  .nav-item .nav-label{opacity:0;transition:opacity .15s ease;white-space:nowrap;}
+  .side.expanded .nav-item .nav-label{opacity:1;transition:opacity .2s ease .1s;}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-row-hover);}
+  .nav-item:hover .navicon,.nav-item:hover{color:#fff;}
+  .nav-item.active{color:#fff;}
+  .nav-item.active .navicon{color:var(--orange);}
+
+  .side-foot{font-size:10.5px;color:var(--sidebar-text-dim);padding:10px 14px;border-top:1px solid var(--sidebar-divider);
+    margin-top:6px;white-space:nowrap;opacity:0;transition:opacity .15s ease;}
+  .side.expanded .side-foot{opacity:1;transition:opacity .2s ease .1s;}
 
   .hamburger{display:none;border:0;background:transparent;width:38px;height:38px;border-radius:9px;
     align-items:center;justify-content:center;color:var(--text);flex:none;}
   .hamburger svg{width:22px;height:22px;}
   @media (max-width:980px){
     .hamburger{display:flex;}
-    .side{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);transition:transform .25s ease;max-width:85vw;}
+    .pin-row{display:none;}
+    .side{position:fixed;top:0;left:0;height:100%;width:264px;transform:translateX(-100%);transition:transform .25s ease;max-width:85vw;}
     .side.open{transform:translateX(0);}
+    .side.open .brand-text,.side.open .nav-item .nav-label,.side.open .side-foot{opacity:1;}
+    .side.open .nav-item .icon-container{width:34px;justify-content:flex-start;}
   }
 
   /* ---------- Main ---------- */
@@ -202,19 +236,39 @@
 <div class="app">
   <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
   <aside class="side" id="side">
+    <div class="pin-row">
+      <button class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3Z"/><path d="M12 15v5"/></svg>
+      </button>
+    </div>
     <div class="brand">
       <div class="brand-mark">M</div>
-      <div>
-        <div class="brand-name"><b>scan</b>marker <span style="color:#ff724e">Max</span></div>
+      <div class="brand-text">
+        <div class="brand-name"><b>scan</b>marker Max</div>
         <div class="brand-sub">Teacher Dashboard</div>
       </div>
     </div>
     <nav class="nav">
-      <button class="nav-item active" data-view="overview"><span class="ic">▦</span>Overview</button>
-      <button class="nav-item" data-view="classes"><span class="ic">🏫</span>Classes</button>
-      <button class="nav-item" data-view="analytics"><span class="ic">📈</span>Student analytics</button>
-      <button class="nav-item" data-view="goals"><span class="ic">🎯</span>Goals</button>
-      <button class="nav-item" data-view="reports"><span class="ic">📄</span>Reports</button>
+      <button class="nav-item active" data-view="overview" title="Overview">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span>
+        <span class="nav-label">Overview</span>
+      </button>
+      <button class="nav-item" data-view="classes" title="Classes">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg></span>
+        <span class="nav-label">Classes</span>
+      </button>
+      <button class="nav-item" data-view="analytics" title="Student analytics">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg></span>
+        <span class="nav-label">Student analytics</span>
+      </button>
+      <button class="nav-item" data-view="goals" title="Goals">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
+        <span class="nav-label">Goals</span>
+      </button>
+      <button class="nav-item" data-view="reports" title="Reports">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
+        <span class="nav-label">Reports</span>
+      </button>
     </nav>
     <div class="side-foot">Concept prototype · example data<br>Scanmarker Max v1.0</div>
   </aside>
@@ -540,6 +594,28 @@ document.querySelectorAll('.nav-item').forEach(b=> b.onclick = ()=>nav(b.dataset
 document.querySelectorAll('[data-go]').forEach(b=> b.onclick = ()=>nav(b.dataset.go));
 function openSidebar(){ $('side').classList.add('open'); $('scrim').classList.add('open'); }
 function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classList.remove('open'); }
+
+(function(){
+  const sideEl = $('side');
+  const pinBtn = $('pinBtn');
+  let collapseTimer = null, pinned = false, hovered = false;
+
+  function applyState(){
+    if(window.innerWidth <= 980) return;
+    clearTimeout(collapseTimer);
+    if(pinned || hovered) sideEl.classList.add('expanded');
+    else collapseTimer = setTimeout(()=> sideEl.classList.remove('expanded'), 300);
+  }
+  sideEl.addEventListener('mouseenter', ()=>{ hovered=true; applyState(); });
+  sideEl.addEventListener('mouseleave', ()=>{ hovered=false; applyState(); });
+
+  window.togglePin = function(){
+    pinned = !pinned;
+    pinBtn.classList.toggle('pinned', pinned);
+    pinBtn.title = pinned ? 'Unpin menu' : 'Keep menu open';
+    applyState();
+  };
+})();
 
 // ---------------- render ----------------
 function render(){ renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); }
