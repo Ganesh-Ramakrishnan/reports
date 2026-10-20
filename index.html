@@ -11,13 +11,14 @@
   :root{
     --blue:#3165e6; --teal:#16a6a0; --amber:#e9a124;
     --ink:#10213e; --text:#1b2942; --dim:#6b7a92; --faint:#9aa6ba;
-    --bg:#f5f7fb; --card:#ffffff; --line:#e4eaf3;
+    --bg:#fafafa; --card:#ffffff; --line:#e9e9e9;
     --green-bg:#e7f8ef; --green:#168053;
     --amber-bg:#fff4e4; --amber-ink:#a66b15;
     --red:#d1453d; --red-bg:#fdeceb;
     --radius:14px; --shadow:0 3px 13px rgba(16,33,62,0.05);
 
-    --orange:#FF761A; --sidebar-home:#FF8234;
+    --orange:#fb6c3b; --orange-dark:#fa551d; --orange-tint:#fff1ea;
+    --sidebar-home:#FF8234;
     --sidebar-text:#F7F7F7; --sidebar-text-dim:#8A8D93;
     --sidebar-row-hover:#464646; --sidebar-divider:rgba(255,255,255,0.14);
   }
@@ -44,38 +45,43 @@
   }
   .side.expanded{width:264px;}
 
-  .pin-row{display:flex;justify-content:center;padding:14px 10px 0;}
-  .side.expanded .pin-row{justify-content:flex-end;}
-  .pin-btn{width:32px;height:32px;flex:none;border:0;background:transparent;border-radius:8px;
-    display:flex;align-items:center;justify-content:center;color:var(--sidebar-text-dim);}
-  .pin-btn svg{width:17px;height:17px;transition:transform .2s ease;}
-  .pin-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
-  .pin-btn.pinned{color:var(--orange);}
-  .pin-btn.pinned svg{transform:rotate(45deg);}
-
-  .brand{display:flex;align-items:center;gap:12px;padding:10px 14px 20px;}
-  .brand-mark{width:32px;height:32px;border-radius:9px;background:var(--orange);color:#1c1c1c;
-    font-family:'Lexend';font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .brand{display:flex;align-items:center;gap:12px;padding:18px 14px 20px;}
+  .brand-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(155deg,#ff8a4d,var(--orange) 55%,var(--orange-dark));
+    color:#fff;font-family:'Lexend';font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none;
+    box-shadow:0 3px 8px rgba(251,108,59,0.35);}
   .brand-text{opacity:0;transition:opacity .15s ease;white-space:nowrap;min-width:0;}
   .side.expanded .brand-text{opacity:1;transition:opacity .2s ease .1s;}
-  .brand-name{font-size:15px;font-weight:800;letter-spacing:-.2px;color:#fff;}
-  .brand-name b{color:var(--orange);}
+  .brand-name{font-size:15px;font-weight:700;letter-spacing:-.2px;color:#fff;}
+  .brand-name .brand-s{color:var(--orange);font-weight:800;}
   .brand-sub{font-size:10px;color:var(--sidebar-text-dim);letter-spacing:.05em;text-transform:uppercase;margin-top:1px;}
+  .pin-btn{opacity:0;margin-left:auto;flex:none;width:30px;height:30px;border:1px solid var(--sidebar-divider);
+    background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;
+    color:var(--sidebar-text-dim);transition:opacity .15s ease,background .15s ease,border-color .15s ease,color .15s ease;}
+  .side.expanded .pin-btn{opacity:1;transition:opacity .2s ease .1s;}
+  .pin-btn svg{width:15px;height:15px;transition:transform .2s ease;}
+  .pin-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:#fff;}
+  .pin-btn.pinned{background:rgba(251,108,59,0.16);border-color:rgba(251,108,59,0.45);color:var(--orange);}
+  .pin-btn.pinned svg{transform:rotate(45deg);}
 
-  .nav{display:flex;flex-direction:column;gap:2px;flex:1;padding:4px 10px;overflow-y:auto;}
+  .nav{display:flex;flex-direction:column;gap:3px;flex:1;padding:4px 10px 4px 14px;overflow-y:auto;overflow-x:hidden;}
   .nav-item{
-    display:flex;align-items:center;gap:0;width:100%;border:0;text-align:left;background:none;
-    color:var(--sidebar-text);min-height:46px;padding:4px 10px;border-radius:6px;font-weight:600;font-size:14.5px;
+    position:relative;display:flex;align-items:center;gap:0;width:32px;border:0;text-align:left;background:none;
+    color:var(--sidebar-text-dim);min-height:46px;padding:0;border-radius:8px;font-weight:600;font-size:14px;
+    transition:width .3s ease,padding .3s ease,background .15s ease,color .15s ease;
   }
-  .nav-item .icon-container{width:36px;flex:none;display:flex;align-items:center;justify-content:center;transition:width .3s ease;}
-  .side.expanded .nav-item .icon-container{width:34px;justify-content:flex-start;}
-  .nav-item .navicon{width:20px;height:20px;flex:none;color:var(--sidebar-text-dim);}
-  .nav-item .nav-label{opacity:0;transition:opacity .15s ease;white-space:nowrap;}
+  .side.expanded .nav-item{width:100%;padding:4px 10px 4px 0;}
+  .nav-item .icon-container{width:32px;flex:none;display:flex;align-items:center;justify-content:center;}
+  .side.expanded .nav-item .icon-container{width:44px;justify-content:flex-start;}
+  .nav-item .navicon{width:20px;height:20px;flex:none;color:inherit;}
+  .nav-item .nav-label{opacity:0;color:inherit;transition:opacity .15s ease;white-space:nowrap;}
   .side.expanded .nav-item .nav-label{opacity:1;transition:opacity .2s ease .1s;}
-  .nav-item:hover,.nav-item.active{background:var(--sidebar-row-hover);}
-  .nav-item:hover .navicon,.nav-item:hover{color:#fff;}
+  .nav-item::before{content:'';position:absolute;left:-14px;top:10px;bottom:10px;width:3px;border-radius:0 4px 4px 0;
+    background:var(--orange);transform:scaleY(0);transition:transform .18s ease;}
+  .nav-item:hover{color:var(--orange);}
   .nav-item.active{color:#fff;}
+  .nav-item.active::before{transform:scaleY(1);}
   .nav-item.active .navicon{color:var(--orange);}
+  .nav-item:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
 
   .side-foot{font-size:10.5px;color:var(--sidebar-text-dim);padding:10px 14px;border-top:1px solid var(--sidebar-divider);
     margin-top:6px;white-space:nowrap;opacity:0;transition:opacity .15s ease;}
@@ -86,19 +92,25 @@
   .hamburger svg{width:22px;height:22px;}
   @media (max-width:980px){
     .hamburger{display:flex;}
-    .pin-row{display:none;}
+    .topbar{display:flex!important;}
     .side{position:fixed;top:0;left:0;height:100%;width:264px;transform:translateX(-100%);transition:transform .25s ease;max-width:85vw;}
     .side.open{transform:translateX(0);}
     .side.open .brand-text,.side.open .nav-item .nav-label,.side.open .side-foot{opacity:1;}
-    .side.open .nav-item .icon-container{width:34px;justify-content:flex-start;}
+    .side.open .nav-item{width:100%;padding:4px 10px 4px 0;}
+    .side.open .nav-item .icon-container{width:44px;justify-content:flex-start;}
   }
 
   /* ---------- Main ---------- */
   .main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
   .topbar{flex:none;background:var(--card);border-bottom:1px solid var(--line);padding:14px 28px;
-    display:flex;align-items:center;gap:14px;}
-  .topbar-title{font-weight:800;font-size:15px;}
-  .content{flex:1;min-height:0;overflow-y:auto;padding:28px 34px 70px;}
+    display:none;align-items:center;gap:14px;}
+  .content{flex:1;min-height:0;overflow-y:auto;padding:28px 34px 70px;position:relative;background:var(--bg);}
+  .content::before{
+    content:'';position:fixed;top:-120px;right:-160px;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle, rgba(251,108,59,0.07), transparent 70%);
+    pointer-events:none;z-index:0;
+  }
+  .content-inner{position:relative;z-index:1;}
   .content-inner{max-width:1280px;margin:0 auto;}
   .view{display:none;}
   .view.active{display:block;animation:fadeIn .2s ease;}
@@ -108,14 +120,14 @@
   .eyebrow{text-transform:uppercase;font-size:11.5px;letter-spacing:.1em;color:var(--dim);font-weight:800;margin:0 0 7px;}
   h1.page-title{font-size:28px;letter-spacing:-1px;margin:0 0 6px;}
   .sub{color:var(--dim);margin:0;font-size:13.5px;}
-  .tag{display:inline-block;border-radius:18px;background:#eaf0ff;color:#385ac3;padding:7px 12px;font-size:12px;font-weight:750;white-space:nowrap;}
+  .tag{display:inline-block;border-radius:18px;background:var(--orange-tint);color:#b84a1f;padding:7px 12px;font-size:12px;font-weight:750;white-space:nowrap;}
 
-  .btn{border-radius:9px;padding:10px 15px;font-weight:700;font-size:13px;border:1px solid var(--line);background:#fff;color:#2e4bac;display:inline-flex;align-items:center;gap:6px;}
+  .btn{border-radius:9px;padding:10px 15px;font-weight:700;font-size:13px;border:1px solid var(--line);background:#fff;color:#8a4420;display:inline-flex;align-items:center;gap:6px;}
   .btn:hover{background:#f6f8fc;}
-  .btn-primary{border:1px solid #315fe5;background:#315fe5;color:#fff;}
-  .btn-primary:hover{background:#2851c9;}
-  .btn-link{border:0;background:none;color:#315fe5;font-weight:700;padding:5px;}
-  .btn-link:hover{text-decoration:underline;}
+  .btn-primary{border:1px solid var(--orange);background:var(--orange);color:#fff;}
+  .btn-primary:hover{background:var(--orange-dark);border-color:var(--orange-dark);}
+  .btn-link{border:0;background:none;color:var(--orange);font-weight:700;padding:5px;}
+  .btn-link:hover{text-decoration:underline;color:var(--orange-dark);}
 
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:26px 0 13px;}
   .actions{display:flex;gap:8px;flex-wrap:wrap;}
@@ -127,31 +139,83 @@
   @media (max-width:900px){.grid3{grid-template-columns:repeat(2,1fr);} .grid2{grid-template-columns:1fr;}}
   @media (max-width:600px){.grid3{grid-template-columns:1fr;} .content{padding:18px 16px 60px;}}
 
-  .mini{background:#f7f9fc;border-radius:10px;padding:16px;}
+  .class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+  @media (max-width:340px){ .class-grid{grid-template-columns:1fr;} }
+  .class-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:var(--shadow);cursor:pointer;min-width:0;transition:box-shadow .18s ease, transform .18s ease, border-color .18s ease;}
+  .class-card:hover{border-color:var(--orange);box-shadow:0 10px 26px rgba(251,108,59,0.12);transform:translateY(-2px);}
+  .class-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .class-card h3{font-size:15px;}
+  .layout-toggle{display:flex;background:#eceef1;padding:4px;border-radius:10px;gap:2px;flex:none;}
+  .layout-btn{display:flex;align-items:center;justify-content:center;width:34px;height:30px;border:0;background:transparent;color:#627590;border-radius:8px;}
+  .layout-btn svg{width:16px;height:16px;}
+  .layout-btn:hover{color:var(--orange-dark);}
+  .layout-btn.active{background:#fff;color:var(--orange-dark);box-shadow:0 2px 8px rgba(23,51,91,0.13);}
+
+  .class-list-table{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:8px 18px;}
+
+  .add-class-card{border:1.5px dashed var(--line);border-radius:var(--radius);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:6px;color:var(--dim);font-weight:700;font-size:13px;min-height:122px;cursor:pointer;}
+  .add-class-card:hover{border-color:var(--orange);color:var(--orange-dark);}
+  .back-link{border:0;background:none;color:var(--orange-dark);font-weight:700;font-size:12.5px;padding:0;margin-bottom:14px;display:inline-flex;align-items:center;gap:5px;}
+  .back-link:hover{text-decoration:underline;}
+  .dropdown{position:relative;}
+  .dropdown-trigger{
+    display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#fff;
+    border-radius:9px;padding:9px 12px;font-size:12.5px;font-weight:700;color:var(--text);
+    max-width:220px;white-space:nowrap;
+  }
+  .dropdown-trigger:hover{border-color:var(--orange);}
+  .dropdown-trigger-label{overflow:hidden;text-overflow:ellipsis;}
+  .dropdown-trigger .chev{width:14px;height:14px;color:var(--dim);flex:none;transition:transform .18s ease;}
+  .dropdown.open .dropdown-trigger{border-color:var(--orange);box-shadow:0 0 0 3px rgba(251,108,59,0.12);}
+  .dropdown.open .dropdown-trigger .chev{transform:rotate(180deg);color:var(--orange);}
+  .dropdown-menu{
+    position:absolute;top:calc(100% + 6px);left:0;min-width:100%;width:max-content;max-width:280px;z-index:50;
+    background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 36px rgba(16,33,62,0.14);
+    padding:6px;display:none;max-height:260px;overflow-y:auto;
+  }
+  .dropdown.open .dropdown-menu{display:block;animation:pop .12s ease;}
+  .dropdown-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;background:none;
+    text-align:left;padding:9px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text);
+  }
+  .dropdown-item:hover{background:#f6f6f7;}
+  .dropdown-item.active{color:var(--orange-dark);background:var(--orange-tint);}
+  .dropdown-item .check{width:14px;height:14px;color:var(--orange);flex:none;visibility:hidden;}
+  .dropdown-item.active .check{visibility:visible;}
+
+  .mini{background:#f6f6f7;border-radius:10px;padding:14px 16px 16px;border-top:2.5px solid var(--orange);}
   .mini span{font-size:11.5px;color:var(--dim);font-weight:600;}
   .mini b{display:block;font-family:'Lexend';font-size:24px;margin:6px 0;letter-spacing:-.5px;}
   .mini small{font-size:11.5px;color:var(--faint);}
 
+  .detail-pair{background:#f6f6f7;border-radius:10px;padding:14px 16px 15px;border-top:2.5px solid var(--orange);min-width:0;}
+  .detail-pair .dp-label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:7px;}
+  .detail-pair .dp-value{display:block;font-family:'Lexend';font-size:16px;font-weight:700;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
   .rowhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .fine{color:var(--dim);font-size:12px;}
 
-  .track{height:9px;background:#edf1f6;border-radius:10px;overflow:hidden;margin:11px 0;}
-  .fill{height:100%;border-radius:10px;transition:width .4s ease;}
+  .track{height:10px;background:#eef0f3;border-radius:20px;overflow:hidden;margin:11px 0;box-shadow:inset 0 1px 3px rgba(16,33,62,0.08);}
+  .fill{height:100%;border-radius:20px;position:relative;transition:width .5s ease;box-shadow:0 1px 4px rgba(16,33,62,0.18);}
+  .fill::after{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,0.4),rgba(255,255,255,0) 60%);}
   .goalhead{display:flex;align-items:center;gap:10px;}
   .icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:17px;flex:none;}
   .big{font-family:'Lexend';font-size:24px;font-weight:800;margin:14px 0 3px;}
 
-  .note{padding:13px 16px;background:#eaf0ff;border-radius:10px;color:#3a527e;font-size:12.5px;line-height:1.55;margin-top:16px;}
+  .note{padding:13px 16px;background:#f6f6f7;border-left:3px solid var(--orange);border-radius:0 10px 10px 0;color:#4b5565;font-size:12.5px;line-height:1.55;margin-top:16px;}
 
   .table-scroll{overflow-x:auto;}
   table{border-collapse:collapse;width:100%;min-width:680px;font-size:13px;}
   th{text-align:left;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;
     padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;}
   th.sortable{cursor:pointer;user-select:none;}
-  th.sortable:hover{color:#2e4bac;}
+  th.sortable:hover{color:var(--orange-dark);}
   th.sortable .arrow{margin-left:3px;opacity:.5;}
   th.sortable.sorted .arrow{opacity:1;}
-  td{padding:12px 9px;border-bottom:1px solid #edf1f6;vertical-align:middle;}
+  td{padding:12px 9px;border-bottom:1px solid #eceef0;vertical-align:middle;}
   tr.clickable{cursor:pointer;}
   tr.clickable:hover{background:#f8fafd;}
 
@@ -160,26 +224,38 @@
 
   .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:18px 0;}
   .toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-  select,input,textarea{border:1px solid #d9e2ee;background:#fff;color:#293955;border-radius:9px;padding:9px 12px;font-size:13px;}
+  select,input,textarea{border:1px solid #dde1e6;background:#fff;color:#293955;border-radius:9px;padding:9px 12px;font-size:13px;}
   input[type=number]{max-width:160px;}
   .search{width:220px;max-width:100%;}
   @media (max-width:600px){.search{width:100%;}}
 
-  .tabs{display:flex;background:#e9eef7;padding:4px;border-radius:10px;}
+  .tabs{display:flex;background:#eceef1;padding:4px;border-radius:10px;}
   .tab{border:0;background:transparent;color:#627590;border-radius:8px;padding:9px 15px;font-weight:750;font-size:12.5px;}
-  .tab.active{background:#fff;color:#2d4fb3;box-shadow:0 2px 8px rgba(23,51,91,0.13);}
+  .tab.active{background:#fff;color:var(--orange-dark);box-shadow:0 2px 8px rgba(23,51,91,0.13);}
 
   /* ---------- Chart ---------- */
-  .chart{height:190px;display:flex;align-items:end;justify-content:space-around;border-bottom:1px solid #dbe3ec;position:relative;margin:24px 2px 30px;}
-  .chartline{position:absolute;left:0;right:0;border-top:2px dashed #b9c7dc;}
-  .chartline label{position:absolute;right:0;top:-19px;color:#7789a4;font-size:10.5px;background:var(--card);padding-left:4px;}
-  .barcol{height:100%;width:13%;display:flex;align-items:end;justify-content:center;position:relative;cursor:pointer;}
-  .barcol.active .bar{outline:3px solid #d8e2fb;outline-offset:3px;}
-  .bar{width:60%;max-width:50px;display:flex;flex-direction:column-reverse;border-radius:6px 6px 0 0;overflow:hidden;transition:height .35s ease;}
-  .bar i{display:block;width:100%;transition:height .35s ease;}
-  .day{position:absolute;bottom:-22px;color:var(--dim);font-size:11.5px;}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:11.5px;}
-  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
+  .chart{height:190px;display:flex;align-items:end;justify-content:space-around;border-bottom:1px solid #dde2e7;
+    position:relative;margin:24px 2px 30px;background-image:repeating-linear-gradient(to top,#eef0f3 0,#eef0f3 1px,transparent 1px,transparent 25%);}
+  .chartline{position:absolute;left:0;right:0;border-top:2px dashed #e0a27f;}
+  .chartline label{position:absolute;right:0;top:-12px;color:#b84a1f;font-weight:750;font-size:10.5px;
+    background:var(--orange-tint);padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .barcol{height:100%;width:13%;display:flex;align-items:end;justify-content:center;position:relative;cursor:pointer;
+    border-radius:10px 10px 0 0;transition:background .15s ease;}
+  .barcol:hover{background:rgba(16,33,62,0.04);}
+  .barcol.active{background:var(--orange-tint);}
+  .barcol:hover .bar{box-shadow:0 6px 14px rgba(16,33,62,0.16);transform:translateY(-1px);}
+  .barcol.active .bar{box-shadow:0 8px 18px rgba(251,108,59,0.28);transform:translateY(-1px);}
+  .bar{width:60%;max-width:50px;display:flex;flex-direction:column-reverse;border-radius:7px 7px 0 0;overflow:hidden;
+    transition:height .35s ease,box-shadow .15s ease,transform .15s ease;}
+  .bar i{display:block;width:100%;transition:height .35s ease;position:relative;}
+  .bar i:not(:first-child){border-top:2px solid #fff;}
+  .day{position:absolute;bottom:-22px;color:var(--dim);font-size:11.5px;font-weight:600;}
+  .barcol.active .day{color:var(--orange-dark);font-weight:750;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;background:#f6f6f7;border-radius:20px;
+    padding:6px 12px 6px 9px;font-size:11.5px;font-weight:650;color:var(--text);}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;flex:none;}
+  .legend .dot{margin-right:0;}
 
   .chart-tip{
     position:fixed;z-index:60;background:var(--ink);color:#fff;border-radius:9px;padding:9px 12px;
@@ -190,24 +266,49 @@
   .chart-tip b{display:block;font-size:11.5px;margin-bottom:3px;}
   .chart-tip .ti{display:flex;align-items:center;gap:5px;}
 
-  .metric{display:grid;grid-template-columns:92px 1fr 96px;align-items:center;gap:9px;margin:15px 0;font-size:12.5px;}
-  .metric strong{text-align:right;}
+  .metric{margin:18px 0;font-size:12.5px;}
+  .metric .track{margin:0;}
+  .metric-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px;}
+  .metric-top span{font-weight:750;color:var(--text);font-size:13px;}
+  .metric-top strong{font-variant-numeric:tabular-nums;color:var(--text);white-space:nowrap;}
+  .metric-top .pct{color:var(--dim);font-weight:600;margin-left:5px;}
 
   /* ---------- Modal ---------- */
-  .modal-scrim{position:fixed;inset:0;background:rgba(7,21,45,0.6);display:none;align-items:center;justify-content:center;padding:18px;z-index:70;}
+  .modal-scrim{position:fixed;inset:0;background:rgba(7,21,45,0.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;padding:18px;z-index:70;}
   .modal-scrim.open{display:flex;}
-  .dialog{background:#fff;border-radius:16px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:26px;
-    box-shadow:0 25px 80px rgba(6,21,43,0.4);animation:pop .15s ease;}
+  .dialog{background:#fff;border-radius:18px;width:min(540px,100%);max-height:90vh;overflow:hidden;
+    display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(6,21,43,0.4);animation:pop .15s ease;}
   @keyframes pop{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:none;}}
-  .dialog p{font-size:12.5px;color:var(--dim);line-height:1.55;}
+  .dialog-head{display:flex;align-items:center;gap:14px;padding:18px 20px 18px 26px;border-bottom:1px solid var(--line);flex:none;}
+  .dialog-icon{width:40px;height:40px;border-radius:11px;background:var(--orange-tint);color:var(--orange-dark);
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .dialog-icon svg{width:20px;height:20px;}
+  .dialog-head-text{flex:1;min-width:0;}
+  .dialog-head-text h2{font-size:17px;line-height:1.3;}
+  .dialog-close{width:32px;height:32px;border-radius:8px;border:0;background:transparent;color:var(--dim);
+    display:flex;align-items:center;justify-content:center;flex:none;}
+  .dialog-close:hover{background:#f6f6f7;color:var(--text);}
+  .dialog-close svg{width:16px;height:16px;}
+  #modalBody{padding:20px 26px;overflow:auto;}
+  #modalBody p{font-size:12.5px;color:var(--dim);line-height:1.55;margin:0 0 4px;}
   .field-label{display:block;font-size:12.5px;font-weight:750;margin:15px 0 6px;}
-  .dialog input,.dialog select{width:100%;}
-  .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px;}
-  .feedback{padding:10px 12px;background:#edf4ff;color:#3b527e;border-radius:9px;font-size:12.5px;margin-top:13px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:15px;}
+  .field-row .field-label{margin-top:0;}
+  #modalBody input,#modalBody .dropdown{width:100%;}
+  #modalBody .dropdown-trigger{max-width:none;width:100%;justify-content:space-between;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:9px;padding:16px 26px 22px;border-top:1px solid var(--line);flex:none;}
+  .feedback{padding:10px 12px;background:#f6f6f7;color:#4b5565;border-radius:9px;font-size:12.5px;margin-top:13px;}
   .feedback.error{background:var(--red-bg);color:#a34531;}
   .preview{max-height:170px;overflow:auto;}
   .preview table{min-width:0;}
   .note-input{display:block;width:100%;min-height:90px;resize:vertical;line-height:1.5;margin-top:10px;}
+  .file-drop{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--line);border-radius:10px;padding:16px;
+    color:var(--dim);font-weight:650;font-size:13px;cursor:pointer;position:relative;
+    transition:border-color .15s ease,color .15s ease,background .15s ease;}
+  .file-drop:hover{border-color:var(--orange);color:var(--orange-dark);background:var(--orange-tint);}
+  .file-drop svg{width:18px;height:18px;flex:none;}
+  .file-drop input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;}
 
   /* ---------- Toasts ---------- */
   .toast-stack{position:fixed;bottom:20px;right:20px;z-index:90;display:flex;flex-direction:column;gap:10px;max-width:min(360px,calc(100vw - 40px));}
@@ -236,41 +337,39 @@
 <div class="app">
   <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
   <aside class="side" id="side">
-    <div class="pin-row">
-      <button class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div class="brand-text">
+        <div class="brand-name"><span class="brand-s">s</span>canmarker</div>
+        <div class="brand-sub">Teacher Dashboard</div>
+      </div>
+      <button type="button" class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open" aria-label="Keep menu open">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3Z"/><path d="M12 15v5"/></svg>
       </button>
     </div>
-    <div class="brand">
-      <div class="brand-mark">M</div>
-      <div class="brand-text">
-        <div class="brand-name"><b>scan</b>marker Max</div>
-        <div class="brand-sub">Teacher Dashboard</div>
-      </div>
-    </div>
     <nav class="nav">
-      <button class="nav-item active" data-view="overview" title="Overview">
+      <button class="nav-item active" data-view="overview">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span>
         <span class="nav-label">Overview</span>
       </button>
-      <button class="nav-item" data-view="classes" title="Classes">
+      <button class="nav-item" data-view="classes">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg></span>
         <span class="nav-label">Classes</span>
       </button>
-      <button class="nav-item" data-view="analytics" title="Student analytics">
+      <button class="nav-item" data-view="analytics">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg></span>
         <span class="nav-label">Student analytics</span>
       </button>
-      <button class="nav-item" data-view="goals" title="Goals">
+      <button class="nav-item" data-view="goals">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
         <span class="nav-label">Goals</span>
       </button>
-      <button class="nav-item" data-view="reports" title="Reports">
+      <button class="nav-item" data-view="reports">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
         <span class="nav-label">Reports</span>
       </button>
     </nav>
-    <div class="side-foot">Concept prototype · example data<br>Scanmarker Max v1.0</div>
+    <div class="side-foot">Scanmarker Max v1.0</div>
   </aside>
 
   <div class="main">
@@ -278,7 +377,6 @@
       <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
-      <div class="topbar-title" id="topbarTitle">Overview</div>
     </div>
 
     <div class="content">
@@ -288,11 +386,25 @@
         <section id="overview" class="view active">
           <div class="top">
             <div>
-              <p class="eyebrow">Teacher dashboard · Sample data</p>
               <h1 class="page-title">Overview</h1>
               <p class="sub" id="overviewSub"></p>
             </div>
-            <span class="tag">Class snapshot</span>
+            <div class="actions">
+              <div class="dropdown" data-class-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleClassDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <div class="dropdown" data-week-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleWeekDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+            </div>
           </div>
           <div class="grid3" id="overviewStats"></div>
           <div class="grid2" style="margin-top:16px">
@@ -302,8 +414,9 @@
               <div class="legend" id="overviewLegend"></div>
             </div>
             <div class="card">
-              <h2>Review next</h2>
-              <div id="reviewList"></div>
+              <h2>Practice by function</h2>
+              <div class="fine" style="margin-top:2px">Class minutes vs weekly goal</div>
+              <div id="reviewList" style="margin-top:14px"></div>
               <div class="actions" style="margin-top:16px">
                 <button class="btn" data-go="classes">Manage class</button>
                 <button class="btn btn-primary" data-go="reports">View reports</button>
@@ -315,60 +428,108 @@
 
         <!-- ================= CLASSES ================= -->
         <section id="classes" class="view">
-          <div class="top">
-            <div>
-              <p class="eyebrow">Teacher dashboard · Class setup</p>
-              <h1 class="page-title">Classes</h1>
-              <p class="sub">Manage the classroom with school-issued student IDs.</p>
+
+          <!-- ---- class list ---- -->
+          <div id="classListView">
+            <div class="top">
+              <div>
+                <h1 class="page-title">Classes</h1>
+                <p class="sub">Pick a class to manage its roster, or create a new one.</p>
+              </div>
+              <div class="layout-toggle" role="group" aria-label="Layout">
+                <button type="button" class="layout-btn" id="classLayoutCards" title="Card view" onclick="setClassesLayout('cards')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+                </button>
+                <button type="button" class="layout-btn" id="classLayoutList" title="List view" onclick="setClassesLayout('list')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+              </div>
             </div>
-            <span class="tag">Class setup</span>
+            <div class="class-grid" id="classGrid"></div>
+            <div id="classListTable"></div>
           </div>
-          <div class="card">
-            <div class="rowhead"><h2>Class details</h2><button class="btn" id="editClassBtn">Edit class</button></div>
-            <div class="grid3" id="classDetails" style="margin-top:16px"></div>
-          </div>
-          <div class="section-head">
-            <div><h2>Students and devices</h2><div class="fine">Enter an ID like s40301234, upload a roster, or review the proposed LMS mapping.</div></div>
-            <div class="actions">
-              <button class="btn" id="lmsBtn">LMS setup</button>
-              <button class="btn" id="uploadBtn">Upload CSV</button>
-              <button class="btn btn-primary" id="addStudentBtn">+ Add student</button>
+
+          <!-- ---- class detail ---- -->
+          <div id="classDetailView" style="display:none">
+            <button class="back-link" onclick="showClassList()">← All classes</button>
+            <div class="top">
+              <div>
+                <h1 class="page-title" id="classDetailTitle">Classes</h1>
+                <p class="sub">Manage the classroom with school-issued student IDs.</p>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="rowhead">
-              <h2>Class roster <span class="fine" id="rosterCount"></span></h2>
-              <input class="search" id="rosterSearch" placeholder="Search name or school ID" aria-label="Search roster">
+            <div class="card">
+              <div class="rowhead"><h2>Class details</h2><button class="btn" id="editClassBtn">Edit class</button></div>
+              <div class="grid3" id="classDetails" style="margin-top:16px"></div>
             </div>
-            <div class="table-scroll">
-              <table>
-                <thead><tr>
-                  <th class="sortable" data-sort="name">Student <span class="arrow">↕</span></th>
-                  <th class="sortable" data-sort="id">School ID <span class="arrow">↕</span></th>
-                  <th>Device SN</th><th>Link</th><th></th>
-                </tr></thead>
-                <tbody id="rosterRows"></tbody>
-              </table>
+            <div class="section-head">
+              <div><h2>Students and devices</h2><div class="fine">Enter an ID like s40301234, upload a roster, or review the proposed LMS mapping.</div></div>
+              <div class="actions">
+                <button class="btn" id="lmsBtn">LMS setup</button>
+                <button class="btn" id="uploadBtn">Upload CSV</button>
+                <button class="btn btn-primary" id="addStudentBtn">+ Add student</button>
+              </div>
             </div>
+            <div class="card">
+              <div class="rowhead">
+                <h2>Class roster <span class="fine" id="rosterCount"></span></h2>
+                <input class="search" id="rosterSearch" placeholder="Search name or school ID" aria-label="Search roster">
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead><tr>
+                    <th class="sortable" data-sort="name">Student <span class="arrow">↕</span></th>
+                    <th class="sortable" data-sort="id">School ID <span class="arrow">↕</span></th>
+                    <th>Device SN</th><th>Link</th><th></th>
+                  </tr></thead>
+                  <tbody id="rosterRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="note">School IT can map LMS student IDs and class IDs to this roster. On a shared pen, each student must enter their own ID before use to attribute activity correctly.</div>
           </div>
-          <div class="note">School IT can map LMS student IDs and class IDs to this roster. On a shared pen, each student must enter their own ID before use to attribute activity correctly.</div>
         </section>
 
         <!-- ================= ANALYTICS ================= -->
         <section id="analytics" class="view">
           <div class="top">
             <div>
-              <p class="eyebrow">Teacher dashboard · Sample data</p>
               <h1 class="page-title">Student analytics</h1>
               <p class="sub">Review time against daily Reading, Dictionary, and Translation goals.</p>
             </div>
-            <span class="tag">Sep 21–25, 2026</span>
+            <div class="actions">
+              <div class="dropdown" data-class-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleClassDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <div class="dropdown" data-week-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleWeekDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+            </div>
           </div>
           <div class="toolbar">
             <div class="left">
-              <label class="fine" for="analyticsStudent" style="display:none">Student</label>
-              <select id="analyticsStudent"></select>
-              <span class="fine" id="analyticsDay"></span>
+              <div class="dropdown" data-select="analyticsStudent" id="analyticsStudent">
+                <button type="button" class="dropdown-trigger" onclick="toggleSelectDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <div class="dropdown" data-select="analyticsDay" id="analyticsDay">
+                <button type="button" class="dropdown-trigger" onclick="toggleSelectDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
             </div>
             <button class="btn" data-go="goals">Edit goals</button>
           </div>
@@ -400,15 +561,30 @@
         <section id="goals" class="view">
           <div class="top">
             <div>
-              <p class="eyebrow">Teacher dashboard · Sample data</p>
               <h1 class="page-title">Goals</h1>
               <p class="sub">Set class practice targets, then adjust them for individual students.</p>
             </div>
-            <button class="btn btn-primary" id="addClassGoalBtn">+ Add class goal</button>
+            <div class="actions">
+              <div class="dropdown" data-class-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleClassDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <div class="dropdown" data-week-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleWeekDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <button class="btn btn-primary" id="addClassGoalBtn">+ Add class goal</button>
+            </div>
           </div>
           <div class="grid3" id="classGoalCards"></div>
           <div class="card" style="margin-top:16px">
-            <div class="rowhead"><h2>Student goals and today's use</h2><span class="fine">Friday, Sep 25 · minutes used / assigned goal</span></div>
+            <div class="rowhead"><h2>Student goals and today's use</h2><span class="fine" id="goalsDayLabel"></span></div>
             <div class="table-scroll">
               <table>
                 <thead><tr><th>Student</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>All goals</th><th></th></tr></thead>
@@ -423,11 +599,25 @@
         <section id="reports" class="view">
           <div class="top">
             <div>
-              <p class="eyebrow">Teacher dashboard · Sample data</p>
               <h1 class="page-title">Reports</h1>
               <p class="sub">Prepare a practice summary for families, conferences, or administrators.</p>
             </div>
-            <span class="tag">Sep 21–25, 2026</span>
+            <div class="actions">
+              <div class="dropdown no-print" data-class-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleClassDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+              <div class="dropdown no-print" data-week-dropdown>
+                <button type="button" class="dropdown-trigger" onclick="toggleWeekDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
+            </div>
           </div>
           <div class="toolbar no-print">
             <div class="left">
@@ -435,7 +625,13 @@
                 <button class="tab active" data-report="student">Student report</button>
                 <button class="tab" data-report="class">Class report</button>
               </div>
-              <select id="reportStudent" aria-label="Student report"></select>
+              <div class="dropdown" data-select="reportStudent" id="reportStudent" aria-label="Student report">
+                <button type="button" class="dropdown-trigger" onclick="toggleSelectDropdown(this)">
+                  <span class="dropdown-trigger-label" data-dropdown-label></span>
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-menu" data-dropdown-menu></div>
+              </div>
             </div>
             <div class="right">
               <button class="btn" id="exportCSVBtn">⬇ Export CSV</button>
@@ -468,8 +664,6 @@
             <p class="fine" style="margin-top:8px">This report documents use of reading support and practice goals. Use assessments and student work to discuss academic growth. Share through school-approved channels.</p>
           </div>
         </section>
-
-        <p class="fine" style="margin:24px 2px 4px">Concept prototype with illustrative minutes. Production reports need user ID, device serial number, function, session duration, and sync rules. Changes in this prototype are stored only in this browser.</p>
       </div>
     </div>
   </div>
@@ -477,7 +671,13 @@
 
 <div class="modal-scrim" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="dialog">
-    <h2 id="modalTitle"></h2>
+    <div class="dialog-head">
+      <div class="dialog-icon" id="modalIcon"></div>
+      <div class="dialog-head-text"><h2 id="modalTitle"></h2></div>
+      <button type="button" class="dialog-close" id="modalClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
     <div id="modalBody"></div>
     <div class="modal-actions">
       <button class="btn" id="modalCancel">Cancel</button>
@@ -490,46 +690,98 @@
 <div class="toast-stack" id="toastStack"></div>
 
 <script>
-const days=['Mon, Sep 21','Tue, Sep 22','Wed, Sep 23','Thu, Sep 24','Fri, Sep 25'];
+const weekOptions=[
+  {id:'w1', label:'Sep 7–11, 2026', days:['Mon, Sep 7','Tue, Sep 8','Wed, Sep 9','Thu, Sep 10','Fri, Sep 11']},
+  {id:'w2', label:'Sep 14–18, 2026', days:['Mon, Sep 14','Tue, Sep 15','Wed, Sep 16','Thu, Sep 17','Fri, Sep 18']},
+  {id:'w3', label:'Sep 21–25, 2026', days:['Mon, Sep 21','Tue, Sep 22','Wed, Sep 23','Thu, Sep 24','Fri, Sep 25']},
+];
+let days = weekOptions[2].days;
+function syncDays(){ days = weekOptions.find(w=>w.id===data.activeWeek).days; }
+
 const keys=['reading','dictionary','translation'];
 const labels={reading:'Reading',dictionary:'Dictionary',translation:'Translation'};
 const colors={reading:'#3165e6',dictionary:'#16a6a0',translation:'#e9a124'};
 const icons={reading:'▤',dictionary:'⌕',translation:'文'};
 
+const defaultGoals = {reading:10,dictionary:5,translation:10};
+const defaultPeriods = {reading:'Every school day',dictionary:'Every school day',translation:'Every school day'};
+
+function zeroWeeks(){
+  return Object.fromEntries(weekOptions.map(w=>[w.id, [0,1,2,3,4].map(()=>[0,0,0])]));
+}
+function buildWeeks(dailyW3){
+  const scale = factors => dailyW3.map((d,i)=> d.map(v=> Math.max(0, Math.round(v*factors[i]))));
+  return { w1: scale([0.75,0.85,0.7,0.9,0.65]), w2: scale([0.9,0.95,1,0.85,0.8]), w3: dailyW3 };
+}
+
 const initial={
-  className:'Grade 5 Reading', classId:'G5-READ-2026', teacher:'Ms. Lee',
-  goals:{reading:10,dictionary:5,translation:10},
-  periods:{reading:'Every school day',dictionary:'Every school day',translation:'Every school day'},
-  students:[
-    {name:'Maya R.', id:'s40301234', sn:'913362309000001', daily:[[10,5,10],[12,4,8],[8,5,10],[10,6,10],[6,2,4]], overrides:{}},
-    {name:'Liam K.', id:'s40301235', sn:'913362309000002', daily:[[15,5,10],[16,4,11],[14,5,10],[15,6,10],[16,5,10]], overrides:{reading:15}},
-    {name:'Ava P.', id:'s40301236', sn:'', daily:[[10,8,10],[11,6,9],[10,8,10],[12,8,10],[11,6,11]], overrides:{dictionary:8}},
-    {name:'Noah D.', id:'s40301237', sn:'913362309000004', daily:[[10,5,10],[11,5,10],[10,5,10],[10,5,10],[10,5,10]], overrides:{}},
-    {name:'Sofia M.', id:'s40301238', sn:'', daily:[[7,5,9],[9,5,10],[10,5,10],[8,4,8],[7,5,8]], overrides:{}},
+  activeClass:0,
+  activeWeek:'w3',
+  classes:[
+    {
+      className:'Grade 5 Reading', classId:'G5-READ-2026', teacher:'Ms. Lee',
+      goals:{...defaultGoals},
+      periods:{...defaultPeriods},
+      students:[
+        {name:'Maya R.', id:'s40301234', sn:'913362309000001', daily:[[10,5,10],[12,4,8],[8,5,10],[10,6,10],[6,2,4]], overrides:{}},
+        {name:'Liam K.', id:'s40301235', sn:'913362309000002', daily:[[15,5,10],[16,4,11],[14,5,10],[15,6,10],[16,5,10]], overrides:{reading:15}},
+        {name:'Ava P.', id:'s40301236', sn:'', daily:[[10,8,10],[11,6,9],[10,8,10],[12,8,10],[11,6,11]], overrides:{dictionary:8}},
+        {name:'Noah D.', id:'s40301237', sn:'913362309000004', daily:[[10,5,10],[11,5,10],[10,5,10],[10,5,10],[10,5,10]], overrides:{}},
+        {name:'Sofia M.', id:'s40301238', sn:'', daily:[[7,5,9],[9,5,10],[10,5,10],[8,4,8],[7,5,8]], overrides:{}},
+      ]
+    },
+    {
+      className:'Grade 3 Reading', classId:'G3-READ-2026', teacher:'Mr. Patel',
+      goals:{reading:8,dictionary:4,translation:6},
+      periods:{reading:'Every school day',dictionary:'Every school day',translation:'Every school day'},
+      students:[
+        {name:'Ethan B.', id:'s30201111', sn:'913362309000011', daily:[[8,4,6],[9,4,7],[8,3,6],[8,4,6],[6,2,4]], overrides:{}},
+        {name:'Priya N.', id:'s30201112', sn:'913362309000012', daily:[[10,5,8],[9,5,7],[10,4,6],[9,5,8],[8,4,6]], overrides:{}},
+        {name:'Oliver T.', id:'s30201113', sn:'', daily:[[5,2,3],[6,3,4],[4,2,3],[5,3,4],[3,1,2]], overrides:{}},
+        {name:'Zoe K.', id:'s30201114', sn:'913362309000014', daily:[[8,4,6],[8,4,6],[8,4,6],[8,4,6],[8,4,6]], overrides:{}},
+      ]
+    },
+    {
+      className:'ESL Morning Group', classId:'ESL-2026', teacher:'Ms. Alvarez',
+      goals:{reading:12,dictionary:8,translation:12},
+      periods:{reading:'Every day',dictionary:'Every day',translation:'Every day'},
+      students:[
+        {name:'Diego M.', id:'s50901001', sn:'913362309000021', daily:[[12,8,12],[14,9,13],[12,7,11],[13,8,12],[10,6,9]], overrides:{}},
+        {name:'Lina F.', id:'s50901002', sn:'913362309000022', daily:[[12,8,12],[12,8,12],[12,8,12],[12,8,12],[12,8,12]], overrides:{}},
+        {name:'Yusuf A.', id:'s50901003', sn:'', daily:[[6,4,5],[7,3,6],[5,4,4],[6,3,5],[4,2,3]], overrides:{translation:15}},
+      ]
+    }
   ]
 };
+initial.classes.forEach(c=> c.students.forEach(s=>{ s.weeks = buildWeeks(s.daily); delete s.daily; }));
 
 let data;
 try{
-  const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v1'));
-  data = (saved?.students && saved?.goals) ? saved : structuredClone(initial);
+  const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v4'));
+  data = (Array.isArray(saved?.classes) && saved.classes.length && typeof saved.activeClass==='number' && typeof saved.activeWeek==='string') ? saved : structuredClone(initial);
 }catch{ data = structuredClone(initial); }
+syncDays();
 
 let current='overview', studentIndex=0, selectedDay=4, reportType='student', mode='', editIndex=-1, staged=[];
 let rosterSort={key:'name', dir:1};
+let classView='list';
+let classesLayout='cards';
+function setClassesLayout(mode){ classesLayout = mode; renderClassList(); }
 
 const $ = id => document.getElementById(id);
+const cls = () => data.classes[data.activeClass];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sum = a => a.reduce((x,y)=>x+y,0);
-const minutes = s => keys.map((_,i)=> sum(s.daily.map(d=>d[i])));
-const target = (s,k) => s.overrides[k] ?? data.goals[k];
+const daily = s => s.weeks[data.activeWeek];
+const minutes = s => keys.map((_,i)=> sum(daily(s).map(d=>d[i])));
+const target = (s,k) => s.overrides[k] ?? cls().goals[k];
 const targetArray = s => keys.map(k=>target(s,k));
-const metDay = (s,d) => s.daily[d].every((n,i)=>n>=targetArray(s)[i]);
+const metDay = (s,d) => daily(s)[d].every((n,i)=>n>=targetArray(s)[i]);
 const metDays = s => days.filter((_,d)=>metDay(s,d)).length;
 const weekTarget = s => sum(targetArray(s)) * 5;
 const weekActual = s => sum(minutes(s));
 const validID = id => /^[A-Za-z0-9_-]{3,32}$/.test(id);
-const persist = () => { try{ localStorage.setItem('scanmarker_max_teacher_prototype_v1', JSON.stringify(data)); }catch{} };
+const persist = () => { try{ localStorage.setItem('scanmarker_max_teacher_prototype_v4', JSON.stringify(data)); }catch{} };
 
 // ---------------- toasts ----------------
 function toast(msg, isError=false){
@@ -585,7 +837,6 @@ function nav(v){
   current = v;
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active', x.id===v));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
-  $('topbarTitle').textContent = document.querySelector('.nav-item[data-view="'+v+'"]').textContent.trim();
   closeSidebar();
   render();
   document.querySelector('.content').scrollTop = 0;
@@ -598,7 +849,7 @@ function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classLis
 (function(){
   const sideEl = $('side');
   const pinBtn = $('pinBtn');
-  let collapseTimer = null, pinned = false, hovered = false;
+  let collapseTimer = null, hovered = false, pinned = false;
 
   function applyState(){
     if(window.innerWidth <= 980) return;
@@ -613,37 +864,166 @@ function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classLis
     pinned = !pinned;
     pinBtn.classList.toggle('pinned', pinned);
     pinBtn.title = pinned ? 'Unpin menu' : 'Keep menu open';
+    pinBtn.setAttribute('aria-label', pinBtn.title);
     applyState();
   };
 })();
 
 // ---------------- render ----------------
-function render(){ renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); }
+function render(){ syncClassSwitchers(); syncWeekSwitchers(); renderClassList(); renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); }
 
-function renderOverview(){
-  const ss = data.students;
-  const total = sum(ss.map(weekActual)), expected = sum(ss.map(weekTarget));
-  const linked = ss.filter(s=>s.sn).length, met = sum(ss.map(metDays));
-  $('overviewSub').textContent = data.className + ' · practice activity for Sep 21–25, 2026';
-  $('overviewStats').innerHTML = `
-    <div class="card mini"><span>Class practice this week</span><b>${total} min</b><small>${Math.round(total/expected*100)}% of assigned minutes</small></div>
-    <div class="card mini"><span>Student-days meeting all goals</span><b>${met} / ${ss.length*5}</b><small>Across five school days</small></div>
-    <div class="card mini"><span>Devices linked</span><b>${linked} / ${ss.length}</b><small>Students with a device SN</small></div>`;
-  const series = days.map((_,d)=> keys.map((_,i)=> sum(ss.map(s=>s.daily[d][i]))));
-  chart($('overviewChart'), series, sum(ss.map(s=>sum(targetArray(s)))));
-  $('overviewLegend').innerHTML = legend();
-  $('reviewList').innerHTML = ss.filter(s=> metDays(s)<3 || !s.sn).map(s=>
-    `<div style="border-bottom:1px solid #eef1f6;padding:12px 0"><strong>${esc(s.name)}</strong><div class="fine">${metDays(s)} / 5 days with all goals met${s.sn?'':' · device not linked'}</div></div>`
-  ).join('') || '<p class="fine">All students have linked devices and at least three days with all goals met.</p>';
+function syncClassSwitchers(){
+  document.querySelectorAll('[data-class-dropdown]').forEach(dd=>{
+    dd.querySelector('[data-dropdown-label]').textContent = cls().className;
+    dd.querySelector('[data-dropdown-menu]').innerHTML = data.classes.map((c,i)=>
+      `<button type="button" class="dropdown-item${i===data.activeClass?' active':''}" onclick="chooseClass(${i})">
+        <span>${esc(c.className)}</span>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </button>`
+    ).join('');
+  });
 }
 
+function syncWeekSwitchers(){
+  document.querySelectorAll('[data-week-dropdown]').forEach(dd=>{
+    const w = weekOptions.find(x=>x.id===data.activeWeek);
+    dd.querySelector('[data-dropdown-label]').textContent = w.label;
+    dd.querySelector('[data-dropdown-menu]').innerHTML = weekOptions.map(x=>
+      `<button type="button" class="dropdown-item${x.id===data.activeWeek?' active':''}" onclick="chooseWeek('${x.id}')">
+        <span>${esc(x.label)}</span>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </button>`
+    ).join('');
+  });
+}
+
+function closeAllDropdowns(){
+  document.querySelectorAll('[data-class-dropdown].open, [data-week-dropdown].open, [data-select].open').forEach(x=> x.classList.remove('open'));
+}
+function toggleClassDropdown(trigger){
+  const dd = trigger.closest('[data-class-dropdown]');
+  const willOpen = !dd.classList.contains('open');
+  closeAllDropdowns();
+  if(willOpen) dd.classList.add('open');
+}
+function chooseClass(i){
+  data.activeClass = i; studentIndex = 0;
+  closeAllDropdowns();
+  persist(); render();
+}
+function toggleWeekDropdown(trigger){
+  const dd = trigger.closest('[data-week-dropdown]');
+  const willOpen = !dd.classList.contains('open');
+  closeAllDropdowns();
+  if(willOpen) dd.classList.add('open');
+}
+function chooseWeek(id){
+  data.activeWeek = id; syncDays(); selectedDay = 4;
+  closeAllDropdowns();
+  persist(); render();
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('[data-class-dropdown]') && !e.target.closest('[data-week-dropdown]') && !e.target.closest('[data-select]')){
+    closeAllDropdowns();
+  }
+});
+
+const selectHandlers = {};
+function bindSelect(id, onChange){ selectHandlers[id] = onChange; }
+function renderSelect(id, items, selectedValue){
+  const dd = document.getElementById(id);
+  if(!dd) return;
+  dd.dataset.value = selectedValue;
+  const match = items.find(it=> String(it.value)===String(selectedValue));
+  dd.querySelector('[data-dropdown-label]').textContent = match ? match.label : '';
+  dd.querySelector('[data-dropdown-menu]').innerHTML = items.map(it=>
+    `<button type="button" class="dropdown-item${String(it.value)===String(selectedValue)?' active':''}" onclick="chooseSelectOption('${id}','${esc(String(it.value))}')">
+      <span>${esc(it.label)}</span>
+      <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </button>`
+  ).join('');
+}
+function toggleSelectDropdown(trigger){
+  const dd = trigger.closest('[data-select]');
+  const willOpen = !dd.classList.contains('open');
+  closeAllDropdowns();
+  if(willOpen) dd.classList.add('open');
+}
+function chooseSelectOption(id, value){
+  closeAllDropdowns();
+  const handler = selectHandlers[id];
+  if(handler) handler(value);
+}
+
+function renderOverview(){
+  const ss = cls().students;
+  const total = sum(ss.map(weekActual)), expected = sum(ss.map(weekTarget));
+  const linked = ss.filter(s=>s.sn).length, met = sum(ss.map(metDays));
+  $('overviewSub').textContent = 'Practice activity for ' + weekOptions.find(w=>w.id===data.activeWeek).label;
+  $('overviewStats').innerHTML = `
+    <div class="card mini"><span>Class practice this week</span><b>${total} min</b><small>${expected? Math.round(total/expected*100):0}% of assigned minutes</small></div>
+    <div class="card mini"><span>Student-days meeting all goals</span><b>${met} / ${ss.length*5}</b><small>Across five school days</small></div>
+    <div class="card mini"><span>Devices linked</span><b>${linked} / ${ss.length}</b><small>Students with a device SN</small></div>`;
+  const series = days.map((_,d)=> keys.map((_,i)=> sum(ss.map(s=>daily(s)[d][i]))));
+  chart($('overviewChart'), series, sum(ss.map(s=>sum(targetArray(s)))));
+  $('overviewLegend').innerHTML = legend();
+  $('reviewList').innerHTML = !ss.length ? '<p class="fine">No students in this class yet.</p>' : keys.map((k,i)=>{
+    const actual = sum(ss.map(x=>minutes(x)[i]));
+    const goal = sum(ss.map(x=>target(x,k)*5));
+    const pct = goal ? Math.round(Math.min(100, actual/goal*100)) : 0;
+    return `<div class="metric">
+      <div class="metric-top"><span>${labels[k]}</span><strong>${actual} / ${goal} min<span class="pct">· ${pct}%</span></strong></div>
+      <div class="track"><div class="fill" style="width:${pct}%;background:${colors[k]}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderClassList(){
+  $('classListView').style.display = classView==='list' ? '' : 'none';
+  $('classDetailView').style.display = classView==='detail' ? '' : 'none';
+  if(classView!=='list') return;
+  $('classLayoutCards').classList.toggle('active', classesLayout==='cards');
+  $('classLayoutList').classList.toggle('active', classesLayout==='list');
+  $('classGrid').style.display = classesLayout==='cards' ? '' : 'none';
+  $('classListTable').style.display = classesLayout==='list' ? '' : 'none';
+  if(classesLayout==='cards'){
+    $('classGrid').innerHTML = data.classes.map((c,i)=>{
+      const met = sum(c.students.map(metDays));
+      return `<div class="class-card" onclick="selectClass(${i})">
+        <div class="class-card-top"><h3>${esc(c.className)}</h3><span class="tag">${c.students.length} students</span></div>
+        <div class="fine">${esc(c.teacher)} · ${esc(c.classId)}</div>
+        <div class="fine" style="margin-top:8px">${met} / ${c.students.length*5} student-days met all goals this week</div>
+      </div>`;
+    }).join('') + `<div class="add-class-card" onclick="openNewClass()"><div style="font-size:22px;line-height:1">＋</div>Create a class</div>`;
+  } else {
+    $('classListTable').innerHTML = `
+      <div class="class-list-table"><div class="table-scroll"><table>
+        <thead><tr><th>Class</th><th>Teacher</th><th>Class ID</th><th>Students</th><th>Goals met this week</th></tr></thead>
+        <tbody>${data.classes.map((c,i)=>{
+          const met = sum(c.students.map(metDays));
+          return `<tr class="clickable" onclick="selectClass(${i})">
+            <td><strong>${esc(c.className)}</strong></td>
+            <td>${esc(c.teacher)}</td>
+            <td>${esc(c.classId)}</td>
+            <td>${c.students.length}</td>
+            <td>${met} / ${c.students.length*5} student-days</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div></div>
+      <button class="btn" style="margin-top:14px" onclick="openNewClass()">+ Create a class</button>`;
+  }
+}
+function selectClass(i){ data.activeClass=i; classView='detail'; studentIndex=0; persist(); render(); }
+function showClassList(){ classView='list'; render(); }
+
 function renderClasses(){
-  $('classDetails').innerHTML = [['Class name',data.className],['School class ID',data.classId],['Teacher',data.teacher]]
-    .map(([a,b])=>`<div class="mini"><span>${a}</span><strong>${esc(b)}</strong></div>`).join('');
-  $('rosterCount').textContent = '· ' + data.students.length + ' students';
+  $('classDetailTitle').textContent = cls().className;
+  $('classDetails').innerHTML = [['Class name',cls().className],['School class ID',cls().classId],['Teacher',cls().teacher]]
+    .map(([a,b])=>`<div class="detail-pair"><span class="dp-label">${a}</span><span class="dp-value">${esc(b)}</span></div>`).join('');
+  $('rosterCount').textContent = '· ' + cls().students.length + ' students';
 
   const q = $('rosterSearch').value.toLowerCase().trim();
-  let rows = data.students.map((s,i)=>({s,i})).filter(({s}) => !q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q));
+  let rows = cls().students.map((s,i)=>({s,i})).filter(({s}) => !q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q));
   rows.sort((a,b)=>{
     const av = rosterSort.key==='name' ? a.s.name.toLowerCase() : a.s.id.toLowerCase();
     const bv = rosterSort.key==='name' ? b.s.name.toLowerCase() : b.s.id.toLowerCase();
@@ -672,14 +1052,21 @@ document.querySelectorAll('#classes th.sortable').forEach(th=>{
 });
 
 function studentSelect(id, selected){
-  $(id).innerHTML = data.students.map((s,i)=>`<option value="${i}" ${i===selected?'selected':''}>${esc(s.name)} · ${esc(s.id)}</option>`).join('');
+  renderSelect(id, cls().students.map((s,i)=>({value:i, label:`${s.name} · ${s.id}`})), selected);
 }
 
 function renderAnalytics(){
-  if(studentIndex >= data.students.length) studentIndex = 0;
   studentSelect('analyticsStudent', studentIndex);
-  const s = data.students[studentIndex], d = s.daily[selectedDay];
-  $('analyticsDay').textContent = days[selectedDay];
+  if(!cls().students.length){
+    renderSelect('analyticsDay', days.map((dy,i)=>({value:i, label:dy})), selectedDay); $('analyticsTarget').textContent='';
+    $('analyticsCards').innerHTML=''; $('analyticsLegend').innerHTML=''; $('analyticsRows').innerHTML='';
+    $('analyticsChart').innerHTML = '<p class="fine" style="margin:auto">Add a student to this class to see analytics.</p>';
+    $('analyticsStats').innerHTML = '<p class="fine">No students in this class yet.</p>';
+    return;
+  }
+  if(studentIndex >= cls().students.length) studentIndex = 0;
+  const s = cls().students[studentIndex], d = daily(s)[selectedDay];
+  renderSelect('analyticsDay', days.map((dy,i)=>({value:i, label:dy})), selectedDay);
   $('analyticsTarget').textContent = sum(targetArray(s)) + ' min daily goal';
   $('analyticsCards').innerHTML = keys.map((k,i)=>{
     const g = target(s,k), p = Math.min(100, d[i]/g*100);
@@ -688,13 +1075,13 @@ function renderAnalytics(){
       <div class="fine">${d[i]>=g ? 'Daily goal met' : (g-d[i])+' more minutes to goal'}</div>
       <div class="track"><div class="fill" style="width:${p}%;background:${colors[k]}"></div></div></div>`;
   }).join('');
-  chart($('analyticsChart'), s.daily, sum(targetArray(s)), selectedDay, i=>{ selectedDay=i; renderAnalytics(); });
+  chart($('analyticsChart'), daily(s), sum(targetArray(s)), selectedDay, i=>{ selectedDay=i; renderAnalytics(); });
   $('analyticsLegend').innerHTML = legend();
   $('analyticsStats').innerHTML = `
     <div class="mini"><span>Minutes practiced</span><b>${weekActual(s)}</b><small>of ${weekTarget(s)} min</small></div>
     <div class="mini"><span>Time vs goal</span><b>${Math.round(weekActual(s)/weekTarget(s)*100)}%</b><small>Across all functions</small></div>
     <div class="mini"><span>All goals met</span><b>${metDays(s)}</b><small>of 5 days</small></div>`;
-  $('analyticsRows').innerHTML = s.daily.map((x,i)=>
+  $('analyticsRows').innerHTML = daily(s).map((x,i)=>
     `<tr class="clickable" data-day="${i}" style="${i===selectedDay?'background:#f1f5ff':''}">
       <td><strong>${days[i]}</strong></td>${x.map((v,j)=>`<td>${v} / ${targetArray(s)[j]} min</td>`).join('')}
       <td><strong>${sum(x)} min</strong></td><td><span class="badge ${metDay(s,i)?'':'partial'}">${metDay(s,i)?'Met':'In progress'}</span></td></tr>`
@@ -703,17 +1090,19 @@ function renderAnalytics(){
 }
 
 function renderGoals(){
+  const n = cls().students.length;
+  $('goalsDayLabel').textContent = days[4] + ' · minutes used / assigned goal';
   $('classGoalCards').innerHTML = keys.map(k=>{
-    const met = data.students.filter(s=> s.daily[4][keys.indexOf(k)] >= target(s,k)).length;
+    const met = cls().students.filter(s=> daily(s)[4][keys.indexOf(k)] >= target(s,k)).length;
     return `<div class="card"><div class="goalhead"><span class="icon" style="background:${colors[k]}18;color:${colors[k]}">${icons[k]}</span><strong>${labels[k]}</strong></div>
-      <div class="big">${data.goals[k]} <span class="fine">min / day</span></div>
-      <div class="fine">${data.periods[k]} · class target</div>
-      <div class="track"><div class="fill" style="background:${colors[k]};width:${met/data.students.length*100}%"></div></div>
-      <span class="fine">${met} / ${data.students.length} students met their individual goal today</span></div>`;
+      <div class="big">${cls().goals[k]} <span class="fine">min / day</span></div>
+      <div class="fine">${cls().periods[k]} · class target</div>
+      <div class="track"><div class="fill" style="background:${colors[k]};width:${n?met/n*100:0}%"></div></div>
+      <span class="fine">${met} / ${n} students met their individual goal today</span></div>`;
   }).join('');
-  $('goalRows').innerHTML = data.students.map((s,i)=>
+  $('goalRows').innerHTML = cls().students.map((s,i)=>
     `<tr><td><strong>${esc(s.name)}</strong><div class="fine">${esc(s.id)}${Object.keys(s.overrides).length?' · individual goal':''}</div></td>
-      ${keys.map((k,j)=>`<td>${s.daily[4][j]} / ${target(s,k)} min</td>`).join('')}
+      ${keys.map((k,j)=>`<td>${daily(s)[4][j]} / ${target(s,k)} min</td>`).join('')}
       <td><span class="badge ${metDay(s,4)?'':'partial'}">${metDay(s,4)?'Met':'In progress'}</span></td>
       <td><button class="btn-link" data-goal-student="${i}">Edit goals</button></td></tr>`
   ).join('');
@@ -721,26 +1110,42 @@ function renderGoals(){
 }
 
 function renderReports(){
-  if(studentIndex >= data.students.length) studentIndex = 0;
+  const ss = cls().students;
+  if(!ss.length && reportType==='student') reportType='class';
+  if(studentIndex >= ss.length) studentIndex = 0;
   studentSelect('reportStudent', studentIndex);
   $('reportStudent').style.display = reportType==='class' ? 'none' : '';
   document.querySelectorAll('[data-report]').forEach(b=> b.classList.toggle('active', b.dataset.report===reportType));
 
-  const isClass = reportType==='class', ss = data.students, s = ss[studentIndex];
+  if(!ss.length){
+    $('reportHeading').textContent = cls().className+' · '+cls().teacher;
+    $('reportSub').textContent = 'No students in this class yet.';
+    $('reportStats').innerHTML=''; $('reportGoals').innerHTML=''; $('reportLegend').innerHTML='';
+    $('reportChart').innerHTML = '<p class="fine" style="margin:auto">Add a student to generate a report.</p>';
+    $('reportTableTitle').textContent=''; $('reportHead').innerHTML=''; $('reportRows').innerHTML='';
+    $('reportNote').value = `${cls().className} has no students yet. Add students from the Classes page to start tracking practice.`;
+    return;
+  }
+
+  const isClass = reportType==='class', s = ss[studentIndex];
   const actual = isClass ? keys.map((_,i)=>sum(ss.map(x=>minutes(x)[i]))) : minutes(s);
   const g = isClass ? keys.map((_,i)=>sum(ss.map(x=>target(x,keys[i])*5))) : keys.map(k=>target(s,k)*5);
   const total = sum(actual), goal = sum(g), met = isClass ? sum(ss.map(metDays)) : metDays(s);
 
-  $('reportHeading').textContent = isClass ? data.className+' · '+data.teacher : s.name+' · '+s.id;
-  $('reportSub').textContent = (isClass?'Class':'Student') + ' practice activity · Sep 21–25, 2026';
+  $('reportHeading').textContent = isClass ? cls().className+' · '+cls().teacher : s.name+' · '+s.id;
+  $('reportSub').textContent = (isClass?'Class':'Student') + ' practice activity · ' + weekOptions.find(w=>w.id===data.activeWeek).label;
   $('reportStats').innerHTML = `
     <div class="mini"><span>Total practice</span><b>${total} min</b><small>of ${goal} min goal</small></div>
-    <div class="mini"><span>Minutes vs goal</span><b>${Math.round(total/goal*100)}%</b><small>All three functions</small></div>
+    <div class="mini"><span>Minutes vs goal</span><b>${goal? Math.round(total/goal*100):0}%</b><small>All three functions</small></div>
     <div class="mini"><span>${isClass?'Student-days':'Days'} all goals met</span><b>${met} / ${isClass?ss.length*5:5}</b><small>Selected period</small></div>`;
-  $('reportGoals').innerHTML = keys.map((k,i)=>
-    `<div class="metric"><span>${labels[k]}</span><div class="track"><div class="fill" style="width:${Math.min(100,actual[i]/g[i]*100)}%;background:${colors[k]}"></div></div><strong>${actual[i]} / ${g[i]} min</strong></div>`
-  ).join('');
-  const series = days.map((_,d)=> isClass ? keys.map((_,i)=>sum(ss.map(x=>x.daily[d][i]))) : s.daily[d]);
+  $('reportGoals').innerHTML = keys.map((k,i)=>{
+    const pct = g[i] ? Math.round(Math.min(100,actual[i]/g[i]*100)) : 0;
+    return `<div class="metric">
+      <div class="metric-top"><span>${labels[k]}</span><strong>${actual[i]} / ${g[i]} min<span class="pct">· ${pct}%</span></strong></div>
+      <div class="track"><div class="fill" style="width:${pct}%;background:${colors[k]}"></div></div>
+    </div>`;
+  }).join('');
+  const series = days.map((_,d)=> isClass ? keys.map((_,i)=>sum(ss.map(x=>daily(x)[d][i]))) : daily(s)[d]);
   chart($('reportChart'), series, isClass ? sum(ss.map(x=>sum(targetArray(x)))) : sum(targetArray(s)));
   $('reportLegend').innerHTML = legend();
   $('reportTableTitle').textContent = isClass ? 'Student summary' : 'Daily activity';
@@ -749,58 +1154,97 @@ function renderReports(){
     : '<tr><th>Day</th><th>Reading</th><th>Dictionary</th><th>Translation</th><th>Total</th><th>Goals</th></tr>';
   $('reportRows').innerHTML = isClass
     ? ss.map(x=>`<tr><td><strong>${esc(x.name)}</strong><div class="fine">${esc(x.id)}</div></td>${minutes(x).map((v,i)=>`<td>${v} / ${target(x,keys[i])*5} min</td>`).join('')}<td>${weekActual(x)} min</td><td>${metDays(x)} / 5 days</td></tr>`).join('')
-    : s.daily.map((d,i)=>`<tr><td><strong>${days[i]}</strong></td>${d.map((v,j)=>`<td>${v} / ${targetArray(s)[j]} min</td>`).join('')}<td>${sum(d)} min</td><td>${metDay(s,i)?'Met':'In progress'}</td></tr>`).join('');
+    : daily(s).map((d,i)=>`<tr><td><strong>${days[i]}</strong></td>${d.map((v,j)=>`<td>${v} / ${targetArray(s)[j]} min</td>`).join('')}<td>${sum(d)} min</td><td>${metDay(s,i)?'Met':'In progress'}</td></tr>`).join('');
   $('reportNote').value = isClass
-    ? `${data.className} practiced across Reading, Dictionary, and Translation this week. Review individual patterns alongside assessments and adjust goals as needed.`
+    ? `${cls().className} practiced across Reading, Dictionary, and Translation this week. Review individual patterns alongside assessments and adjust goals as needed.`
     : `${s.name} used the pen during this week and met all three daily practice goals on ${met} of five school days. Review reading comprehension with a classroom assessment.`;
 }
 
 // ---------------- modal ----------------
 const modal = $('modal');
-function show(title, body, button='Save'){
+const dialogIcons = {
+  class: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg>',
+  student: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>',
+  goal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
+  lms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H6a3 3 0 0 0-3 3v0a3 3 0 0 0 3 3h3"/><path d="M15 7h3a3 3 0 0 1 3 3v0a3 3 0 0 1-3 3h-3"/><line x1="8" y1="10" x2="16" y2="10"/></svg>',
+};
+function show(title, body, button='Save', icon=''){
   modal.classList.add('open');
   $('modalTitle').textContent = title;
+  $('modalIcon').innerHTML = icon || dialogIcons.class;
   $('modalBody').innerHTML = body;
   $('modalSave').textContent = button;
   $('modalSave').disabled = false;
-  $('modalBody').querySelector('input,select')?.focus();
+  $('modalBody').querySelector('input,select,.dropdown-trigger')?.focus();
 }
 function closeModal(){ modal.classList.remove('open'); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); });
 function formError(msg){ const e=$('feedback'); if(e){ e.className='feedback error'; e.textContent=msg; } }
 
 function openClass(){
   mode='class';
-  show('Edit class', `<label class="field-label">Class name</label><input id="className" value="${esc(data.className)}">
-    <label class="field-label">School class ID</label><input id="classId" value="${esc(data.classId)}">
-    <div class="feedback" id="feedback">Use the class identifier supplied by your school.</div>`, 'Save class');
+  show('Edit class', `<label class="field-label">Class name</label><input id="className" value="${esc(cls().className)}">
+    <label class="field-label">School class ID</label><input id="classId" value="${esc(cls().classId)}">
+    <label class="field-label">Teacher</label><input id="classTeacher" value="${esc(cls().teacher)}">
+    <div class="feedback" id="feedback">Use the class identifier supplied by your school.</div>`, 'Save class', dialogIcons.class);
+}
+function openNewClass(){
+  mode='newclass';
+  show('Create a class', `<p>Start a new class with its own roster and practice goals.</p>
+    <label class="field-label">Class name</label><input id="className" placeholder="e.g. Grade 4 Reading">
+    <label class="field-label">School class ID</label><input id="classId" placeholder="e.g. G4-READ-2026">
+    <label class="field-label">Teacher</label><input id="classTeacher" placeholder="e.g. Mr. Alvarez">
+    <div class="feedback" id="feedback">Daily goals default to 10 / 5 / 10 minutes and can be changed from the Goals page.</div>`, 'Create class', dialogIcons.class);
 }
 function openStudent(i=-1){
   mode='student'; editIndex=i;
-  const s = data.students[i] ?? {name:'',id:'',sn:''};
+  const s = cls().students[i] ?? {name:'',id:'',sn:''};
   show(i<0?'Add student':'Edit student',
     `<p>Use the school-issued student ID, for example s40301234.</p>
      <label class="field-label">Student name</label><input id="studentName" value="${esc(s.name)}">
      <label class="field-label">School ID</label><input id="schoolId" value="${esc(s.id)}">
      <label class="field-label">Device serial number (optional)</label><input id="deviceSn" value="${esc(s.sn)}" placeholder="Enter SN or scan QR in connected app">
      <div class="feedback" id="feedback">Each school ID must be unique in this class.</div>`,
-    i<0?'Add student':'Save changes');
+    i<0?'Add student':'Save changes', dialogIcons.student);
+}
+function dropdownHtml(id){
+  return `<div class="dropdown" id="${id}" data-select="${id}">
+     <button type="button" class="dropdown-trigger" onclick="toggleSelectDropdown(this)">
+       <span class="dropdown-trigger-label" data-dropdown-label></span>
+       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+     </button>
+     <div class="dropdown-menu" data-dropdown-menu></div>
+   </div>`;
 }
 function openGoal(i=null){
   mode='goal'; editIndex=i;
   const k='reading';
-  show(i===null?'Add class goal':'Edit goals for '+data.students[i].name,
+  show(i===null?'Add class goal':'Edit goals for '+cls().students[i].name,
     `<p>${i===null ? 'Apply a daily target to the class. Individual overrides remain in place.' : 'Set a different daily target for this student.'}</p>
-     <label class="field-label">Function</label><select id="goalFunction">${keys.map(x=>`<option value="${x}">${labels[x]}</option>`).join('')}</select>
-     <label class="field-label">Minutes per day</label><input type="number" min="1" max="240" id="goalMinutes" value="${i===null ? data.goals[k] : target(data.students[i],k)}">
-     <label class="field-label">Time period</label><select id="goalPeriod"><option>Every school day</option><option>Every day</option></select>
+     <label class="field-label">Function</label>${dropdownHtml('goalFunction')}
+     <div class="field-row">
+       <div>
+         <label class="field-label">Minutes per day</label>
+         <input type="number" min="1" max="240" id="goalMinutes" value="${i===null ? cls().goals[k] : target(cls().students[i],k)}">
+       </div>
+       <div>
+         <label class="field-label">Time period</label>
+         ${dropdownHtml('goalPeriod')}
+       </div>
+     </div>
      <div class="feedback" id="feedback">Practice minutes are tracked by function.</div>`,
-    i===null?'Apply to class':'Save individual goal');
-  $('goalPeriod').value = data.periods[k];
-  $('goalFunction').onchange = e=>{
-    const key = e.target.value;
-    $('goalMinutes').value = i===null ? data.goals[key] : target(data.students[i], key);
-    $('goalPeriod').value = data.periods[key];
-  };
+    i===null?'Apply to class':'Save individual goal', dialogIcons.goal);
+  const functionItems = keys.map(x=>({value:x, label:labels[x]}));
+  const periodItems = [{value:'Every school day', label:'Every school day'}, {value:'Every day', label:'Every day'}];
+  bindSelect('goalFunction', key=>{
+    $('goalMinutes').value = i===null ? cls().goals[key] : target(cls().students[i], key);
+    renderSelect('goalFunction', functionItems, key);
+    renderSelect('goalPeriod', periodItems, cls().periods[key]);
+  });
+  bindSelect('goalPeriod', period=> renderSelect('goalPeriod', periodItems, period));
+  renderSelect('goalFunction', functionItems, k);
+  renderSelect('goalPeriod', periodItems, cls().periods[k]);
 }
 
 function csvParse(text){
@@ -831,17 +1275,23 @@ function openUpload(){
   mode='upload'; staged=[];
   show('Upload class roster',
     `<p>CSV headers: <strong>student_name,school_id</strong>. Existing IDs update names; new IDs are added.</p>
-     <label class="field-label">CSV file</label><input type="file" id="csvFile" accept=".csv,text/csv">
+     <label class="field-label">CSV file</label>
+     <label class="file-drop" for="csvFile">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+       <span id="csvFileLabel">Click to choose a CSV file</span>
+       <input type="file" id="csvFile" accept=".csv,text/csv">
+     </label>
      <div class="feedback" id="feedback">Select a file to preview before applying.</div>
-     <div class="preview" id="preview"></div>`, 'Apply roster');
+     <div class="preview" id="preview"></div>`, 'Apply roster', dialogIcons.upload);
   $('modalSave').disabled = true;
   $('csvFile').onchange = async e=>{
     try{
       staged = csvParse(await e.target.files[0].text());
+      $('csvFileLabel').textContent = e.target.files[0].name;
       $('feedback').className='feedback';
       $('feedback').textContent = staged.length + ' valid row(s). Review the actions below.';
       $('preview').innerHTML = '<table><thead><tr><th>Student</th><th>School ID</th><th>Action</th></tr></thead><tbody>' +
-        staged.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.id)}</td><td>${data.students.some(x=>x.id.toLowerCase()===s.id.toLowerCase())?'Update':'Add'}</td></tr>`).join('') +
+        staged.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.id)}</td><td>${cls().students.some(x=>x.id.toLowerCase()===s.id.toLowerCase())?'Update':'Add'}</td></tr>`).join('') +
         '</tbody></table>';
       $('modalSave').disabled = false;
     }catch(err){
@@ -854,10 +1304,11 @@ function openLMS(){
   show('School LMS integration · IT setup',
     `<p>Proposed integration; no LMS is connected to this prototype.</p>
      <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section ID → School class ID</div>
-     <p>School IT would authorize roster access, choose the class, review ID matches, and enable synchronization. Manual entry and CSV upload remain available.</p>`, 'Close');
+     <p>School IT would authorize roster access, choose the class, review ID matches, and enable synchronization. Manual entry and CSV upload remain available.</p>`, 'Close', dialogIcons.lms);
 }
 
 $('modalCancel').onclick = closeModal;
+$('modalClose').onclick = closeModal;
 modal.onclick = e=>{ if(e.target===modal) closeModal(); };
 $('editClassBtn').onclick = openClass;
 $('addStudentBtn').onclick = ()=>openStudent();
@@ -865,46 +1316,55 @@ $('uploadBtn').onclick = openUpload;
 $('lmsBtn').onclick = openLMS;
 $('addClassGoalBtn').onclick = ()=>openGoal();
 $('rosterSearch').oninput = renderClasses;
-$('analyticsStudent').onchange = e=>{ studentIndex=Number(e.target.value); renderAnalytics(); };
-$('reportStudent').onchange = e=>{ studentIndex=Number(e.target.value); renderReports(); };
+bindSelect('analyticsStudent', value=>{ studentIndex=Number(value); renderAnalytics(); });
+bindSelect('reportStudent', value=>{ studentIndex=Number(value); renderReports(); });
+bindSelect('analyticsDay', value=>{ selectedDay=Number(value); renderAnalytics(); });
 document.querySelectorAll('[data-report]').forEach(b=> b.onclick = ()=>{ reportType=b.dataset.report; renderReports(); });
 $('printReportBtn').onclick = ()=> window.print();
 
 $('modalSave').onclick = ()=>{
   if(mode==='lms'){ closeModal(); return; }
   if(mode==='class'){
-    const name=$('className').value.trim(), id=$('classId').value.trim();
+    const name=$('className').value.trim(), id=$('classId').value.trim(), teacher=$('classTeacher').value.trim();
     if(!name||!id) return formError('Enter both class name and class ID.');
-    data.className=name; data.classId=id;
+    if(data.classes.some((c,i)=> i!==data.activeClass && c.classId.toLowerCase()===id.toLowerCase())) return formError('Another class already uses this class ID.');
+    cls().className=name; cls().classId=id; cls().teacher=teacher;
     persist(); closeModal(); render(); toast('Class details saved.');
+  } else if(mode==='newclass'){
+    const name=$('className').value.trim(), id=$('classId').value.trim(), teacher=$('classTeacher').value.trim();
+    if(!name||!id) return formError('Enter both class name and class ID.');
+    if(data.classes.some(c=> c.classId.toLowerCase()===id.toLowerCase())) return formError('A class with this class ID already exists.');
+    data.classes.push({ className:name, classId:id, teacher:teacher||'—', goals:{...defaultGoals}, periods:{...defaultPeriods}, students:[] });
+    data.activeClass = data.classes.length-1; classView='detail'; studentIndex=0;
+    persist(); closeModal(); render(); toast('Class created.');
   } else if(mode==='student'){
     const name=$('studentName').value.trim(), id=$('schoolId').value.trim(), sn=$('deviceSn').value.trim();
     if(!name || !validID(id)) return formError('Enter a name and a school ID with 3–32 letters, numbers, hyphens, or underscores.');
-    if(data.students.some((s,i)=> i!==editIndex && s.id.toLowerCase()===id.toLowerCase())) return formError('This school ID already belongs to another student.');
-    if(editIndex<0){ data.students.push({name,id,sn,daily:days.map(()=>[0,0,0]),overrides:{}}); toast('Student added.'); }
-    else { Object.assign(data.students[editIndex], {name,id,sn}); toast('Student updated.'); }
+    if(cls().students.some((s,i)=> i!==editIndex && s.id.toLowerCase()===id.toLowerCase())) return formError('This school ID already belongs to another student.');
+    if(editIndex<0){ cls().students.push({name,id,sn,weeks:zeroWeeks(),overrides:{}}); toast('Student added.'); }
+    else { Object.assign(cls().students[editIndex], {name,id,sn}); toast('Student updated.'); }
     persist(); closeModal(); render();
   } else if(mode==='upload'){
     for(const s of staged){
-      const found = data.students.find(x=>x.id.toLowerCase()===s.id.toLowerCase());
+      const found = cls().students.find(x=>x.id.toLowerCase()===s.id.toLowerCase());
       if(found) found.name=s.name;
-      else data.students.push({name:s.name,id:s.id,sn:'',daily:days.map(()=>[0,0,0]),overrides:{}});
+      else cls().students.push({name:s.name,id:s.id,sn:'',weeks:zeroWeeks(),overrides:{}});
     }
     persist(); closeModal(); render(); toast(staged.length + ' student(s) applied to the roster.');
   } else if(mode==='goal'){
-    const k=$('goalFunction').value, n=Number($('goalMinutes').value);
+    const k=$('goalFunction').dataset.value, n=Number($('goalMinutes').value);
     if(!Number.isInteger(n) || n<1 || n>240) return formError('Enter a target from 1 to 240 minutes.');
-    if(editIndex===null){ data.goals[k]=n; data.periods[k]=$('goalPeriod').value; toast('Class goal updated.'); }
-    else { data.students[editIndex].overrides[k]=n; toast('Individual goal saved.'); }
+    if(editIndex===null){ cls().goals[k]=n; cls().periods[k]=$('goalPeriod').dataset.value; toast('Class goal updated.'); }
+    else { cls().students[editIndex].overrides[k]=n; toast('Individual goal saved.'); }
     persist(); closeModal(); render();
   }
 };
 
 $('exportCSVBtn').onclick = ()=>{
-  const ss = reportType==='class' ? data.students : [data.students[studentIndex]];
+  const ss = reportType==='class' ? cls().students : [cls().students[studentIndex]];
   const rows = [['Student','School ID','Date','Reading minutes','Reading goal','Dictionary minutes','Dictionary goal','Translation minutes','Translation goal','Total minutes','All goals met']];
   for(const s of ss) for(let i=0;i<days.length;i++){
-    const d=s.daily[i], g=targetArray(s);
+    const d=daily(s)[i], g=targetArray(s);
     rows.push([s.name,s.id,days[i],d[0],g[0],d[1],g[1],d[2],g[2],sum(d),metDay(s,i)?'Yes':'No']);
   }
   const csv = rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
