@@ -87,6 +87,9 @@
     margin-top:6px;white-space:nowrap;opacity:0;transition:opacity .15s ease;}
   .side.expanded .side-foot{opacity:1;transition:opacity .2s ease .1s;}
 
+  .topbar-brand{font-family:'Lexend',system-ui,sans-serif;font-size:18px;font-weight:700;letter-spacing:-.3px;color:var(--ink);
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;}
+  .topbar-brand .brand-s{color:var(--orange);font-weight:800;}
   .hamburger{display:none;border:0;background:transparent;width:38px;height:38px;border-radius:9px;
     align-items:center;justify-content:center;color:var(--text);flex:none;}
   .hamburger svg{width:22px;height:22px;}
@@ -103,7 +106,7 @@
   /* ---------- Main ---------- */
   .main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
   .topbar{flex:none;background:var(--card);border-bottom:1px solid var(--line);padding:14px 28px;
-    display:none;align-items:center;gap:14px;}
+    display:none;align-items:center;gap:14px;position:relative;}
   .content{flex:1;min-height:0;overflow-y:auto;padding:28px 34px 70px;position:relative;background:var(--bg);}
   .content::before{
     content:'';position:fixed;top:-120px;right:-160px;width:520px;height:520px;border-radius:50%;
@@ -340,7 +343,7 @@
     <div class="brand">
       <div class="brand-mark">S</div>
       <div class="brand-text">
-        <div class="brand-name"><span class="brand-s">s</span>canmarker</div>
+        <div class="brand-name"><span class="brand-s">scan</span>marker</div>
         <div class="brand-sub">Teacher Dashboard</div>
       </div>
       <button type="button" class="pin-btn" id="pinBtn" onclick="togglePin()" title="Keep menu open" aria-label="Keep menu open">
@@ -377,6 +380,7 @@
       <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
+      <div class="topbar-brand"><span class="brand-s">scan</span>marker</div>
     </div>
 
     <div class="content">
