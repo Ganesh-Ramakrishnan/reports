@@ -723,7 +723,7 @@ const initial={
   activeWeek:'w3',
   classes:[
     {
-      className:'Period 1',
+      className:'Class 1',
       goals:{...defaultGoals},
       periods:{...defaultPeriods},
       students:[
@@ -735,7 +735,7 @@ const initial={
       ]
     },
     {
-      className:'Period 2',
+      className:'Class 2',
       goals:{reading:8,dictionary:4,translation:6},
       periods:{reading:'Every school day',dictionary:'Every school day',translation:'Every school day'},
       students:[
@@ -746,7 +746,7 @@ const initial={
       ]
     },
     {
-      className:'Period 3',
+      className:'Class 3',
       goals:{reading:12,dictionary:8,translation:12},
       periods:{reading:'Every day',dictionary:'Every day',translation:'Every day'},
       students:[
@@ -761,7 +761,7 @@ initial.classes.forEach(c=> c.students.forEach(s=>{ s.weeks = buildWeeks(s.daily
 
 let data;
 try{
-  const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v4'));
+  const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v5'));
   data = (Array.isArray(saved?.classes) && saved.classes.length && typeof saved.activeClass==='number' && typeof saved.activeWeek==='string') ? saved : structuredClone(initial);
 }catch{ data = structuredClone(initial); }
 syncDays();
@@ -785,7 +785,7 @@ const metDays = s => days.filter((_,d)=>metDay(s,d)).length;
 const weekTarget = s => sum(targetArray(s)) * 5;
 const weekActual = s => sum(minutes(s));
 const validID = id => /^[A-Za-z0-9_-]{3,32}$/.test(id);
-const persist = () => { try{ localStorage.setItem('scanmarker_max_teacher_prototype_v4', JSON.stringify(data)); }catch{} };
+const persist = () => { try{ localStorage.setItem('scanmarker_max_teacher_prototype_v5', JSON.stringify(data)); }catch{} };
 
 // ---------------- toasts ----------------
 function toast(msg, isError=false){
@@ -1185,12 +1185,12 @@ function formError(msg){ const e=$('feedback'); if(e){ e.className='feedback err
 function openClass(){
   mode='class';
   show('Edit class', `<label class="field-label">Class name</label><input id="className" value="${esc(cls().className)}">
-    <div class="feedback" id="feedback">Name the class by period, for example Period 1.</div>`, 'Save class', dialogIcons.class);
+    <div class="feedback" id="feedback">Give the class a short name, for example Class 1.</div>`, 'Save class', dialogIcons.class);
 }
 function openNewClass(){
   mode='newclass';
   show('Create a class', `<p>Start a new class with its own roster and practice goals.</p>
-    <label class="field-label">Class name</label><input id="className" placeholder="e.g. Period 1">
+    <label class="field-label">Class name</label><input id="className" placeholder="e.g. Class 1">
     <div class="feedback" id="feedback">Daily goals default to 10 / 5 / 10 minutes and can be changed from the Goals page.</div>`, 'Create class', dialogIcons.class);
 }
 function openStudent(i=-1){
@@ -1299,7 +1299,7 @@ function openLMS(){
   mode='lms';
   show('School LMS integration · IT setup',
     `<p>Proposed integration; no LMS is connected to this prototype.</p>
-     <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section → Class name (period)</div>
+     <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section → Class name</div>
      <p>School IT would authorize roster access, choose the class, review ID matches, and enable synchronization. Manual entry and CSV upload remain available.</p>`, 'Close', dialogIcons.lms);
 }
 
