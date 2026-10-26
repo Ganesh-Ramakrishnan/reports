@@ -410,7 +410,7 @@
               </div>
             </div>
           </div>
-          <div class="grid3" id="overviewStats"></div>
+          <div class="grid3" id="overviewStats" style="grid-template-columns:repeat(2,1fr)"></div>
           <div class="grid2" style="margin-top:16px">
             <div class="card">
               <div class="rowhead"><h2>Class practice by day</h2><span class="fine">Minutes across the roster</span></div>
@@ -723,7 +723,7 @@ const initial={
   activeWeek:'w3',
   classes:[
     {
-      className:'Grade 5 Reading', classId:'G5-READ-2026', teacher:'Ms. Lee',
+      className:'Period 1',
       goals:{...defaultGoals},
       periods:{...defaultPeriods},
       students:[
@@ -735,7 +735,7 @@ const initial={
       ]
     },
     {
-      className:'Grade 3 Reading', classId:'G3-READ-2026', teacher:'Mr. Patel',
+      className:'Period 2',
       goals:{reading:8,dictionary:4,translation:6},
       periods:{reading:'Every school day',dictionary:'Every school day',translation:'Every school day'},
       students:[
@@ -746,7 +746,7 @@ const initial={
       ]
     },
     {
-      className:'ESL Morning Group', classId:'ESL-2026', teacher:'Ms. Alvarez',
+      className:'Period 3',
       goals:{reading:12,dictionary:8,translation:12},
       periods:{reading:'Every day',dictionary:'Every day',translation:'Every day'},
       students:[
@@ -962,12 +962,11 @@ function chooseSelectOption(id, value){
 function renderOverview(){
   const ss = cls().students;
   const total = sum(ss.map(weekActual)), expected = sum(ss.map(weekTarget));
-  const linked = ss.filter(s=>s.sn).length, met = sum(ss.map(metDays));
+  const met = sum(ss.map(metDays));
   $('overviewSub').textContent = 'Practice activity for ' + weekOptions.find(w=>w.id===data.activeWeek).label;
   $('overviewStats').innerHTML = `
     <div class="card mini"><span>Class practice this week</span><b>${total} min</b><small>${expected? Math.round(total/expected*100):0}% of assigned minutes</small></div>
-    <div class="card mini"><span>Student-days meeting all goals</span><b>${met} / ${ss.length*5}</b><small>Across five school days</small></div>
-    <div class="card mini"><span>Devices linked</span><b>${linked} / ${ss.length}</b><small>Students with a device SN</small></div>`;
+    <div class="card mini"><span>Student-days meeting all goals</span><b>${met} / ${ss.length*5}</b><small>Across five school days</small></div>`;
   const series = days.map((_,d)=> keys.map((_,i)=> sum(ss.map(s=>daily(s)[d][i]))));
   chart($('overviewChart'), series, sum(ss.map(s=>sum(targetArray(s)))));
   $('overviewLegend').innerHTML = legend();
@@ -995,20 +994,17 @@ function renderClassList(){
       const met = sum(c.students.map(metDays));
       return `<div class="class-card" onclick="selectClass(${i})">
         <div class="class-card-top"><h3>${esc(c.className)}</h3><span class="tag">${c.students.length} students</span></div>
-        <div class="fine">${esc(c.teacher)} · ${esc(c.classId)}</div>
         <div class="fine" style="margin-top:8px">${met} / ${c.students.length*5} student-days met all goals this week</div>
       </div>`;
     }).join('') + `<div class="add-class-card" onclick="openNewClass()"><div style="font-size:22px;line-height:1">＋</div>Create a class</div>`;
   } else {
     $('classListTable').innerHTML = `
       <div class="class-list-table"><div class="table-scroll"><table>
-        <thead><tr><th>Class</th><th>Teacher</th><th>Class ID</th><th>Students</th><th>Goals met this week</th></tr></thead>
+        <thead><tr><th>Class</th><th>Students</th><th>Goals met this week</th></tr></thead>
         <tbody>${data.classes.map((c,i)=>{
           const met = sum(c.students.map(metDays));
           return `<tr class="clickable" onclick="selectClass(${i})">
             <td><strong>${esc(c.className)}</strong></td>
-            <td>${esc(c.teacher)}</td>
-            <td>${esc(c.classId)}</td>
             <td>${c.students.length}</td>
             <td>${met} / ${c.students.length*5} student-days</td>
           </tr>`;
@@ -1022,7 +1018,7 @@ function showClassList(){ classView='list'; render(); }
 
 function renderClasses(){
   $('classDetailTitle').textContent = cls().className;
-  $('classDetails').innerHTML = [['Class name',cls().className],['School class ID',cls().classId],['Teacher',cls().teacher]]
+  $('classDetails').innerHTML = [['Class name',cls().className]]
     .map(([a,b])=>`<div class="detail-pair"><span class="dp-label">${a}</span><span class="dp-value">${esc(b)}</span></div>`).join('');
   $('rosterCount').textContent = '· ' + cls().students.length + ' students';
 
@@ -1122,7 +1118,7 @@ function renderReports(){
   document.querySelectorAll('[data-report]').forEach(b=> b.classList.toggle('active', b.dataset.report===reportType));
 
   if(!ss.length){
-    $('reportHeading').textContent = cls().className+' · '+cls().teacher;
+    $('reportHeading').textContent = cls().className;
     $('reportSub').textContent = 'No students in this class yet.';
     $('reportStats').innerHTML=''; $('reportGoals').innerHTML=''; $('reportLegend').innerHTML='';
     $('reportChart').innerHTML = '<p class="fine" style="margin:auto">Add a student to generate a report.</p>';
@@ -1136,7 +1132,7 @@ function renderReports(){
   const g = isClass ? keys.map((_,i)=>sum(ss.map(x=>target(x,keys[i])*5))) : keys.map(k=>target(s,k)*5);
   const total = sum(actual), goal = sum(g), met = isClass ? sum(ss.map(metDays)) : metDays(s);
 
-  $('reportHeading').textContent = isClass ? cls().className+' · '+cls().teacher : s.name+' · '+s.id;
+  $('reportHeading').textContent = isClass ? cls().className : s.name+' · '+s.id;
   $('reportSub').textContent = (isClass?'Class':'Student') + ' practice activity · ' + weekOptions.find(w=>w.id===data.activeWeek).label;
   $('reportStats').innerHTML = `
     <div class="mini"><span>Total practice</span><b>${total} min</b><small>of ${goal} min goal</small></div>
@@ -1189,16 +1185,12 @@ function formError(msg){ const e=$('feedback'); if(e){ e.className='feedback err
 function openClass(){
   mode='class';
   show('Edit class', `<label class="field-label">Class name</label><input id="className" value="${esc(cls().className)}">
-    <label class="field-label">School class ID</label><input id="classId" value="${esc(cls().classId)}">
-    <label class="field-label">Teacher</label><input id="classTeacher" value="${esc(cls().teacher)}">
-    <div class="feedback" id="feedback">Use the class identifier supplied by your school.</div>`, 'Save class', dialogIcons.class);
+    <div class="feedback" id="feedback">Name the class by period, for example Period 1.</div>`, 'Save class', dialogIcons.class);
 }
 function openNewClass(){
   mode='newclass';
   show('Create a class', `<p>Start a new class with its own roster and practice goals.</p>
-    <label class="field-label">Class name</label><input id="className" placeholder="e.g. Grade 4 Reading">
-    <label class="field-label">School class ID</label><input id="classId" placeholder="e.g. G4-READ-2026">
-    <label class="field-label">Teacher</label><input id="classTeacher" placeholder="e.g. Mr. Alvarez">
+    <label class="field-label">Class name</label><input id="className" placeholder="e.g. Period 1">
     <div class="feedback" id="feedback">Daily goals default to 10 / 5 / 10 minutes and can be changed from the Goals page.</div>`, 'Create class', dialogIcons.class);
 }
 function openStudent(i=-1){
@@ -1307,7 +1299,7 @@ function openLMS(){
   mode='lms';
   show('School LMS integration · IT setup',
     `<p>Proposed integration; no LMS is connected to this prototype.</p>
-     <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section ID → School class ID</div>
+     <div class="feedback"><strong>Field mapping</strong><br>LMS student ID → Scanmarker School ID<br>LMS student name → Student name<br>LMS class or section → Class name (period)</div>
      <p>School IT would authorize roster access, choose the class, review ID matches, and enable synchronization. Manual entry and CSV upload remain available.</p>`, 'Close', dialogIcons.lms);
 }
 
@@ -1329,16 +1321,16 @@ $('printReportBtn').onclick = ()=> window.print();
 $('modalSave').onclick = ()=>{
   if(mode==='lms'){ closeModal(); return; }
   if(mode==='class'){
-    const name=$('className').value.trim(), id=$('classId').value.trim(), teacher=$('classTeacher').value.trim();
-    if(!name||!id) return formError('Enter both class name and class ID.');
-    if(data.classes.some((c,i)=> i!==data.activeClass && c.classId.toLowerCase()===id.toLowerCase())) return formError('Another class already uses this class ID.');
-    cls().className=name; cls().classId=id; cls().teacher=teacher;
+    const name=$('className').value.trim();
+    if(!name) return formError('Enter a class name.');
+    if(data.classes.some((c,i)=> i!==data.activeClass && c.className.toLowerCase()===name.toLowerCase())) return formError('Another class already uses this name.');
+    cls().className=name;
     persist(); closeModal(); render(); toast('Class details saved.');
   } else if(mode==='newclass'){
-    const name=$('className').value.trim(), id=$('classId').value.trim(), teacher=$('classTeacher').value.trim();
-    if(!name||!id) return formError('Enter both class name and class ID.');
-    if(data.classes.some(c=> c.classId.toLowerCase()===id.toLowerCase())) return formError('A class with this class ID already exists.');
-    data.classes.push({ className:name, classId:id, teacher:teacher||'—', goals:{...defaultGoals}, periods:{...defaultPeriods}, students:[] });
+    const name=$('className').value.trim();
+    if(!name) return formError('Enter a class name.');
+    if(data.classes.some(c=> c.className.toLowerCase()===name.toLowerCase())) return formError('A class with this name already exists.');
+    data.classes.push({ className:name, goals:{...defaultGoals}, periods:{...defaultPeriods}, students:[] });
     data.activeClass = data.classes.length-1; classView='detail'; studentIndex=0;
     persist(); closeModal(); render(); toast('Class created.');
   } else if(mode==='student'){
