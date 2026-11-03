@@ -236,6 +236,25 @@
   .tab{border:0;background:transparent;color:#627590;border-radius:8px;padding:9px 15px;font-weight:750;font-size:12.5px;}
   .tab.active{background:#fff;color:var(--orange-dark);box-shadow:0 2px 8px rgba(23,51,91,0.13);}
 
+  /* ---------- Administrator ---------- */
+  .person{display:flex;align-items:center;gap:10px;}
+  .avatar{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#eceef1;color:#4b5565;font-size:12px;font-weight:750;flex:none;}
+  .avatar.admin{background:var(--orange-tint);color:#b84a1f;}
+  .chip-link{display:inline-block;margin:0 6px 4px 0;padding:3px 10px;border-radius:14px;background:#f3f4f6;color:inherit;border:0;font-size:12px;font-weight:650;}
+  .chip-link:hover{color:var(--orange-dark);}
+  .btn-link.danger{color:var(--red);}
+  .btn-link.danger:hover{color:#a34531;}
+  .btn.danger{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn.danger:hover{background:#b93b34;}
+  #modalBody select{width:100%;}
+  #modalBody input[type=checkbox]{width:auto;padding:0;}
+  .check-list{display:grid;gap:8px;margin-top:2px;}
+  .check-list label{display:flex;align-items:center;gap:9px;font-size:13px;}
+  .adm-list{display:grid;gap:12px;margin-top:6px;}
+  .adm-row{display:flex;justify-content:space-between;gap:16px;padding-bottom:10px;border-bottom:1px solid #eceef0;font-size:13px;}
+  .adm-row .k{color:var(--dim);font-size:12px;}
+  .adm-row .v{font-weight:650;text-align:right;overflow-wrap:anywhere;}
+
   /* ---------- Chart ---------- */
   .chart{height:190px;display:flex;align-items:end;justify-content:space-around;border-bottom:1px solid #dde2e7;
     position:relative;margin:24px 2px 30px;background-image:repeating-linear-gradient(to top,#eef0f3 0,#eef0f3 1px,transparent 1px,transparent 25%);}
@@ -370,6 +389,10 @@
       <button class="nav-item" data-view="reports">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
         <span class="nav-label">Reports</span>
+      </button>
+      <button class="nav-item" data-view="administrator">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.3c2 .7 3.5 2.6 3.5 5.7"/></svg></span>
+        <span class="nav-label">Administrator</span>
       </button>
     </nav>
     <div class="side-foot">Scanmarker Max v1.0</div>
@@ -668,6 +691,36 @@
             <p class="fine" style="margin-top:8px">This report documents use of reading support and practice goals. Use assessments and student work to discuss academic growth. Share through school-approved channels.</p>
           </div>
         </section>
+
+        <!-- ================= ADMINISTRATOR ================= -->
+        <section id="administrator" class="view">
+          <div class="top">
+            <div>
+              <h1 class="page-title">Administrator</h1>
+              <p class="sub">Admins and teachers with access to this school dashboard.</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" id="addStaffBtn">+ Add person</button>
+            </div>
+          </div>
+          <div class="grid3" id="adminStats"></div>
+          <div class="card" style="margin-top:16px">
+            <div class="rowhead">
+              <div class="tabs" role="group" aria-label="Filter by role">
+                <button class="tab active" data-admin-role="all">All</button>
+                <button class="tab" data-admin-role="Admin">Admins</button>
+                <button class="tab" data-admin-role="Teacher">Teachers</button>
+              </div>
+              <input class="search" id="adminSearch" placeholder="Search name or email" aria-label="Search administrators">
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Classes</th><th>Status</th><th></th></tr></thead>
+                <tbody id="adminRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -759,15 +812,26 @@ const initial={
 };
 initial.classes.forEach(c=> c.students.forEach(s=>{ s.weeks = buildWeeks(s.daily); delete s.daily; }));
 
+// Admins and teachers on the Administrator page. `classes` are indexes into data.classes; admins manage every class.
+initial.staff=[
+  {name:'Priya Raman',    email:'priya.raman@riverside.edu',    phone:'+1 555 0101', role:'Admin',   status:'Active',  title:'School administrator', classes:[],  lastActive:'Sep 25, 2026'},
+  {name:'Daniel Okafor',  email:'daniel.okafor@riverside.edu',  phone:'+1 555 0102', role:'Admin',   status:'Active',  title:'School IT',            classes:[],  lastActive:'Sep 24, 2026'},
+  {name:'Elena Garcia',   email:'elena.garcia@riverside.edu',   phone:'+1 555 0103', role:'Teacher', status:'Active',  title:'',                     classes:[0], lastActive:'Sep 25, 2026'},
+  {name:'Marcus Lee',     email:'marcus.lee@riverside.edu',     phone:'+1 555 0104', role:'Teacher', status:'Active',  title:'',                     classes:[1], lastActive:'Sep 23, 2026'},
+  {name:'Hannah Schmidt', email:'hannah.schmidt@riverside.edu', phone:'+1 555 0105', role:'Teacher', status:'Invited', title:'',                     classes:[],  lastActive:''},
+];
+
 let data;
 try{
   const saved = JSON.parse(localStorage.getItem('scanmarker_max_teacher_prototype_v5'));
   data = (Array.isArray(saved?.classes) && saved.classes.length && typeof saved.activeClass==='number' && typeof saved.activeWeek==='string') ? saved : structuredClone(initial);
 }catch{ data = structuredClone(initial); }
+if(!Array.isArray(data.staff)) data.staff = structuredClone(initial.staff);
 syncDays();
 
 let current='overview', studentIndex=0, selectedDay=4, reportType='student', mode='', editIndex=-1, staged=[];
 let rosterSort={key:'name', dir:1};
+let adminRole='all', adminQuery='';
 let classView='list';
 let classesLayout='cards';
 function setClassesLayout(mode){ classesLayout = mode; renderClassList(); }
@@ -874,7 +938,7 @@ function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classLis
 })();
 
 // ---------------- render ----------------
-function render(){ syncClassSwitchers(); syncWeekSwitchers(); renderClassList(); renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); }
+function render(){ syncClassSwitchers(); syncWeekSwitchers(); renderClassList(); renderOverview(); renderClasses(); renderAnalytics(); renderGoals(); renderReports(); renderAdministrator(); }
 
 function syncClassSwitchers(){
   document.querySelectorAll('[data-class-dropdown]').forEach(dd=>{
@@ -1160,6 +1224,111 @@ function renderReports(){
     : `${s.name} used the pen during this week and met all three daily practice goals on ${met} of five school days. Review reading comprehension with a classroom assessment.`;
 }
 
+// ---------------- administrator ----------------
+const initials = name => name.split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+const staffClasses = p => p.role==='Admin' ? [] : p.classes.filter(i=>data.classes[i]);
+
+function renderAdministrator(){
+  const staff = data.staff;
+  const admins = staff.filter(p=>p.role==='Admin').length, teachers = staff.filter(p=>p.role==='Teacher').length;
+  $('adminStats').innerHTML = `
+    <div class="mini"><span>Admins</span><b>${admins}</b><small>Manage every class</small></div>
+    <div class="mini"><span>Teachers</span><b>${teachers}</b><small>Assigned to classes</small></div>
+    <div class="mini"><span>Active accounts</span><b>${staff.filter(p=>p.status==='Active').length}</b><small>of ${staff.length} total</small></div>`;
+  document.querySelectorAll('[data-admin-role]').forEach(b=> b.classList.toggle('active', b.dataset.adminRole===adminRole));
+
+  const q = adminQuery.trim().toLowerCase();
+  const rows = staff.map((p,i)=>({p,i})).filter(({p})=> (adminRole==='all' || p.role===adminRole) && (!q || p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)));
+  $('adminRows').innerHTML = rows.length ? rows.map(({p,i})=>{
+    const mine = staffClasses(p);
+    const classes = p.role==='Admin' ? '<span class="fine">All classes</span>'
+      : mine.length ? mine.map(c=>`<button class="chip-link" onclick="goToClass(${c})">${esc(data.classes[c].className)}</button>`).join('')
+      : '<span class="fine">None assigned</span>';
+    return `<tr>
+      <td><div class="person"><span class="avatar ${p.role==='Admin'?'admin':''}">${initials(p.name)}</span><strong>${esc(p.name)}</strong></div></td>
+      <td>${p.role}</td><td>${esc(p.email)}</td><td>${classes}</td>
+      <td><span class="badge ${p.status==='Active'?'':'partial'}">${p.status}</span></td>
+      <td style="white-space:nowrap"><button class="btn-link" onclick="viewAdmin(${i})">View</button><button class="btn-link" onclick="openStaff(${i})">Edit</button><button class="btn-link danger" onclick="askRemoveStaff(${i})">Remove</button></td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="fine">No matching people</td></tr>';
+}
+function goToClass(i){ data.activeClass=i; classView='detail'; studentIndex=0; persist(); nav('classes'); }
+function viewAdmin(i){
+  const p = data.staff[i], mine = staffClasses(p);
+  const row = (k,v) => `<div class="adm-row"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  mode='administrator';
+  show(p.name, `<div class="adm-list">
+    ${row('Role', p.role)}
+    ${p.title ? row('Position', esc(p.title)) : ''}
+    ${row('Email', esc(p.email))}
+    ${row('Phone', esc(p.phone))}
+    ${row('Status', p.status)}
+    ${row('Last active', p.lastActive || 'Never signed in')}
+    ${row('Classes', p.role==='Admin' ? 'All classes' : mine.length ? mine.map(c=>esc(data.classes[c].className)).join(', ') : 'None assigned')}
+  </div>`, 'Close', p.role==='Admin' ? dialogIcons.class : dialogIcons.student);
+}
+let staffIndex = -1;
+const adminCount = () => data.staff.filter(p=>p.role==='Admin').length;
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const options = (list, current) => list.map(v=>`<option value="${v}" ${v===current?'selected':''}>${v}</option>`).join('');
+
+function openStaff(i=-1){
+  mode='staff'; staffIndex=i;
+  const p = data.staff[i] ?? {name:'',email:'',phone:'',role:'Teacher',status:'Invited',title:'',classes:[]};
+  show(i<0 ? 'Add person' : 'Edit person',
+    `<p>Admins manage every class. Teachers see the classes you assign to them.</p>
+    <label class="field-label" for="staffName">Full name</label><input id="staffName" value="${esc(p.name)}">
+    <label class="field-label" for="staffEmail">Email</label><input id="staffEmail" type="email" value="${esc(p.email)}" placeholder="name@school.edu">
+    <label class="field-label" for="staffPhone">Phone (optional)</label><input id="staffPhone" value="${esc(p.phone)}">
+    <div class="field-row">
+      <div><label class="field-label" for="staffRole">Role</label><select id="staffRole">${options(['Admin','Teacher'], p.role)}</select></div>
+      <div><label class="field-label" for="staffStatus">Status</label><select id="staffStatus">${options(['Active','Invited','Inactive'], p.status)}</select></div>
+    </div>
+    <div id="staffTitleWrap"><label class="field-label" for="staffTitle">Position (optional)</label><input id="staffTitle" value="${esc(p.title)}" placeholder="e.g. School IT"></div>
+    <div id="staffClassWrap"><label class="field-label">Classes</label><div class="check-list">${data.classes.map((c,ci)=>
+      `<label><input type="checkbox" value="${ci}" ${p.classes.includes(ci)?'checked':''}> ${esc(c.className)}</label>`).join('')}</div></div>
+    <div class="feedback" id="feedback">Each email can belong to one person.</div>`,
+    i<0 ? 'Add person' : 'Save changes', dialogIcons.student);
+  const sync = () => {
+    const admin = $('staffRole').value==='Admin';
+    $('staffTitleWrap').style.display = admin ? '' : 'none';
+    $('staffClassWrap').style.display = admin ? 'none' : '';
+  };
+  $('staffRole').onchange = sync; sync();
+}
+function saveStaff(){
+  const name=$('staffName').value.trim(), email=$('staffEmail').value.trim(), phone=$('staffPhone').value.trim();
+  const role=$('staffRole').value, status=$('staffStatus').value;
+  const title = role==='Admin' ? $('staffTitle').value.trim() : '';
+  const classes = role==='Teacher' ? [...$('modalBody').querySelectorAll('.check-list input:checked')].map(c=>Number(c.value)) : [];
+  if(!name) return formError('Enter the name of the person.');
+  if(!EMAIL.test(email)) return formError('Enter a valid email address.');
+  if(data.staff.some((p,i)=> i!==staffIndex && p.email.toLowerCase()===email.toLowerCase())) return formError('Another person already uses this email.');
+  const others = data.staff.filter((_,i)=> i!==staffIndex);
+  if(role!=='Admin' && !others.some(p=>p.role==='Admin')) return formError('Keep at least one admin. Make someone else an admin first.');
+  if(role==='Admin' && status!=='Active' && !others.some(p=>p.role==='Admin' && p.status==='Active')) return formError('At least one admin must stay active.');
+  if(staffIndex<0){ data.staff.push({name,email,phone,role,status,title,classes,lastActive:''}); toast('Person added.'); }
+  else { Object.assign(data.staff[staffIndex], {name,email,phone,role,status,title,classes}); toast('Person updated.'); }
+  persist(); closeModal(); render();
+}
+function askRemoveStaff(i){
+  const p = data.staff[i], last = p.role==='Admin' && adminCount()===1;
+  const mine = staffClasses(p);
+  mode='staffdelete'; staffIndex=i;
+  show('Remove ' + p.name, `<p>Remove <strong>${esc(p.name)}</strong> from this school dashboard? They lose access straight away${mine.length ? ' and are unassigned from ' + mine.map(c=>esc(data.classes[c].className)).join(', ') : ''}. This cannot be undone.</p>
+    <div class="feedback ${last?'error':''}" id="feedback">${last ? 'You cannot remove the last admin. Make someone else an admin first.' : 'Their classes and students stay as they are.'}</div>`,
+    'Remove person', dialogIcons.student);
+  $('modalSave').classList.add('danger');
+  $('modalSave').disabled = last;
+}
+function removeStaff(){
+  const p = data.staff[staffIndex];
+  data.staff.splice(staffIndex,1);
+  persist(); closeModal(); render(); toast(p.name + ' removed.');
+}
+$('addStaffBtn').onclick = ()=>openStaff();
+document.querySelectorAll('[data-admin-role]').forEach(b=> b.onclick = ()=>{ adminRole=b.dataset.adminRole; renderAdministrator(); });
+$('adminSearch').oninput = e=>{ adminQuery=e.target.value; renderAdministrator(); };
+
 // ---------------- modal ----------------
 const modal = $('modal');
 const dialogIcons = {
@@ -1171,6 +1340,7 @@ const dialogIcons = {
 };
 function show(title, body, button='Save', icon=''){
   modal.classList.add('open');
+  $('modalSave').classList.remove('danger');
   $('modalTitle').textContent = title;
   $('modalIcon').innerHTML = icon || dialogIcons.class;
   $('modalBody').innerHTML = body;
@@ -1178,7 +1348,7 @@ function show(title, body, button='Save', icon=''){
   $('modalSave').disabled = false;
   $('modalBody').querySelector('input,select,.dropdown-trigger')?.focus();
 }
-function closeModal(){ modal.classList.remove('open'); }
+function closeModal(){ modal.classList.remove('open'); $('modalSave').classList.remove('danger'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); });
 function formError(msg){ const e=$('feedback'); if(e){ e.className='feedback error'; e.textContent=msg; } }
 
@@ -1319,7 +1489,9 @@ document.querySelectorAll('[data-report]').forEach(b=> b.onclick = ()=>{ reportT
 $('printReportBtn').onclick = ()=> window.print();
 
 $('modalSave').onclick = ()=>{
-  if(mode==='lms'){ closeModal(); return; }
+  if(mode==='lms' || mode==='administrator'){ closeModal(); return; }
+  if(mode==='staff') return saveStaff();
+  if(mode==='staffdelete') return removeStaff();
   if(mode==='class'){
     const name=$('className').value.trim();
     if(!name) return formError('Enter a class name.');
