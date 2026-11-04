@@ -83,6 +83,15 @@
   .nav-item.active .navicon{color:var(--orange);}
   .nav-item:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
 
+  .account{display:grid;gap:3px;padding:6px 10px 4px 14px;border-top:1px solid var(--sidebar-divider);}
+  .account[hidden]{display:none;}
+  .account .nav-item{border:0;background:transparent;font:inherit;text-align:left;}
+  .account .nav-item.static{cursor:default;}
+  .account .nav-item.static:hover{color:var(--sidebar-text-dim);}
+  .user-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.14);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:750;}
+  .nav-label.stack{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+  .nav-label.stack #accName{color:#fff;overflow:hidden;text-overflow:ellipsis;}
+  .nav-label.stack small{font-size:10.5px;font-weight:600;}
   .side-foot{font-size:10.5px;color:var(--sidebar-text-dim);padding:10px 14px;border-top:1px solid var(--sidebar-divider);
     margin-top:6px;white-space:nowrap;opacity:0;transition:opacity .15s ease;}
   .side.expanded .side-foot{opacity:1;transition:opacity .2s ease .1s;}
@@ -250,6 +259,7 @@
   #modalBody input[type=checkbox]{width:auto;padding:0;}
   .check-list{display:grid;gap:8px;margin-top:2px;}
   .check-list label{display:flex;align-items:center;gap:9px;font-size:13px;}
+  .you{margin-left:2px;padding:2px 8px;border-radius:10px;background:var(--orange-tint);color:var(--orange-dark);font-size:10px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;}
   .adm-list{display:grid;gap:12px;margin-top:6px;}
   .adm-row{display:flex;justify-content:space-between;gap:16px;padding-bottom:10px;border-bottom:1px solid #eceef0;font-size:13px;}
   .adm-row .k{color:var(--dim);font-size:12px;}
@@ -341,6 +351,90 @@
   .toast .dot-ok{width:8px;height:8px;border-radius:50%;background:#4ade80;flex:none;}
   .toast.err .dot-ok{background:#f87171;}
 
+  /* ---------- Login ---------- */
+  .login-screen{--lr-blue:#1A53CE;--lr-line:#EDE4DC;display:none;position:fixed;inset:0;z-index:60;overflow:auto;color:#191A1C;font-family:'Public Sans',system-ui,sans-serif;
+    background:radial-gradient(1200px 800px at 50% 40%,#232326 0%,rgba(35,35,38,0) 70%),linear-gradient(165deg,#1d1e21 0%,#131416 55%,#0b0b0c 100%);}
+  body.signed-out .login-screen{display:grid;place-items:center;padding:28px 16px;}
+  body.signed-out .app,body.signed-out .modal-scrim{display:none;}
+  .lr-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
+  .lr-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse at 50% 45%,#000 0%,transparent 72%);mask-image:radial-gradient(ellipse at 50% 45%,#000 0%,transparent 72%);}
+  .lr-glow{position:absolute;border-radius:50%;filter:blur(70px);}
+  .lr-glow-1{width:640px;height:640px;left:-200px;bottom:-240px;background:rgba(255,106,10,.5);filter:blur(100px);}
+  .lr-glow-2{width:520px;height:520px;right:-160px;top:-200px;background:rgba(255,170,60,.3);filter:blur(100px);}
+  .lr-glow-3{width:760px;height:520px;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,115,21,.16);filter:blur(110px);}
+  .lr-waves{position:absolute;inset:0;width:100%;height:100%;animation:lrDrift 18s ease-in-out infinite alternate;}
+  .lr-waves path{fill:none;stroke:url(#lrWave);stroke-width:1.5;}
+  .lr-waves .glow{filter:drop-shadow(0 0 7px rgba(255,115,21,.55));}
+  .lr-waves .top{opacity:.5;}
+  @keyframes lrDrift{from{transform:translate3d(-8px,6px,0) scale(1.01);}to{transform:translate3d(10px,-8px,0) scale(1.03);}}
+  .lr-dust i{position:absolute;border-radius:50%;background:#ffb27a;box-shadow:0 0 12px 2px rgba(255,115,21,.55);opacity:.55;animation:lrFloat 9s ease-in-out infinite alternate;}
+  @keyframes lrFloat{from{transform:translateY(0);opacity:.25;}to{transform:translateY(-22px);opacity:.7;}}
+
+  .lr-card{position:relative;z-index:2;width:min(clamp(420px,24vw,460px),100%);margin:auto;background:#fff;border-radius:30px;padding:64px clamp(28px,5vw,46px) 58px;
+    box-shadow:0 0 0 1px rgba(255,255,255,.1),0 50px 100px -36px rgba(255,115,21,.38),0 34px 70px -24px rgba(0,0,0,.7);animation:lrRise .6s cubic-bezier(.2,.8,.2,1) both;}
+  .lr-card::before{content:'';position:absolute;left:30px;right:30px;top:0;height:3px;border-radius:0 0 6px 6px;background:linear-gradient(90deg,rgba(255,115,21,0),var(--orange) 25%,#ffb347 75%,rgba(255,179,71,0));}
+  @keyframes lrRise{from{opacity:0;transform:translateY(22px) scale(.97);}to{opacity:1;transform:none;}}
+  .lr-card.shake{animation:lrShake .38s ease;}
+  @keyframes lrShake{20%{transform:translateX(-7px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(3px);}}
+  .lr-card > *{animation:lrIn .5s ease both;}
+  .lr-card > :nth-child(1){animation-delay:.12s;}.lr-card > :nth-child(2){animation-delay:.18s;}.lr-card > :nth-child(3){animation-delay:.24s;}
+  .lr-card > :nth-child(4){animation-delay:.3s;}.lr-card > :nth-child(5){animation-delay:.36s;}
+  @keyframes lrIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .lr-logo{display:block;width:200px;height:auto;margin:0 auto 36px;}
+  .lr-title{color:#191A1C;font-size:29px;font-weight:800;text-align:center;margin:0 0 44px;letter-spacing:-.025em;}
+  .lr-title::after{content:'';display:block;width:34px;height:3px;border-radius:2px;margin:10px auto 0;background:var(--orange);}
+
+  .lr-field{margin-bottom:22px;}
+  .lr-input-wrap{position:relative;}
+  .lr-card .lr-input{width:100%;height:60px;border:1.5px solid #E3DED8;border-radius:18px;padding:0 52px 0 52px;font-size:16px;color:#191A1C;background:#FBFAF9;outline:none;transition:border-color .16s,box-shadow .16s,background .16s;}
+  .lr-card .lr-input:hover{border-color:#D3CCC4;}
+  .lr-card .lr-input::placeholder{color:#B4B7BC;}
+  .lr-card .lr-input:focus{background:#fff;border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,115,21,.14);}
+  .lr-card .lr-input[aria-invalid="true"]{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,115,21,.14);}
+  .lr-label{display:block;margin:0 0 10px;font-size:14.5px;font-weight:650;color:#2A2D31;letter-spacing:.005em;transition:color .16s;}
+  .lr-field:focus-within .lr-label{color:var(--orange-dark);}
+  .lr-input-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#A3A6AB;pointer-events:none;transition:color .16s;}
+  .lr-input-icon svg{width:20px;height:20px;}
+  .lr-input-wrap:focus-within .lr-input-icon{color:var(--orange);}
+  .lr-ok{position:absolute;right:14px;top:50%;width:19px;height:19px;transform:translateY(-50%) scale(.5);opacity:0;color:#16a34a;transition:opacity .18s,transform .18s;pointer-events:none;}
+  .lr-ok svg{width:19px;height:19px;}
+  .lr-input:not(:placeholder-shown):valid ~ .lr-ok{opacity:1;transform:translateY(-50%) scale(1);}
+  .lr-reveal{position:absolute;top:0;right:0;bottom:0;width:52px;border:0;background:transparent;color:#A3A6AB;display:grid;place-items:center;border-radius:0 18px 18px 0;}
+  .lr-reveal:hover{color:var(--orange-dark);}
+  .lr-reveal:focus-visible{outline:2px solid var(--orange);outline-offset:-2px;}
+  .lr-reveal svg{width:19px;height:19px;}
+  .lr-forgot{text-align:right;margin:4px 2px 36px;}
+  .lr-link-blue{border:0;background:none;padding:0;color:var(--lr-blue);font-size:14px;font-weight:600;}
+  .lr-link-blue:hover{text-decoration:underline;}
+  .lr-card .feedback{margin:0 0 20px;font-size:13.5px;padding:11px 14px;border-radius:14px;}
+  .lr-card .feedback[hidden]{display:none;}
+  .lr-btn{position:relative;overflow:hidden;width:100%;height:62px;border:0;border-radius:18px;font-size:16.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:filter .15s,transform .08s,box-shadow .15s,background .15s;}
+  .lr-btn:active{transform:translateY(1px) scale(.995);}
+  .lr-btn:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .lr-btn-primary{background:linear-gradient(180deg,#ff8a4d 0%,var(--orange) 55%,var(--orange-dark) 100%);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 16px 28px -12px rgba(255,115,21,.85);}
+  .lr-btn-primary::after{content:'';position:absolute;top:0;bottom:0;width:60px;left:-90px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);}
+  .lr-btn-primary:hover{filter:brightness(1.04);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 20px 34px -12px rgba(255,115,21,.95);}
+  .lr-btn-primary:hover::after{left:120%;transition:left .65s ease;}
+  .lr-btn-primary svg{width:18px;height:18px;transition:transform .15s;}
+  .lr-btn-primary:hover svg{transform:translateX(3px);}
+  @media (max-width:520px){
+    .lr-dust,.lr-glow-2{display:none;}
+    .lr-card{padding:44px 22px 38px;border-radius:24px;}
+    .lr-logo{width:176px;margin-bottom:24px;}
+    .lr-title{font-size:26px;margin-bottom:30px;}
+  }
+  @media (min-width:521px) and (max-height:820px){
+    .lr-card{padding:34px 40px 32px;}
+    .lr-logo{width:170px;margin-bottom:16px;}
+    .lr-title{font-size:25px;margin-bottom:22px;}
+    .lr-label{margin-bottom:7px;font-size:14px;}
+    .lr-card .lr-input{height:52px;}
+    .lr-field{margin-bottom:14px;}
+    .lr-forgot{margin:2px 2px 20px;}
+    .lr-btn{height:54px;}
+  }
+  @media (prefers-reduced-motion:reduce){ .lr-card,.lr-card > *,.lr-waves,.lr-dust i{animation:none;} .lr-btn-primary::after{display:none;} }
+
   @media print{
     body{background:#fff;}
     .side,.no-print,.modal-scrim,.hamburger,.toast-stack{display:none!important;}
@@ -354,7 +448,88 @@
   }
 </style>
 </head>
-<body>
+<body class="signed-out">
+
+<!-- ================= LOGIN ================= -->
+<main class="login-screen" id="login">
+  <div class="lr-bg" aria-hidden="true">
+    <div class="lr-grid"></div>
+    <span class="lr-glow lr-glow-3"></span><span class="lr-glow lr-glow-1"></span><span class="lr-glow lr-glow-2"></span>
+    <svg class="lr-waves" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="lrWave" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#FF7315" stop-opacity="0"/><stop offset=".25" stop-color="#FF8A3D" stop-opacity=".95"/>
+        <stop offset=".62" stop-color="#FFC15A" stop-opacity=".7"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/>
+      </linearGradient></defs>
+      <g class="top">
+        <path d="M-20,30 C420,-10 940,120 1556,40"/>
+        <path d="M-20,37 C420,-4 940,125 1556,47"/>
+        <path d="M-20,44 C420,2 940,130 1556,54"/>
+        <path d="M-20,51 C420,8 940,135 1556,61"/>
+        <path d="M-20,58 C420,14 940,140 1556,68"/>
+        <path d="M-20,65 C420,20 940,145 1556,75"/>
+        <path d="M-20,72 C420,26 940,150 1556,82"/>
+        <path d="M-20,79 C420,32 940,155 1556,89"/>
+        <path d="M-20,86 C420,38 940,160 1556,96"/>
+      </g>
+      <g class="glow">
+        <path d="M120,900 C400,600 470,200 720,200 C990,200 1200,380 1536,380"/>
+        <path d="M123,898 C400,605 470,220 720,220 C990,220 1200,390 1536,382.4"/>
+        <path d="M126,896 C400,610 470,240 720,240 C990,240 1200,400 1536,384.8"/>
+        <path d="M129,894 C400,615 470,260 720,260 C990,260 1200,410 1536,387.2"/>
+        <path d="M132,892 C400,620 470,280 720,280 C990,280 1200,420 1536,389.6"/>
+        <path d="M135,890 C400,625 470,300 720,300 C990,300 1200,430 1536,392"/>
+        <path d="M138,888 C400,630 470,320 720,320 C990,320 1200,440 1536,394.4"/>
+        <path d="M141,886 C400,635 470,340 720,340 C990,340 1200,450 1536,396.8"/>
+        <path d="M144,884 C400,640 470,360 720,360 C990,360 1200,460 1536,399.2"/>
+        <path d="M147,882 C400,645 470,380 720,380 C990,380 1200,470 1536,401.6"/>
+        <path d="M150,880 C400,650 470,400 720,400 C990,400 1200,480 1536,404"/>
+        <path d="M153,878 C400,655 470,420 720,420 C990,420 1200,490 1536,406.4"/>
+        <path d="M156,876 C400,660 470,440 720,440 C990,440 1200,500 1536,408.8"/>
+        <path d="M159,874 C400,665 470,460 720,460 C990,460 1200,510 1536,411.2"/>
+        <path d="M162,872 C400,670 470,480 720,480 C990,480 1200,520 1536,413.6"/>
+        <path d="M165,870 C400,675 470,500 720,500 C990,500 1200,530 1536,416"/>
+        <path d="M168,868 C400,680 470,520 720,520 C990,520 1200,540 1536,418.4"/>
+        <path d="M171,866 C400,685 470,540 720,540 C990,540 1200,550 1536,420.8"/>
+        <path d="M174,864 C400,690 470,560 720,560 C990,560 1200,560 1536,423.2"/>
+        <path d="M177,862 C400,695 470,580 720,580 C990,580 1200,570 1536,425.6"/>
+        <path d="M180,860 C400,700 470,600 720,600 C990,600 1200,580 1536,428"/>
+        <path d="M183,858 C400,705 470,620 720,620 C990,620 1200,590 1536,430.4"/>
+      </g>
+    </svg>
+    <div class="lr-dust"><i style="left:8%;top:22%;width:5px;height:5px;animation-delay:-0s"></i><i style="left:14%;top:71%;width:3px;height:3px;animation-delay:-3.2s"></i><i style="left:23%;top:38%;width:4px;height:4px;animation-delay:-6.4s"></i><i style="left:31%;top:88%;width:3px;height:3px;animation-delay:-1.6s"></i><i style="left:46%;top:12%;width:4px;height:4px;animation-delay:-4.800000000000001s"></i><i style="left:58%;top:79%;width:5px;height:5px;animation-delay:-8s"></i><i style="left:66%;top:26%;width:3px;height:3px;animation-delay:-3.2s"></i><i style="left:74%;top:61%;width:4px;height:4px;animation-delay:-0s"></i><i style="left:82%;top:18%;width:5px;height:5px;animation-delay:-6.4s"></i><i style="left:90%;top:47%;width:3px;height:3px;animation-delay:-1.6s"></i><i style="left:93%;top:83%;width:4px;height:4px;animation-delay:-4.800000000000001s"></i><i style="left:4%;top:52%;width:3px;height:3px;animation-delay:-8s"></i></div>
+  </div>
+
+  <form class="lr-card" id="loginForm" novalidate>
+    <img class="lr-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAM4AAAAlCAYAAAAKnNaFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAA2oSURBVHgB7VxNbhtHFn7VpCTKCjDKCdwCJo6MLEJvMw5MnUDSCUxh4CCYje0TiDqB5M0giA2IPoHpE5iBk9maXhiilIU7JwgHsC1aYnfle9XVVHezf6pJS7Kd/iBBVLO6ft9fvfeqBJUocc5YXV21PaLXwf8W0Uq/33foE4ZFJUqUKIyScUqUmAIl45QoMQVKxilRYgqUjFOixBQoGadEiSlQMk6JElOgZJwSJaZANe2Lk/98Vz85EQ3Lsq4KQcvBcylp4El6OT/n9ub/+78ezQDbtpdrtRrXbfP/lUpl8OrVq5nqLFHiIjDBOG/ufN+0SN4enVLDEqQ4BT8RsJoanVr07s73Dr7qWpXKzuJPXYcMwMyysLjYRKXrUoi6J+WYKT3XpWvXrw+ElD1Emh9XUHdWhBkR6QbK3RKoB/XVpWZABdSB5wOTeoJ+gYnrad8Ph8Oe4ziDoOx8rXZ33K6UA2FZDsby9Pd+v00lPnuI4MPxjw1buqN9fGxQYQjnysPnK3mlrl27tgEC240QeAZQbitOiN988039ZDS6jXqY+ZbJECDyvffHxzsB8ccBJmyCyfYppy88BqjG/Yy2HQiWNdOUEsWE8/MNsqy67icLjk7a+ywsWODIoH3P652cnHTTxpXS1joW3uY6uD1iAQOmPx0OOyb1pEELsgZ/xnw5gcAqmnLD5SlEh7BEeiaWCLfvQiBbLNB8GnOCsZkIz7Q6g/nWa9NDPV2lcXymcZ+RIUFPg6+uX98Fsd2TNBtOXfcFBkATajAHGPg9aIkNTMTaNBOIFm+BaQYguic5bdueEC/A4Gvhxf56dfV1IDACwkliQskanmj32upq+2Q4vB/WctDU+yCCjUj7lkUYF9d1/+joqJPYIa0hQUT3grZUDZhH6TfK49tAme2vVld3srRm0jiY0PFs3wsRO0tkjwkXZaggMMYn5BM/wyHXXcsqr9oXYpfnRgRj0kMPxoY1GWBO9476/Z34+zzX+HObPwcCUs/ZLsbQDOZbrw23t6KcAz7TSJvOCcw04NR7dPlgyfeMJ4WKQgifyE0A4gSDP0lrBxJ0GYu1rZkwrS/NhVrtieo0M02t9kIy0yTD5rpYOsa/+CeezS8usrRvGWhoG0S2//X166ZrZWumeSanslQmoQRswDQg9jztzRYIC6qMufHhj72l5j0DQk03mGZhgRVJM62cxXua82Qa7uhHwjQBbEju7cJv8cQXMA25HUisxHGDqdaJCZnBphJRG78sCR8LX0r7TYIYmRlY8gVSHt93ddkd/XkMNjXjzFr1pe74Gb8DqXwf7W4yUfJf/N+JDlXuMkFSDkCwy5pp7KBuvPtA9Y3r9MdmDDDs3QituO5Wnkk3goCKjA/t8rhYG85VKjfwdys8p0ArSzCwSTbH9BFiXkpYn2oFjoBZzac0aNu2RR8Z2GwDge3MYs8bgtV/K+G5esaLjH3XVrgf2ux4ERADzI+xBGaCPzw42AtXBMHEdQWCwJ6DOUr+QkegGAaLz/Z5Qn86sXoIBLlLzFhZ8Lxt9NVO61sRMKNCoITf30kzPQOEmVZpJyk3+wcH3VixHua0i34yg9X1e9tY/3bS+mN/tA76UHWyEMC+r5VYDoSdK1nQ0AC13PfIu8G/0hObUorHBu+ZmTbTIioNEqVwGtK0wQeGnWEWOiC0zfiiKAnrS20fZ7b+ThJhwmZvRSS7Jo4AbNsrou7311KYZlwPiGvcLm+Ic03aDIYugrHmCNrG+NW4st9php1Mc5aVOj6eU2aq8TxBKKWtf6jOnd8PD++lCdcqCC3f/BD04MrD38IT08NvB06FljdyW9iP3aLJgTU8U7sXA5Ke97giBNdL+r3bqeXh2YBkuJ8gXYK27Yg0SmqSJvts2le031FeKYPx6TjVxOTDjNjMaKMXc0A4mYQErxHp+ULczQ5/dXRwkCm1w6hIuYe5v6vrXF5aWrLJX+sstGdhGoZ2Bti63R4TbN47MqQduQ95XjdmHuyf2NTyxycE/22lFHfyGNdiVzLlQMhkIuPYzdKj503hS/sIvCzCj3US0uAGTxYG1+ZfdLrJNuo83JATfQHDHB0e3siSnjxJ6NMWZUBO6UHkvqJ/WyzBTbXbBMAYWQuNNiKMJhPmNwbnrLD8B00Jpe1C2uvEdXOtESu/b5lQm/WQBw0CcTPvHeUiDq2faR8i6wXBoN3eEzCYb6pKQb+AMeyccg0EO1+DGXaWliodsdeNLOziw+dtmuxkI3fv5NuliV6TtE1hlnRjO9nFYsOX/62yvXPcxlQc7XC/UPsfNAWgXX8pUj5JgJwXsDkfSBMrhHxCnOUINDsDYJa1/MrSaSEOFx5Oode2SB8sP7A+huczrBMvZxLErlqebIN5DLSDtMHZ+8dvR/vvfrjZERY9WPzp125SSbteX5bDoZ1fZXqgzwTxLARsLtWCK19+wTiPEYR4Sh8AMKecIuXfvn1bqPxFASbWS5oSynEE03D8gD1oR0eOybthM5s1D2JLz0zeU1kqYhzzJ5ngJTW1IqqLj37tvvn3zQeIo90lU0jakC5tvLtzsysq1a14uk1tOKx7BtWAEXMdDEkIB/TGgz8PRokhbkJNC69gPefh/VOE63l1nbFwVfga2C5iwhYVACHYMzmOog4Q8z6HmCajzP/JACpz4NStthYqo6vMEFQMDemOXiMWtPVFgrmWB87/ooJQ6j0I5l0As3xOCKWkbHh+0HT83TQz6U0pSLSL3Y48tKxdCMTc1CG2ZkA4dF6AIP7TpJxinC/bas+yeYxgKMy2bZLFAqIWyf3jH286IdPNpnMAbyTHNnEatNeL/P3HNpVQez+Oy7C3MpaS4sN3CLAbvKcyJIoFeovjzI3dCSXnBgHjVtarsGaWw9aMzizo0gUjch6HN/nCqqxxzAajcqgApCvCqtcxeUe7O43AfnvKnlSVXAn365fs9cpzJ/5dwPlwnN8XcZ2z+x+xEo6qs/dSzdnBgfIWig9kjhrAQVv3Ix5ZuIinSoe6BEwcZOP9ypVHv+1d+fn5iiCxZe5ylbafvqPgmLyBBTUyDZWzIVt7OJcleT5mKHdrOL+OGQbMwowScv87dPEYZ5BzH8YpMdB0RdOhOO2HLgEWZ0anfckaaPHhr74GMoK/aRvWamZSy1DCQD1v5GwAu5dEAB81PFJmtz+/vrv3xsdwXkj6qT9O8H9Y63A6VFp8hRFfZ3neZmUKLGzuX7z74V+ZkVrWQDI/gkwVS6jgm9PrDYw0lZ/6sJv0FTNUMIHuWYAsDRPxFLWJLNEMPohYDCoN8gIkeCVGG6x1SGeNqD7keNxENOCbG6Q9D7CpBu+U2H175/v9LO0Ds63QhGLwpkG+Jjb9r9kWD5iFs1c5jd7VdrnIkSpJUodd4vQ3RvyIgfDTcjKhhM2lSfAzqybICk8rG6YteAi/pUvA+Og0fC1NaJ8mGAjcT0/nqq4zNz/vDIejOmI22yZHD+BmHEv+k1ptb/79+7uGC6HOk0D7kPKYFHQzC8u6jYnei0X1S49aFE5eAdP423mA96dfcxbz2QlSXr9uUllI+653dvCswV7Di76rYsI5wAwE6fRkdGq9OH47+hNMw1HZBhkAYYFu8JnNtUiW7wwQITWeCDAnH1CD5tpn7xtHkqVBnz8VD840cF03ss/08s3dIvmF54LIXgfr95XvSZ0A9tCRsz5wMpkH78l3muhjFFPjQ14P1Y2n4LDWEYYetiy8X1hoGxSz8avuDZCGjF7EHf6p4XRpyYkdN1jPKq8PrjXpEsFaJ7w3hsDcTRJuCUKZzX0jpldZ+3zeiegqzYAPwjh8XodTb+LPeYDVrPR5Qxg7GwrCJPv3U4UmrvC+ppl28lEHSJ/QR4BIXCfj3EyCUG5nnexkBuRj2WyZfIh9XJVmBDNNVYithZTrodj2BJdveTMeatPHBJ4VyEsa5E2QThZs02cKSMUWpOv6+IIOKfkSkG/J855aljXwPG8ZXrRbp57XxNfLKijKJyCDo9BS3sXaOfhoD2e8AccU8b2ODlnsxdtmwQCG30Tfn4XHh3fX+Uowzihnc5Xz8XiM8VuRrCkz28fvm5zkTIUQjiRvbeHn552sYuxu5PPfs5ht+ozNmlEdYBo+EUh5eyNOL/mMoU8+xmNwTXbEKMmLv+Ls5pvHHBSVnHYTgO+9QzkWevpA3oUgQeskhixYKOt1HjMVMxxfOMLZEupKqugYFW3wma7+jJklljqIVqmuKAYyTLNhLQPH187ilcqNLx6a3ebJgxT+GfZ8RvUnYofv+Qo/Dpgnsw4sPE+m8rLkuWD9w0wN+oyhYySbWQJHH1Vu8ue5anWHLhnxvQ7QTFsnXmcO7FIeXWmaOjk+Xpn1xCpDmWr6WECTP7+58129QpW65CwAQVeF1IeaLGgX13uJeE7vyqPkczh50O7iJlTvPUiwDRfBq7Efni+O87w/KkJ0hsfHvTSzIKgDanrvZDRqBu9LP43jcf/wsBuU5Xy1Vf/OrFTABFHteP5lc92ssnxFb+yRk7f3CurXN4s6/NHK0ZpsYliVSpcMwfVJ3Q8vrDE09PHpjjqnH5hufr7aS4sDo4eHTlBWm9YrfMkKxnaV5xX9ftk/OHCKjiOM8DyN5yS7fISB9XH6blLZgCbQb743ga2IW8EYNU31QFNZpubZOmKsZIC/ALOPXxbN67HCAAAAAElFTkSuQmCC" alt="Scanmarker" width="206" height="37">
+    <h1 class="lr-title">Sign in</h1>
+
+    <div class="lr-field">
+      <label class="lr-label" for="loginEmail">Email</label>
+      <div class="lr-input-wrap">
+        <span class="lr-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+        <input class="lr-input" id="loginEmail" type="email" name="email" autocomplete="username" placeholder="name@school.edu" aria-describedby="loginError">
+        <span class="lr-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span>
+      </div>
+    </div>
+
+    <div class="lr-field">
+      <label class="lr-label" for="loginPassword">Password</label>
+      <div class="lr-input-wrap">
+        <span class="lr-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+        <input class="lr-input" id="loginPassword" type="password" name="password" autocomplete="current-password" placeholder="Enter your password" aria-describedby="loginError">
+        <button type="button" class="lr-reveal" id="loginReveal" aria-pressed="false" aria-label="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+    </div>
+
+    <div class="lr-forgot"><button type="button" class="lr-link-blue" id="loginForgot" aria-expanded="false">Forgot password?</button></div>
+    <div class="feedback" id="loginForgotNote" hidden>Ask your school administrator to reset your access.</div>
+    <div class="feedback" id="loginNotice" hidden></div>
+    <div class="feedback error" id="loginError" role="alert" hidden></div>
+
+    <button type="submit" class="lr-btn lr-btn-primary lg-submit">Sign in <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+
+  </form>
+</main>
 
 <div class="app">
   <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
@@ -390,11 +565,21 @@
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 17v-4M12.5 17v-6M15.5 17v-2.5"/></svg></span>
         <span class="nav-label">Reports</span>
       </button>
-      <button class="nav-item" data-view="administrator">
+      <button class="nav-item" data-view="administrator" id="navAdmin">
         <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.3c2 .7 3.5 2.6 3.5 5.7"/></svg></span>
         <span class="nav-label">Administrator</span>
       </button>
     </nav>
+    <div class="account" id="account" hidden>
+      <div class="nav-item static" id="accountRow">
+        <span class="icon-container"><span class="user-avatar" id="accAvatar"></span></span>
+        <span class="nav-label stack"><span id="accName"></span><small id="accRole"></small></span>
+      </div>
+      <button type="button" class="nav-item" onclick="signOut()">
+        <span class="icon-container"><svg class="navicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M16 8l4 4-4 4"/><path d="M20 12H9"/></svg></span>
+        <span class="nav-label">Sign out</span>
+      </button>
+    </div>
     <div class="side-foot">Scanmarker Max v1.0</div>
   </aside>
 
@@ -700,7 +885,7 @@
               <p class="sub">Admins and teachers with access to this school dashboard.</p>
             </div>
             <div class="actions">
-              <button class="btn btn-primary" id="addStaffBtn">+ Add person</button>
+              <button class="btn btn-primary" id="addStaffBtn">+ Add team member</button>
             </div>
           </div>
           <div class="grid3" id="adminStats"></div>
@@ -814,6 +999,7 @@ initial.classes.forEach(c=> c.students.forEach(s=>{ s.weeks = buildWeeks(s.daily
 
 // Admins and teachers on the Administrator page. `classes` are indexes into data.classes; admins manage every class.
 initial.staff=[
+  {name:'Admin',          email:'admin@gmail.com',              phone:'',            role:'Admin',   status:'Active',  title:'Administrator',        classes:[],  lastActive:'', password:'admin123'},
   {name:'Priya Raman',    email:'priya.raman@riverside.edu',    phone:'+1 555 0101', role:'Admin',   status:'Active',  title:'School administrator', classes:[],  lastActive:'Sep 25, 2026'},
   {name:'Daniel Okafor',  email:'daniel.okafor@riverside.edu',  phone:'+1 555 0102', role:'Admin',   status:'Active',  title:'School IT',            classes:[],  lastActive:'Sep 24, 2026'},
   {name:'Elena Garcia',   email:'elena.garcia@riverside.edu',   phone:'+1 555 0103', role:'Teacher', status:'Active',  title:'',                     classes:[0], lastActive:'Sep 25, 2026'},
@@ -827,6 +1013,7 @@ try{
   data = (Array.isArray(saved?.classes) && saved.classes.length && typeof saved.activeClass==='number' && typeof saved.activeWeek==='string') ? saved : structuredClone(initial);
 }catch{ data = structuredClone(initial); }
 if(!Array.isArray(data.staff)) data.staff = structuredClone(initial.staff);
+if(!data.staff.some(p=>p.password)) data.staff.unshift(structuredClone(initial.staff[0]));
 syncDays();
 
 let current='overview', studentIndex=0, selectedDay=4, reportType='student', mode='', editIndex=-1, staged=[];
@@ -902,6 +1089,7 @@ function hideChartTip(){ $('chartTip').classList.remove('show'); }
 
 // ---------------- nav / sidebar ----------------
 function nav(v){
+  if(v==='administrator' && currentUser()?.role!=='Admin') v = 'overview';  // only admins open the Administrator page
   current = v;
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active', x.id===v));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
@@ -909,7 +1097,7 @@ function nav(v){
   render();
   document.querySelector('.content').scrollTop = 0;
 }
-document.querySelectorAll('.nav-item').forEach(b=> b.onclick = ()=>nav(b.dataset.view));
+document.querySelectorAll('.nav-item[data-view]').forEach(b=> b.onclick = ()=>nav(b.dataset.view));
 document.querySelectorAll('[data-go]').forEach(b=> b.onclick = ()=>nav(b.dataset.go));
 function openSidebar(){ $('side').classList.add('open'); $('scrim').classList.add('open'); }
 function closeSidebar(){ $('side').classList.remove('open'); $('scrim').classList.remove('open'); }
@@ -1245,7 +1433,7 @@ function renderAdministrator(){
       : mine.length ? mine.map(c=>`<button class="chip-link" onclick="goToClass(${c})">${esc(data.classes[c].className)}</button>`).join('')
       : '<span class="fine">None assigned</span>';
     return `<tr>
-      <td><div class="person"><span class="avatar ${p.role==='Admin'?'admin':''}">${initials(p.name)}</span><strong>${esc(p.name)}</strong></div></td>
+      <td><div class="person"><span class="avatar ${p.role==='Admin'?'admin':''}">${initials(p.name)}</span><strong>${esc(p.name)}</strong>${isCurrent(p)?'<span class="you">You</span>':''}</div></td>
       <td>${p.role}</td><td>${esc(p.email)}</td><td>${classes}</td>
       <td><span class="badge ${p.status==='Active'?'':'partial'}">${p.status}</span></td>
       <td style="white-space:nowrap"><button class="btn-link" onclick="viewAdmin(${i})">View</button><button class="btn-link" onclick="openStaff(${i})">Edit</button><button class="btn-link danger" onclick="askRemoveStaff(${i})">Remove</button></td></tr>`;
@@ -1260,65 +1448,71 @@ function viewAdmin(i){
     ${row('Role', p.role)}
     ${p.title ? row('Position', esc(p.title)) : ''}
     ${row('Email', esc(p.email))}
-    ${row('Phone', esc(p.phone))}
     ${row('Status', p.status)}
     ${row('Last active', p.lastActive || 'Never signed in')}
     ${row('Classes', p.role==='Admin' ? 'All classes' : mine.length ? mine.map(c=>esc(data.classes[c].className)).join(', ') : 'None assigned')}
   </div>`, 'Close', p.role==='Admin' ? dialogIcons.class : dialogIcons.student);
 }
 let staffIndex = -1;
-const adminCount = () => data.staff.filter(p=>p.role==='Admin').length;
+const MIN_PASSWORD = 6;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const options = (list, current) => list.map(v=>`<option value="${v}" ${v===current?'selected':''}>${v}</option>`).join('');
 
 function openStaff(i=-1){
   mode='staff'; staffIndex=i;
-  const p = data.staff[i] ?? {name:'',email:'',phone:'',role:'Teacher',status:'Invited',title:'',classes:[]};
-  show(i<0 ? 'Add person' : 'Edit person',
-    `<p>Admins manage every class. Teachers see the classes you assign to them.</p>
+  const p = data.staff[i] ?? {name:'',email:'',role:'Teacher',status:'Invited',title:''};
+  show(i<0 ? 'Add team member' : 'Edit team member',
+    `<p>Admins manage every class. Teachers sign in with the email and password set here.</p>
     <label class="field-label" for="staffName">Full name</label><input id="staffName" value="${esc(p.name)}">
     <label class="field-label" for="staffEmail">Email</label><input id="staffEmail" type="email" value="${esc(p.email)}" placeholder="name@school.edu">
-    <label class="field-label" for="staffPhone">Phone (optional)</label><input id="staffPhone" value="${esc(p.phone)}">
+    <label class="field-label" for="staffPassword">Password</label><input id="staffPassword" type="password" autocomplete="new-password" placeholder="${i<0 ? 'At least ' + MIN_PASSWORD + ' characters' : 'Leave blank to keep the current password'}">
     <div class="field-row">
       <div><label class="field-label" for="staffRole">Role</label><select id="staffRole">${options(['Admin','Teacher'], p.role)}</select></div>
       <div><label class="field-label" for="staffStatus">Status</label><select id="staffStatus">${options(['Active','Invited','Inactive'], p.status)}</select></div>
     </div>
     <div id="staffTitleWrap"><label class="field-label" for="staffTitle">Position (optional)</label><input id="staffTitle" value="${esc(p.title)}" placeholder="e.g. School IT"></div>
-    <div id="staffClassWrap"><label class="field-label">Classes</label><div class="check-list">${data.classes.map((c,ci)=>
-      `<label><input type="checkbox" value="${ci}" ${p.classes.includes(ci)?'checked':''}> ${esc(c.className)}</label>`).join('')}</div></div>
     <div class="feedback" id="feedback">Each email can belong to one person.</div>`,
-    i<0 ? 'Add person' : 'Save changes', dialogIcons.student);
+    i<0 ? 'Add member' : 'Save changes', dialogIcons.student);
   const sync = () => {
     const admin = $('staffRole').value==='Admin';
     $('staffTitleWrap').style.display = admin ? '' : 'none';
-    $('staffClassWrap').style.display = admin ? 'none' : '';
   };
   $('staffRole').onchange = sync; sync();
 }
 function saveStaff(){
-  const name=$('staffName').value.trim(), email=$('staffEmail').value.trim(), phone=$('staffPhone').value.trim();
+  const name=$('staffName').value.trim(), email=$('staffEmail').value.trim(), password=$('staffPassword').value;
   const role=$('staffRole').value, status=$('staffStatus').value;
   const title = role==='Admin' ? $('staffTitle').value.trim() : '';
-  const classes = role==='Teacher' ? [...$('modalBody').querySelectorAll('.check-list input:checked')].map(c=>Number(c.value)) : [];
   if(!name) return formError('Enter the name of the person.');
   if(!EMAIL.test(email)) return formError('Enter a valid email address.');
   if(data.staff.some((p,i)=> i!==staffIndex && p.email.toLowerCase()===email.toLowerCase())) return formError('Another person already uses this email.');
+  if(staffIndex<0 && !password) return formError('Set a password so this person can sign in.');
+  if(password && password.length < MIN_PASSWORD) return formError('Use at least ' + MIN_PASSWORD + ' characters for the password.');
   const others = data.staff.filter((_,i)=> i!==staffIndex);
-  if(role!=='Admin' && !others.some(p=>p.role==='Admin')) return formError('Keep at least one admin. Make someone else an admin first.');
-  if(role==='Admin' && status!=='Active' && !others.some(p=>p.role==='Admin' && p.status==='Active')) return formError('At least one admin must stay active.');
-  if(staffIndex<0){ data.staff.push({name,email,phone,role,status,title,classes,lastActive:''}); toast('Person added.'); }
-  else { Object.assign(data.staff[staffIndex], {name,email,phone,role,status,title,classes}); toast('Person updated.'); }
-  persist(); closeModal(); render();
+  // The dashboard must always have an active admin to manage it, whatever this change does to this person.
+  const activeAdminLeft = others.some(p=>p.role==='Admin' && p.status==='Active') || (role==='Admin' && status==='Active');
+  if(!activeAdminLeft) return formError(role==='Admin' ? 'At least one admin must stay active.' : 'Keep at least one admin. Make someone else an admin first.');
+  if(staffIndex<0){ data.staff.push({name,email,role,status,title,classes:[],lastActive:'',password}); toast('Team member added.'); }
+  else {
+    const wasMe = isCurrent(data.staff[staffIndex]);
+    Object.assign(data.staff[staffIndex], {name,email,role,status,title});
+    if(password) data.staff[staffIndex].password = password;  // blank keeps the current one
+    if(wasMe){ sessionEmail = email.toLowerCase(); saveSession(); }  // editing your own email keeps you signed in
+    toast('Team member updated.');
+  }
+  persist(); closeModal(); applyAuth();
 }
 function askRemoveStaff(i){
-  const p = data.staff[i], last = p.role==='Admin' && adminCount()===1;
+  const p = data.staff[i], self = isCurrent(p);
+  const last = p.role==='Admin' && !data.staff.some((q,j)=> j!==i && q.role==='Admin' && q.status==='Active');
+  const block = self ? 'You cannot remove your own account.' : last ? 'You cannot remove the last active admin. Make someone else an admin first.' : '';
   const mine = staffClasses(p);
   mode='staffdelete'; staffIndex=i;
   show('Remove ' + p.name, `<p>Remove <strong>${esc(p.name)}</strong> from this school dashboard? They lose access straight away${mine.length ? ' and are unassigned from ' + mine.map(c=>esc(data.classes[c].className)).join(', ') : ''}. This cannot be undone.</p>
-    <div class="feedback ${last?'error':''}" id="feedback">${last ? 'You cannot remove the last admin. Make someone else an admin first.' : 'Their classes and students stay as they are.'}</div>`,
+    <div class="feedback ${block?'error':''}" id="feedback">${block || 'Their classes and students stay as they are.'}</div>`,
     'Remove person', dialogIcons.student);
   $('modalSave').classList.add('danger');
-  $('modalSave').disabled = last;
+  $('modalSave').disabled = !!block;
 }
 function removeStaff(){
   const p = data.staff[staffIndex];
@@ -1328,6 +1522,78 @@ function removeStaff(){
 $('addStaffBtn').onclick = ()=>openStaff();
 document.querySelectorAll('[data-admin-role]').forEach(b=> b.onclick = ()=>{ adminRole=b.dataset.adminRole; renderAdministrator(); });
 $('adminSearch').oninput = e=>{ adminQuery=e.target.value; renderAdministrator(); };
+
+// ---------------- sign in ----------------
+// A stand-in until real accounts exist: the demo admin (admin@gmail.com / admin123) is the one account that can sign in.
+// The password is kept in the browser only; a real sign-in checks it on the server.
+const SESSION_KEY = 'scanmarker_max_teacher_prototype_session';
+let sessionEmail = '';
+try{ sessionEmail = (localStorage.getItem(SESSION_KEY) || '').toLowerCase(); }catch{}
+let loginNotice = '';
+const saveSession = () => { try{ sessionEmail ? localStorage.setItem(SESSION_KEY, sessionEmail) : localStorage.removeItem(SESSION_KEY); }catch{} };
+const sameEmail = (a,b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+const currentUser = () => data.staff.find(p=> sessionEmail && sameEmail(p.email, sessionEmail) && p.status==='Active') || null;
+const isCurrent = p => { const u = currentUser(); return !!u && u === p; };
+
+function signIn(email, password){
+  if(!EMAIL.test(email.trim())) return 'Enter the email address you use at school.';
+  if(!password) return 'Enter your password.';
+  const person = data.staff.find(p=> sameEmail(p.email, email) && p.password && p.password === password);
+  // One message for a wrong email, a wrong password and an account that is not active, so the form reveals nothing.
+  if(!person || person.status!=='Active') return 'We could not sign you in with these details.';
+  sessionEmail = person.email.toLowerCase(); saveSession();
+  person.lastActive = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  persist();
+  return '';
+}
+function signOut(){
+  sessionEmail = ''; saveSession();
+  loginNotice = 'You have been signed out.';
+  applyAuth();
+}
+// Shows the app or the login screen, and what this person is allowed to see.
+function applyAuth(){
+  const u = currentUser();
+  document.body.classList.toggle('signed-out', !u);
+  $('navAdmin').style.display = u && u.role==='Admin' ? '' : 'none';
+  $('account').hidden = !u;
+  if(u){
+    $('accAvatar').textContent = initials(u.name); $('accName').textContent = u.name; $('accRole').textContent = u.role;
+    $('accountRow').title = u.name;
+    if(current==='administrator' && u.role!=='Admin') nav('overview'); else render();
+  } else {
+    $('loginPassword').value = ''; setLoginMessage('', loginNotice); loginNotice = '';
+    closeModal(); closeSidebar();
+  }
+}
+function setLoginMessage(error, notice){
+  $('loginError').hidden = !error; $('loginError').textContent = error;
+  $('loginNotice').hidden = !notice; $('loginNotice').textContent = notice;
+  [$('loginEmail'), $('loginPassword')].forEach(i=> error ? i.setAttribute('aria-invalid','true') : i.removeAttribute('aria-invalid'));
+}
+$('loginForm').onsubmit = e => {
+  e.preventDefault();
+  const error = signIn($('loginEmail').value, $('loginPassword').value);
+  if(error){
+    $('loginPassword').value = ''; setLoginMessage(error, ''); $('loginPassword').focus();
+    const card = $('loginForm'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');  // a little shake says no
+    return;
+  }
+  setLoginMessage('', '');
+  $('loginEmail').value = ''; $('loginPassword').value = '';
+  nav('overview'); applyAuth();
+};
+$('loginReveal').onclick = () => {
+  const shown = $('loginPassword').type === 'text';
+  $('loginPassword').type = shown ? 'password' : 'text';
+  $('loginReveal').setAttribute('aria-pressed', String(!shown));
+  $('loginReveal').setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+};
+$('loginForgot').onclick = () => {
+  const open = $('loginForgotNote').hidden;
+  $('loginForgotNote').hidden = !open;
+  $('loginForgot').setAttribute('aria-expanded', String(open));
+};
 
 // ---------------- modal ----------------
 const modal = $('modal');
@@ -1545,6 +1811,7 @@ $('exportCSVBtn').onclick = ()=>{
 };
 
 render();
+applyAuth();
 </script>
 </body>
 </html>
